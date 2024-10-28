@@ -25,9 +25,11 @@ struct ContentView: View {
                         .frame(width: 370, height: 250)
                         .overlay (
                             HStack {
-                                Text("Hi")
-                                Divider().frame(width: 1)
-                                Text("hi")
+                                Text("Spent this month")
+                                    .font(.system(size: 20))
+                                Divider().frame(width: 1).overlay(Color(red: 46/255, green: 40/255, blue: 42/255))
+                                Text("Spent Last month")
+                                    .font(.system(size: 20))
                             }
                                 .padding()
                                 .foregroundColor(Color(red: 46/255, green: 40/255, blue: 42/255))
@@ -40,17 +42,23 @@ struct ContentView: View {
                         .frame(width: 370, height: 250)
                         .overlay (
                             HStack {
-                                Text("hello")
+                                Text("Spent")
                                     .foregroundColor(Color(red: 46/255, green: 40/255, blue: 42/255))
-                                    .font(.system(size: 40))
+                                    .font(.system(size: 20))
                                 
-                                Divider().frame(width: 1)
+                                Divider().frame(width: 1).overlay(Color(red: 46/255, green: 40/255, blue: 42/255))
                                 
-                                Text("hello")
+                                Text("Date")
                                     .foregroundColor(Color(red: 46/255, green: 40/255, blue: 42/255))
-                                    .font(.system(size: 40))
+                                    .font(.system(size: 20))
+                                
+                                Divider().frame(width: 1).overlay(Color(red: 46/255, green: 40/255, blue: 42/255))
+                               
+                                Text("Place")
+                                    .foregroundColor(Color(red: 46/255, green: 40/255, blue: 42/255))
+                                    .font(.system(size: 20))
+                                
                             }.padding()
-                            
                         )
                 }
             }
