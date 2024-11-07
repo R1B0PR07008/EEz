@@ -16,6 +16,7 @@
 		A7C5F1762CCEF24A00E823D0 /* EEzUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C5F1752CCEF24A00E823D0 /* EEzUITestsLaunchTests.swift */; };
 		A7C5F1832CCEF3A400E823D0 /* monthlyDash.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C5F1822CCEF3A400E823D0 /* monthlyDash.swift */; };
 		A7C5F1852CCEF40B00E823D0 /* billChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C5F1842CCEF40B00E823D0 /* billChart.swift */; };
+		A7C7BB302CD3DD7E0011101E /* Pie.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C7BB2F2CD3DD7E0011101E /* Pie.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		A7C5F1752CCEF24A00E823D0 /* EEzUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEzUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		A7C5F1822CCEF3A400E823D0 /* monthlyDash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = monthlyDash.swift; sourceTree = "<group>"; };
 		A7C5F1842CCEF40B00E823D0 /* billChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = billChart.swift; sourceTree = "<group>"; };
+		A7C7BB2F2CD3DD7E0011101E /* Pie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pie.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 		A7C5F1572CCEF24700E823D0 /* EEz */ = {
 			isa = PBXGroup;
 			children = (
+				A7C7BB2F2CD3DD7E0011101E /* Pie.swift */,
 				A7C5F1582CCEF24700E823D0 /* EEzApp.swift */,
 				A7C5F1822CCEF3A400E823D0 /* monthlyDash.swift */,
 				A7C5F1842CCEF40B00E823D0 /* billChart.swift */,
@@ -263,6 +266,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C7BB302CD3DD7E0011101E /* Pie.swift in Sources */,
 				A7C5F1832CCEF3A400E823D0 /* monthlyDash.swift in Sources */,
 				A7C5F15B2CCEF24700E823D0 /* ContentView.swift in Sources */,
 				A7C5F1592CCEF24700E823D0 /* EEzApp.swift in Sources */,

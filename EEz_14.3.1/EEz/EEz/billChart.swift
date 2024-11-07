@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import Charts
 
 struct billChart: View {
     var body: some View {
-        Text("Hello, World! \nBill Chart")
+        Text("Hello worl")
     }
 }
 
