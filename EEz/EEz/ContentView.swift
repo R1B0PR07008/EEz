@@ -2,7 +2,8 @@
 //  ContentView.swift
 //  EEz
 //
-//  Created by Riboldi  on 07/11/24.
+//  Created by Riboldi  on 29/12/24.
+//
 
 import SwiftUI
 import Charts
@@ -62,7 +63,7 @@ struct graph_Pie: View {
                                 angle: .value("Value", value),
                                 innerRadius: .ratio(0.6),
                                 outerRadius: .ratio(1.0),
-                                angularInset: 3
+                                angularInset: 30
                             )
                             .foregroundStyle(color)
                             .cornerRadius(20)
@@ -119,7 +120,7 @@ struct graph_Line: View {
                     )
                 ) /// adjust this color
             }
-        }.frame(width: 190, height: 150)
+        }.frame(width: 190, height: 80)
             .padding(.top, 10)
     }
 }
@@ -152,7 +153,8 @@ struct ContentView2: View {
     @AppStorage("SavingGoal") var SavingGoal : String = "300"
     @AppStorage("CurrentSaving") var CurrentSaving: Double = 200
     @AppStorage("ModularSmallRectangle") var ModularSmallRectangle : Bool = true
-    @AppStorage("Pref_stock") var Pref_stock : String = "NVDA"
+    @AppStorage("Pref_stock") var Pref_stock : String = "APPL"
+    @AppStorage("Stocks_questionMark") var Stocks_questionMark : Bool = true
     
     /// other vars
     
@@ -162,6 +164,18 @@ struct ContentView2: View {
     /// Dark mode detection
     
     @Environment(\.colorScheme) var colorScheme
+    
+    /// Make stocks optional
+    
+    func OPT_Stocks() {
+        if Pref_stock == "" {
+            UserDefaults.standard.set(false, forKey: "Stocks_questionMark")
+            UserDefaults.standard.set(false, forKey: "ModularSmallRectangle")
+        }
+        else {
+            UserDefaults.standard.set(true, forKey: "Stocks_questionMark")
+        }
+    }
     
     func ChangeBakcgroudGradient(item: String) -> RadialGradient {
         if item == "1" {
@@ -194,7 +208,6 @@ struct ContentView2: View {
     }
     
     var body: some View {
-        
         @AppStorage("SavingGoalDouble") var SavingGoalDouble: Double = (SavingGoal as NSString).doubleValue
         
         NavigationView {
@@ -216,43 +229,67 @@ struct ContentView2: View {
                     )
                 
                 HStack(spacing: 15) {
-                    NavigationLink(destination: dashMonthly()) {
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(white)
-                            .frame(width: 220, height:  340)
-                            .overlay(
-                                VStack {
-                                    Text("Spent this month")
-                                        .font(.system(size: 20))
-                                        .fontWeight(.semibold)
-                                    
-                                    RoundedRectangle(cornerRadius: 40)
-                                        .fill(white2)
-                                        .frame(width: 160, height: 60)
-                                        .overlay (
-                                            Text("$1,234")
-                                                .font(.system(size: 20, weight: .semibold))
-                                        )
-                                        .padding(.bottom, 10)
-                                        .shadow(color: white.opacity(0.8),radius: 5)
-                                    
-                                    Divider().frame(width: 190, height: 1).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                                    
-                                    /// graph 2
-                                    
-                                    Text("Monthly Spending")
-                                    
-                                    graph_Line()
-                                    
-                                }
-                            ).foregroundColor(black)
+                    VStack (spacing: 15) {
+                        NavigationLink(destination: dashMonthly()) {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(white)
+                                .frame(width: 220, height:  260)
+                                .overlay(
+                                    VStack {
+                                        Text("Spent this month")
+                                            .font(.system(size: 20))
+                                            .fontWeight(.semibold)
+                                        
+                                        RoundedRectangle(cornerRadius: 30)
+                                            .fill(white2)
+                                            .frame(width: 130, height: 50)
+                                            .overlay (
+                                                Text("$1,234")
+                                                    .font(.system(size: 20, weight: .semibold))
+                                            )
+                                            .padding(.bottom, 10)
+                                            .shadow(color: white.opacity(0.8),radius: 5)
+                                        
+                                        Divider().frame(width: 190, height: 1).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+                                        
+                                        /// graph 2
+                                        
+                                        Text("Monthly Spending")
+                                        
+                                        graph_Line()
+                                        
+                                    }
+                                ).foregroundColor(black)
+                        }
+                        NavigationLink(destination: CreditScore()
+                            .navigationTitle("Credit Score")) {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(white)
+                                .frame(width: 220, height: 70)
+                                .overlay(
+                                    HStack {
+                                        Text("Credit \nScore")
+                                            .foregroundStyle(black)
+                                            .font(.system(size: 18, weight: .semibold))
+                                        
+                                        RoundedRectangle(cornerRadius: 40)
+                                            .fill(white2)
+                                            .frame(width: 100, height: 45)
+                                            .overlay(content: {
+                                                Text("600")
+                                                    .foregroundStyle(black)
+                                                    .font(.system(size: 20, weight: .bold))
+                                            })
+                                    }
+                                )
+                        }
                     }
                     
                     VStack (spacing: 15) {
                             if !ModularSmallRectangle {
                                 RoundedRectangle(cornerRadius: 20)
                                     .fill(white)
-                                    .frame(width: 125, height: 200)
+                                    .frame(width: 125, height: 210)
                                     .overlay(
                                         VStack {
                                             Text("Saving \n Goal")
@@ -264,7 +301,7 @@ struct ContentView2: View {
                                                 .frame(width: 90, height: 40)
                                                 .overlay (
                                                     Text("$\(SavingGoal)")
-                                                        .font(.system(size: 15, weight: .semibold))
+                                                        .font(.system(size: 18, weight: .semibold))
                                                 )
                                                 .padding(.bottom, 5)
                                                 .shadow(color: white.opacity(0.8),radius: 5)
@@ -285,17 +322,20 @@ struct ContentView2: View {
                                             
                                         }
                                             .onLongPressGesture {
-                                                UserDefaults.standard.set(true , forKey: "ModularSmallRectangle")
+                                                if Stocks_questionMark {
+                                                    UserDefaults.standard.set(true , forKey: "ModularSmallRectangle")
+                                                }
                                             }
                                             
                                         
                                     )
                             }
-                            else if ModularSmallRectangle {
-                                NavigationLink(destination: Stocks()) {
+                            else if ModularSmallRectangle && Stocks_questionMark {
+                                NavigationLink(destination: Stocks()
+                                    .navigationTitle("Stocks")) {
                                 RoundedRectangle(cornerRadius: 20)
                                     .fill(white)
-                                    .frame(width: 125, height: 200)
+                                    .frame(width: 125, height: 210)
                                     .overlay(
                                         VStack {
                                             Text("Stocks")
@@ -366,6 +406,8 @@ struct ContentView2: View {
                 }
                 Spacer()
             }
+        }.onAppear() {
+            OPT_Stocks()
         }
     }
 }
@@ -384,14 +426,14 @@ struct ViewMain : View {
             }
             
             Tab("Acount", systemImage: "person.crop.circle.fill") {
-                Ini_Setup()
+                Account()
             }
         }
         .padding(.top, 20)
         .onAppear() {
             UITabBar.appearance().barTintColor = UIColor(white)
             UITabBar.appearance().backgroundColor = UIColor(white)
-            UITabBar.appearance().unselectedItemTintColor = UIColor(black2)	
+            UITabBar.appearance().unselectedItemTintColor = UIColor(black2)
             UITabBar.appearance().barTintColor = UIColor(white)
         }
     }

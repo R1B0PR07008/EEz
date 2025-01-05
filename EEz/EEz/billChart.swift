@@ -2,7 +2,7 @@
 //  billChart.swift
 //  EEz
 //
-//  Created by Riboldi  on 07/11/24.
+//  Created by Riboldi  on 29/12/24.
 //
 
 import SwiftUI
@@ -182,7 +182,7 @@ struct billChart: View {
                                     .fill(white2)
                                     .frame(width: 100,height: 50)
                                     .overlay(
-                                        Text("$1923")
+                                        Text("$1,923")
                                             .font(.system(size: 20, weight: .semibold))
                                     )
                             }.frame(width: 120)
@@ -210,7 +210,7 @@ struct billChart: View {
                                     .fill(white2)
                                     .frame(width: 100,height: 50)
                                     .overlay(
-                                        Text("$1923")
+                                        Text("$1,923")
                                             .font(.system(size: 20, weight: .semibold))
                                     )
                             }.frame(width: 120)
@@ -237,7 +237,7 @@ struct billChart: View {
                                     .fill(white2)
                                     .frame(width: 100,height: 50)
                                     .overlay(
-                                        Text("$1923")
+                                        Text("$1,923")
                                             .font(.system(size: 20, weight: .semibold))
                                     )
                             }.frame(width: 120)
@@ -263,7 +263,7 @@ struct billChart: View {
                                     .fill(white2)
                                     .frame(width: 100,height: 50)
                                     .overlay(
-                                        Text("$1923")
+                                        Text("$1,923")
                                             .font(.system(size: 20, weight: .semibold))
                                     )
                             }.frame(width: 120)
@@ -289,7 +289,7 @@ struct billChart: View {
                                     .fill(white2)
                                     .frame(width: 100,height: 50)
                                     .overlay(
-                                        Text("$1923")
+                                        Text("$1,923")
                                             .font(.system(size: 20, weight: .semibold))
                                     )
                             }.frame(width: 120)
