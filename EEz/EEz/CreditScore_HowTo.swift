@@ -2,7 +2,7 @@
 //  CreditScore_HowTo.swift
 //  EEz
 //
-//  Created by Riboldi  on 29/12/24.
+//  Created by Riboldi  on 20/12/24.
 //
 
 import SwiftUI

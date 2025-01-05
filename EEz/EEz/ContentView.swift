@@ -2,8 +2,7 @@
 //  ContentView.swift
 //  EEz
 //
-//  Created by Riboldi  on 29/12/24.
-//
+//  Created by Riboldi  on 07/11/24.
 
 import SwiftUI
 import Charts
@@ -13,16 +12,20 @@ let defaults = UserDefaults.standard
 /// my colours
 
 let green = Color(UIColor(named: "Green")!)
+let green2 = Color(UIColor(named: "Green2")!)
 let white = Color(UIColor(named: "back")!)
 let white2 = Color(UIColor(named: "back2")!)
 let black = Color(UIColor(named: "text")!)
 let black2 = Color(UIColor(named: "black")!)
 let red = Color(UIColor(named: "red")!)
+let orange = Color(UIColor(named: "Orange")!)
+let purple = Color(UIColor(named: "Purple")!)
 
 /// Demo chart/table data
 
 var budget_monthly = 8300
 var spent = 4000
+var investment = 2000
 var Left = budget_monthly-spent
 
 /// rounded rectangle 2 vars
@@ -35,8 +38,9 @@ struct graph_Pie: View {
     
     let Budget = [
         ("Left", Double(Left), green),
-        ("Spent", Double(spent), red)
-        ]
+        ("Spent", Double(spent), red),
+		("Invested", Double(spent), orange)
+	]
     
     /// Bills data
     
@@ -207,6 +211,8 @@ struct ContentView2: View {
         }
     }
     
+	/// ACTUAL VIEW CODE
+	
     var body: some View {
         @AppStorage("SavingGoalDouble") var SavingGoalDouble: Double = (SavingGoal as NSString).doubleValue
         
@@ -424,6 +430,10 @@ struct ViewMain : View {
             Tab("Bill Charts", systemImage: "dollarsign.gauge.chart.leftthird.topthird.rightthird") {
                 billChart()
             }
+			
+			Tab("Portfolio", systemImage: "briefcase") {
+				Invest_Portfo()
+			}
             
             Tab("Acount", systemImage: "person.crop.circle.fill") {
                 Account()
@@ -433,7 +443,7 @@ struct ViewMain : View {
         .onAppear() {
             UITabBar.appearance().barTintColor = UIColor(white)
             UITabBar.appearance().backgroundColor = UIColor(white)
-            UITabBar.appearance().unselectedItemTintColor = UIColor(black2)
+            UITabBar.appearance().unselectedItemTintColor = UIColor(black2)	
             UITabBar.appearance().barTintColor = UIColor(white)
         }
     }

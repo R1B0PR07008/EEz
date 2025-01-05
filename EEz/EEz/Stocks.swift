@@ -2,7 +2,7 @@
 //  Stocks.swift
 //  EEz
 //
-//  Created by Riboldi  on 29/12/24.
+//  Created by Riboldi  on 27/11/24.
 //
 
 /// WORK ON THIS LATER (IT'LL HAVE TO BE PAID)
@@ -46,6 +46,10 @@ func getCSVData() -> Array<dat> {
     
     return records
 }
+
+/// vars
+
+var stock_perf : Double = 10
 
 /// VIEW
 
@@ -140,10 +144,41 @@ struct Stocks: View {
                 .padding(.bottom, 10)
                 .chartXAxis(.hidden)
                 
+			RoundedRectangle(cornerRadius: 20)
+				.fill(white)
+				.frame(width: 370, height: 90)
+				.overlay(content: {
+					HStack (spacing: 15) {
+						Text("Current Stock \nPerformance")
+							.font(.system(size: 20, weight: .semibold))
+						
+						Divider().frame(width: 1, height: 70).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white2)
+							.frame(width: 130, height: 50)
+							.overlay(content: {
+								if (stock_perf > 0) {
+									Text("+\(stock_perf)")
+										.foregroundStyle(green2)
+										.font(.system(size: 20, weight: .semibold))
+								}
+								else if (stock_perf == 0) {
+									Text("\(stock_perf)")
+										.font(.system(size: 20, weight: .semibold))
+								}
+								else {
+									Text("-\(stock_perf)")
+										.foregroundStyle(red)
+										.font(.system(size: 20, weight: .semibold))
+								}
+							})
+					}
+				})
                 
             RoundedRectangle(cornerRadius: 20)
                 .fill(white)
-                .frame(width: 370, height: 280)
+                .frame(width: 370, height: 190)
 
                 .overlay(
                     
@@ -207,8 +242,6 @@ struct Stocks: View {
                     }
                     
                 )
-        }.onAppear {
-            getCSVData()
         }
     }
 }

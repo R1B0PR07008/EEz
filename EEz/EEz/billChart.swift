@@ -2,7 +2,7 @@
 //  billChart.swift
 //  EEz
 //
-//  Created by Riboldi  on 29/12/24.
+//  Created by Riboldi  on 07/11/24.
 //
 
 import SwiftUI
@@ -108,68 +108,93 @@ struct dataResponse: Codable{ /// FIX THIS SHIT. THE TYPES DON'T MATCH FOR SOME 
 struct graph: View {
     
     let monthly_data = [
-            ("1", 12343),
-            ("2", 12332),
-            ("3", 23324),
-            ("4", 23455),
-            ("5", 45675),
-            ("6", 13456),
+            ("1", 12343, 23353),
+            ("2", 12332, 23343),
+            ("3", 23324, 34334),
+            ("4", 23455, 34465),
+            ("5", 45675, 55685),
+            ("6", 13456, 24466),
         ]
     
     var body: some View {
-        Chart {
-            ForEach(monthly_data, id: \.0) { month, value in
-                LineMark(
-                    x: .value("Month", month),
-                    y: .value("Sales", value)
-                )
-                .foregroundStyle(green)  // Line color
-                
-                AreaMark(
-                        x: .value("Month", month),
-                        y: .value("Spent", value)
-                    )
-                .foregroundStyle(
-                    LinearGradient (
-                        gradient: Gradient(colors: [green,green.opacity(0.1)]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ))
-            }
-        }.frame(width:180, height: 150)
-        
-        // X-Axis Stuff
-        .chartXAxis {
-            AxisMarks(values: .automatic) { _ in
-            AxisGridLine()
-            AxisTick()
-            AxisValueLabel()
-                    .font(.system(size: 6, weight: .medium, design: .rounded)) // X-axis label font
-            }
-        }
-        
-        .chartXAxisLabel("Month")
-        .chartYAxisLabel("Month")
-        
-        // Y-Axis Stuff
-        .chartYAxis {
-            AxisMarks(values: .automatic) { _ in
-                AxisGridLine()
-                AxisTick()
-                AxisValueLabel()
-                    .font(.system(size: 7, weight: .medium, design: .rounded)) // Y-axis label font
-            }
-        }
+		VStack {
+			Chart {
+				ForEach(monthly_data, id: \.0) { month, value, budget in
+					AreaMark(
+							x: .value("Month", month),
+							y: .value("Spent", budget)
+						)
+					.foregroundStyle(
+						LinearGradient (
+							gradient: Gradient(colors: [green,green.opacity(0.1)]),
+							startPoint: .top,
+							endPoint: .bottom
+						))
+					
+					LineMark(
+						x: .value("Month", month),
+						y: .value("Sales", value)
+					)
+					.foregroundStyle(red)
+					
+				}
+			}.frame(width:180, height: 150)
+			
+			// X-Axis Stuff
+			.chartXAxis {
+				AxisMarks(values: .automatic) { _ in
+				AxisGridLine()
+				AxisTick()
+				AxisValueLabel()
+						.font(.system(size: 6, weight: .medium, design: .rounded)) // X-axis label font
+				}
+			}
+			
+			.chartXAxisLabel("Month")
+			.chartYAxisLabel("$ (USD)")
+			
+			// Y-Axis Stuff
+			.chartYAxis {
+				AxisMarks(values: .automatic) { _ in
+					AxisGridLine()
+					AxisTick()
+					AxisValueLabel()
+						.font(.system(size: 7, weight: .medium, design: .rounded)) // Y-axis label font
+				}
+			}
+			
+			HStack(spacing: 6) {
+				
+				Circle()
+					.fill(red)
+					.frame(width: 8, height: 8)
+				
+				Text("Spent")
+					.font(.system(size: 14))
+				
+				Circle()
+					.fill(green)
+					.frame(width: 8, height: 8)
+				
+				Text("Budget")
+					.font(.system(size: 14))
+				
+			}
+		}
     }
 }
 
 struct billChart: View {
     
     var body: some View {
+		Text("Bills Sorted By Category")
+			.font(.system(size: 20, weight: .semibold))
+			.padding(.bottom, 15)
+		
         ScrollView(Axis.Set.vertical) {
             VStack(alignment: .leading) {
                 
-                RoundedRectangle(cornerRadius: 40)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(white)
                     .frame(width: 370,height: 200)
                     .overlay(
@@ -197,7 +222,7 @@ struct billChart: View {
                     )
                 
                 
-                RoundedRectangle(cornerRadius: 40)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(white)
                     .frame(width: 370,height: 200)
                     .overlay(
@@ -224,7 +249,7 @@ struct billChart: View {
                     )
                 
                 
-                RoundedRectangle(cornerRadius: 40)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(white)
                     .frame(width: 370,height: 200)
                     .overlay(
@@ -250,7 +275,7 @@ struct billChart: View {
                     )
                 
                 
-                RoundedRectangle(cornerRadius: 40)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(white)
                     .frame(width: 370,height: 200)
                     .overlay(
@@ -276,7 +301,7 @@ struct billChart: View {
                     )
                 
                 
-                RoundedRectangle(cornerRadius: 40)
+                RoundedRectangle(cornerRadius: 25)
                     .fill(white)
                     .frame(width: 370,height: 200)
                     .overlay(
