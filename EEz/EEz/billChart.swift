@@ -7,103 +7,12 @@
 
 import SwiftUI
 import Charts
+import Alamofire
 
-struct dataResponse: Codable{ /// FIX THIS SHIT. THE TYPES DON'T MATCH FOR SOME SHITY ASS REASON.
-    var id: String?
-    var name: String?
-    var domain: String?
-    var claimed: Bool?
-    var description: String?
-    var longDescription: String?
-    
-    struct links: Codable {
-        var name: String?
-        var url: String?
-    }
-    
-    struct logos: Codable {
-        var theme: String?
-        
-        struct formats: Codable {
-            var src: String?
-            var format: String?
-            var height: Int?
-            var width: Int?
-            var size: Int?
-            var backgroud: String?
-
-        }
-        
-        var tags: [String]?
-        var type: String?
-    }
-    
-    struct colors: Codable {
-        var hex: String?
-        var type: String?
-        var brightness: Float?
-    }
-    
-    struct fonts: Codable {
-        var name: String?
-        var type: String?
-        var origin: String?
-        var originId: String?
-        var weights: [String]?
-    }
-    
-    struct images: Codable {
-        
-        struct formats: Codable {
-            var src: String?
-            var format: String?
-            var height: Int?
-            var width: Int?
-            var size: Int?
-            var background: String?
-        }
-        
-        var tags: [String]?
-        var type: String?
-    }
-
-    var qualityScore: String?
-    
-    struct company: Codable {
-        var employees: Int?
-        var foundedYear: Int?
-        
-        struct industries: Codable {
-            var id: String?
-            var score: Float?
-            var slug: String?
-            var name: String?
-            var emoji: String?
-
-            struct parent: Codable {
-                var id: String?
-                var slug: String?
-                var name: String?
-                var emoji: String?
-                
-            }
-            
-            var kind: String?
-           
-            struct location: Codable {
-                var city: String?
-                var country: String?
-                var countryCode: String?
-                var region: String?
-                var state: String?
-                var subregion: String?
-            }
-        }
-    }
-    
-    var isNsfw: Bool?
-    var urn: String?
-}
+/// API vars
+let header : HTTPHeaders = [
+	"Authorization": "Bearer brand__3ZaBa85tGcY9wxJuj5m5FXU6"
+]
 
 struct graph: View {
     
@@ -185,6 +94,17 @@ struct graph: View {
 }
 
 struct billChart: View {
+	
+	/// API Stuff
+
+	let responce = AF.request("https://api.brand.dev/v1/brand/retrieve?domain=apple.com", headers: header).responseJSON { response in
+		switch response.result {
+	 case .success(let value):
+		 print("Response JSON: \(value)")
+	 case .failure(let error):
+		 print("Error: \(error.localizedDescription)")
+	 }
+	}
     
     var body: some View {
 		Text("Bills Sorted By Category")

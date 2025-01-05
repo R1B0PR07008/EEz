@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		740C13F72D0CCEF2005CA4B3 /* CSV in Frameworks */ = {isa = PBXBuildFile; productRef = 740C13F62D0CCEF2005CA4B3 /* CSV */; };
+		742DC7152D2A38CC00088B0D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 742DC7142D2A38CC00088B0D /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				740C13F72D0CCEF2005CA4B3 /* CSV in Frameworks */,
+				742DC7152D2A38CC00088B0D /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 			name = EEz;
 			packageProductDependencies = (
 				740C13F62D0CCEF2005CA4B3 /* CSV */,
+				742DC7142D2A38CC00088B0D /* Alamofire */,
 			);
 			productName = EEz;
 			productReference = 74D8209E2D0BA0F2009C4C26 /* EEz.app */;
@@ -203,6 +206,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				740C13F52D0CCEF2005CA4B3 /* XCRemoteSwiftPackageReference "CSV.swift" */,
+				742DC7132D2A38CC00088B0D /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 74D8209F2D0BA0F2009C4C26 /* Products */;
@@ -610,6 +614,14 @@
 				minimumVersion = 2.5.2;
 			};
 		};
+		742DC7132D2A38CC00088B0D /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = exactVersion;
+				version = 5.10.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -617,6 +629,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 740C13F52D0CCEF2005CA4B3 /* XCRemoteSwiftPackageReference "CSV.swift" */;
 			productName = CSV;
+		};
+		742DC7142D2A38CC00088B0D /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 742DC7132D2A38CC00088B0D /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
