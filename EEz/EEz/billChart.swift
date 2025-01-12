@@ -97,14 +97,380 @@ struct billChart: View {
 	
 	/// API Stuff
 
-	let responce = AF.request("https://api.brand.dev/v1/brand/retrieve?domain=apple.com", headers: header).responseJSON { response in
-		switch response.result {
-	 case .success(let value):
-		 print("Response JSON: \(value)")
-	 case .failure(let error):
-		 print("Error: \(error.localizedDescription)")
+//	let responce = AF.request("https://api.brand.dev/v1/brand/retrieve?domain=apple.com", headers: header).responseJSON { response in
+//		switch response.result {
+//	 case .success(let value):
+//		 print("Response JSON: \(value)")
+//	 case .failure(let error):
+//		 print("Error: \(error.localizedDescription)")
+//	 }
+//	}
+	
+	/* Responce:
+	 
+	 Response JSON: {
+		 brand =     {
+			 address =         {
+				 city = Cupertino;
+				 country = "UNITED STATES";
+				 "country_code" = US;
+				 "postal_code" = 95014;
+				 "state_code" = CA;
+				 "state_province" = California;
+				 street = "1 Apple Park Way";
+			 };
+			 backdrops =         (
+							 {
+					 colors =                 (
+											 {
+							 hex = "#2f9ae9";
+							 name = "Rockman Blue";
+						 },
+											 {
+							 hex = "#1b0f22";
+							 name = "Me\U0161ki Black";
+						 },
+											 {
+							 hex = "#ce7395";
+							 name = "Devilish Diva";
+						 }
+					 );
+					 resolution =                 {
+						 height = 500;
+						 width = 1500;
+					 };
+					 url = "https://media.brand.dev/cf513e23-91e6-42b0-b393-3436ee1df1f1.jpg";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#dbc095";
+							 name = "Bananas Foster";
+						 },
+											 {
+							 hex = "#71624e";
+							 name = "Reed Mace Brown";
+						 },
+											 {
+							 hex = "#d1d6de";
+							 name = "Twinkle Blue";
+						 }
+					 );
+					 resolution =                 {
+						 height = 191;
+						 width = 1128;
+					 };
+					 url = "https://media.brand.dev/d68e4528-f83f-4be8-856b-5c9ca33129e4.jpg";
+				 }
+			 );
+			 colors =         (
+							 {
+					 hex = "#7c7c7c";
+					 name = "Namara Grey";
+				 },
+							 {
+					 hex = "#050505";
+					 name = "Black Metal";
+				 },
+							 {
+					 hex = "#cacaca";
+					 name = Leadbelcher;
+				 }
+			 );
+			 description = "Apple is a leading global corporation specializing in the design, manufacturing, and marketing of consumer electronics, personal computers, and software. With a diverse team of innovative thinkers and doers, Apple continually seeks to redefine possibilities, enabling users to engage with technology in transformative ways. The company's commitment to innovation is matched by its dedication to sustainability and making a positive impact on the world. Apple offers a wide range of products, including the iPhone, iPad, Apple Watch, Mac, and Apple TV, along with a variety of accessories and expert support. As an equal opportunity employer, Apple values inclusion and diversity within its workforce and encourages individuals to join them in their mission to enhance everyday life through technology.";
+			 domain = "apple.com";
+			 fonts =         (
+							 {
+					 name = "SF Pro TC";
+					 usage = title;
+				 },
+							 {
+					 name = "SF Pro TC";
+					 usage = body;
+				 },
+							 {
+					 name = "SF Pro TC";
+					 usage = button;
+				 }
+			 );
+			 logos =         (
+							 {
+					 colors =                 (
+											 {
+							 hex = "#7c7c7c";
+							 name = "Namara Grey";
+						 },
+											 {
+							 hex = "#050505";
+							 name = "Black Metal";
+						 },
+											 {
+							 hex = "#cacaca";
+							 name = Leadbelcher;
+						 }
+					 );
+					 group = 1;
+					 mode = dark;
+					 resolution =                 {
+						 height = 48;
+						 width = 48;
+					 };
+					 url = "https://media.brand.dev/280eaf8f-517f-4dfb-99c2-ef23e6c58a74.png";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#848484";
+							 name = "Dover Grey";
+						 },
+											 {
+							 hex = "#0f0f0f";
+							 name = "Chaos Black";
+						 },
+											 {
+							 hex = "#cecece";
+							 name = "American Silver";
+						 }
+					 );
+					 group = 2;
+					 mode = dark;
+					 resolution =                 {
+						 height = 720;
+						 width = 720;
+					 };
+					 url = "https://media.brand.dev/08e2acb0-ff78-4ec1-949e-e01a011958d8.png";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#6eb158";
+							 name = "Techno Green";
+						 },
+											 {
+							 hex = "#2e331c";
+							 name = "Metal Construction Green";
+						 }
+					 );
+					 group = 3;
+					 mode = light;
+					 resolution =                 {
+						 height = 460;
+						 width = 460;
+					 };
+					 url = "https://media.brand.dev/05b285b8-89e2-401c-8a07-19c1cfa9902f.png";
+				 }
+			 );
+			 slogan = "Reimagining possibilities to help you do what you love.";
+			 socials =         (
+							 {
+					 type = facebook;
+					 url = "https://facebook.com/apple";
+				 },
+							 {
+					 type = x;
+					 url = "https://x.com/apple";
+				 },
+							 {
+					 type = linkedin;
+					 url = "https://linkedin.com/company/apple";
+				 },
+							 {
+					 type = crunchbase;
+					 url = "https://crunchbase.com/organization/apple";
+				 }
+			 );
+			 stock =         {
+				 exchange = NASDAQ;
+				 ticker = AAPL;
+			 };
+			 title = Apple;
+			 verified = 0;
+		 };
+		 code = 200;
+		 status = ok;
 	 }
-	}
+	 Response JSON: {
+		 brand =     {
+			 address =         {
+				 city = Cupertino;
+				 country = "UNITED STATES";
+				 "country_code" = US;
+				 "postal_code" = 95014;
+				 "state_code" = CA;
+				 "state_province" = California;
+				 street = "1 Apple Park Way";
+			 };
+			 backdrops =         (
+							 {
+					 colors =                 (
+											 {
+							 hex = "#2f9ae9";
+							 name = "Rockman Blue";
+						 },
+											 {
+							 hex = "#1b0f22";
+							 name = "Me\U0161ki Black";
+						 },
+											 {
+							 hex = "#ce7395";
+							 name = "Devilish Diva";
+						 }
+					 );
+					 resolution =                 {
+						 height = 500;
+						 width = 1500;
+					 };
+					 url = "https://media.brand.dev/cf513e23-91e6-42b0-b393-3436ee1df1f1.jpg";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#dbc095";
+							 name = "Bananas Foster";
+						 },
+											 {
+							 hex = "#71624e";
+							 name = "Reed Mace Brown";
+						 },
+											 {
+							 hex = "#d1d6de";
+							 name = "Twinkle Blue";
+						 }
+					 );
+					 resolution =                 {
+						 height = 191;
+						 width = 1128;
+					 };
+					 url = "https://media.brand.dev/d68e4528-f83f-4be8-856b-5c9ca33129e4.jpg";
+				 }
+			 );
+			 colors =         (
+							 {
+					 hex = "#7c7c7c";
+					 name = "Namara Grey";
+				 },
+							 {
+					 hex = "#050505";
+					 name = "Black Metal";
+				 },
+							 {
+					 hex = "#cacaca";
+					 name = Leadbelcher;
+				 }
+			 );
+			 description = "Apple is a leading global corporation specializing in the design, manufacturing, and marketing of consumer electronics, personal computers, and software. With a diverse team of innovative thinkers and doers, Apple continually seeks to redefine possibilities, enabling users to engage with technology in transformative ways. The company's commitment to innovation is matched by its dedication to sustainability and making a positive impact on the world. Apple offers a wide range of products, including the iPhone, iPad, Apple Watch, Mac, and Apple TV, along with a variety of accessories and expert support. As an equal opportunity employer, Apple values inclusion and diversity within its workforce and encourages individuals to join them in their mission to enhance everyday life through technology.";
+			 domain = "apple.com";
+			 fonts =         (
+							 {
+					 name = "SF Pro TC";
+					 usage = title;
+				 },
+							 {
+					 name = "SF Pro TC";
+					 usage = body;
+				 },
+							 {
+					 name = "SF Pro TC";
+					 usage = button;
+				 }
+			 );
+			 logos =         (
+							 {
+					 colors =                 (
+											 {
+							 hex = "#7c7c7c";
+							 name = "Namara Grey";
+						 },
+											 {
+							 hex = "#050505";
+							 name = "Black Metal";
+						 },
+											 {
+							 hex = "#cacaca";
+							 name = Leadbelcher;
+						 }
+					 );
+					 group = 1;
+					 mode = dark;
+					 resolution =                 {
+						 height = 48;
+						 width = 48;
+					 };
+					 url = "https://media.brand.dev/280eaf8f-517f-4dfb-99c2-ef23e6c58a74.png";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#848484";
+							 name = "Dover Grey";
+						 },
+											 {
+							 hex = "#0f0f0f";
+							 name = "Chaos Black";
+						 },
+											 {
+							 hex = "#cecece";
+							 name = "American Silver";
+						 }
+					 );
+					 group = 2;
+					 mode = dark;
+					 resolution =                 {
+						 height = 720;
+						 width = 720;
+					 };
+					 url = "https://media.brand.dev/08e2acb0-ff78-4ec1-949e-e01a011958d8.png";
+				 },
+							 {
+					 colors =                 (
+											 {
+							 hex = "#6eb158";
+							 name = "Techno Green";
+						 },
+											 {
+							 hex = "#2e331c";
+							 name = "Metal Construction Green";
+						 }
+					 );
+					 group = 3;
+					 mode = light;
+					 resolution =                 {
+						 height = 460;
+						 width = 460;
+					 };
+					 url = "https://media.brand.dev/05b285b8-89e2-401c-8a07-19c1cfa9902f.png";
+				 }
+			 );
+			 slogan = "Reimagining possibilities to help you do what you love.";
+			 socials =         (
+							 {
+					 type = facebook;
+					 url = "https://facebook.com/apple";
+				 },
+							 {
+					 type = x;
+					 url = "https://x.com/apple";
+				 },
+							 {
+					 type = linkedin;
+					 url = "https://linkedin.com/company/apple";
+				 },
+							 {
+					 type = crunchbase;
+					 url = "https://crunchbase.com/organization/apple";
+				 }
+			 );
+			 stock =         {
+				 exchange = NASDAQ;
+				 ticker = AAPL;
+			 };
+			 title = Apple;
+			 verified = 0;
+		 };
+		 code = 200;
+		 status = ok;
+	 }
+	 */
     
     var body: some View {
 		Text("Bills Sorted By Category")
