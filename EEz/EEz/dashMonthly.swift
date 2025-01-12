@@ -10,7 +10,7 @@ import Charts
 
 struct dashMonthly: View {
     
-    let percentDiffMonthly_spent = 23
+    let percentDiffMonthly = 23
     
     let monthly_data = [
             ("mon 1", 12343),
@@ -80,7 +80,7 @@ struct dashMonthly: View {
                                         .font(.system(size: 20, weight: .semibold))
                                 ).padding(.bottom, 10)
                             
-                            Text("Up \(percentDiffMonthly_spent)% from last month")
+                            Text("Up \(percentDiffMonthly)% from last month")
                         }.padding(10)
                         
                         Divider().frame(width: 1, height: 180).overlay(Color(red: 176/255, green: 216/255, blue: 212/255))
