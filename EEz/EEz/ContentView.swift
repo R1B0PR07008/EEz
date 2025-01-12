@@ -242,7 +242,7 @@ struct ContentView2: View {
                                 .frame(width: 220, height:  260)
                                 .overlay(
                                     VStack {
-                                        Text("full branch test")
+                                        Text("Spent this month")
                                             .font(.system(size: 20))
                                             .fontWeight(.semibold)
                                         
