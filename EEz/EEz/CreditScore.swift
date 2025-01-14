@@ -108,32 +108,47 @@ struct CreditScore: View {
                     .overlay(
                         HStack {
 							VStack {
-								Text("Your Current \nCredit Score \nHistory")
+								Text("Your Current \nCredit Score")
 									.font(.system(size: 20, weight: .semibold))
 								
-								Spacer()
-									.frame(height: 30)
+//								Spacer()
+//									.frame(height: 30)
+//								
+//								Text("Up \(percentDiffMonthly_credit)% from last month")
 								
-								Text("Up \(percentDiffMonthly_credit)% from last month")
+								RoundedRectangle(cornerRadius: 20)
+																	.fill(white2)
+																	.frame(width: 120, height: 50)
+																	.overlay(
+																		Text("\(current_Score)")
+																			.font(.system(size: 22, weight: .semibold))
+																	)
+																	.padding(.top, 12.5)
 							}
                             
                             Divider().frame(width: 1, height: 170).overlay(Color(red: 176/255, green: 216/255, blue: 212/255))
                                 .padding(.horizontal, 10)
                             
-                            Chart(creditScoreHistory) { item in
-                                LineMark(
-                                    x: .value("Date", item.date),
-                                    y: .value("Score", item.score)
-                                )
-                                .foregroundStyle(green)
-                                AreaMark(
-                                    x: .value("Date", item.date),
-                                    y: .value("Score", item.score)
-                                ).foregroundStyle(
-                                    LinearGradient(colors: [green.opacity(0.8), green.opacity(0.1)], startPoint: .top, endPoint: .bottom)
-                                )
-                            }
-                            .frame(width: 170, height: 160)
+							VStack {
+								Text(" Credit Score History")
+									.font(.system(size: 18, weight: .semibold))
+									.padding(.bottom, 8)
+														
+								Chart(creditScoreHistory) { item in
+									LineMark(
+										x: .value("Date", item.date),
+										y: .value("Score", item.score)
+									)
+									.foregroundStyle(green)
+									AreaMark(
+										x: .value("Date", item.date),
+										y: .value("Score", item.score)
+									).foregroundStyle(
+										LinearGradient(colors: [green.opacity(0.8), green.opacity(0.1)], startPoint: .top, endPoint: .bottom)
+									)
+								}
+							.frame(width: 170, height: 130)
+							}
                         }
                     )
                 

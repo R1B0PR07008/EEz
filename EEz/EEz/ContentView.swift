@@ -325,6 +325,7 @@ struct ContentView2: View {
                                             }
                                             .frame(width: 90, height: 70)
                                             .chartYScale(domain: [0, SavingGoalDouble])
+											.chartXAxis(.hidden)
                                             
                                         }
                                             .onLongPressGesture {
