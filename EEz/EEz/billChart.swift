@@ -14,6 +14,23 @@ let header : HTTPHeaders = [
 	"Authorization": "Bearer brand__3ZaBa85tGcY9wxJuj5m5FXU6"
 ]
 
+/// "cookie" vars
+
+var cookie : String!
+
+/// data strcture
+
+struct bills_data : Identifiable {
+	let id: UUID
+	let category: String
+	struct data : Identifiable {
+		let id: UUID
+		let month: String
+		let value: Double
+		let budget: Double
+	}
+}
+
 struct graph: View {
     
     let monthly_data = [
@@ -477,142 +494,176 @@ struct billChart: View {
 			.font(.system(size: 20, weight: .semibold))
 			.padding(.bottom, 15)
 		
-        ScrollView(Axis.Set.vertical) {
-            VStack(alignment: .leading) {
-                
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(white)
-                    .frame(width: 370,height: 200)
-                    .overlay(
-                        HStack(alignment: .center) {
-                            VStack {
-                                Text("Gas")
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(white2)
-                                    .frame(width: 100,height: 50)
-                                    .overlay(
-                                        Text("$1,923")
-                                            .font(.system(size: 20, weight: .semibold))
-                                    )
-                            }.frame(width: 120)
-                            
-                            Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                            
-                            graph()
-                            
-                            
-                            
-                        }
-                    )
-                
-                
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(white)
-                    .frame(width: 370,height: 200)
-                    .overlay(
-                        HStack(alignment: .center) {
-                            VStack {
-                                Text("Super Market")
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(white2)
-                                    .frame(width: 100,height: 50)
-                                    .overlay(
-                                        Text("$1,923")
-                                            .font(.system(size: 20, weight: .semibold))
-                                    )
-                            }.frame(width: 120)
-                            
-                            Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                            
-                            graph()
-                            
-                        }
-                    
-                    )
-                
-                
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(white)
-                    .frame(width: 370,height: 200)
-                    .overlay(
-                        HStack(alignment: .center) {
-                            VStack {
-                                Text("Fast Food")
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(white2)
-                                    .frame(width: 100,height: 50)
-                                    .overlay(
-                                        Text("$1,923")
-                                            .font(.system(size: 20, weight: .semibold))
-                                    )
-                            }.frame(width: 120)
-                            
-                            Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                            
-                            graph()
-                            
-                        }
-                    )
-                
-                
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(white)
-                    .frame(width: 370,height: 200)
-                    .overlay(
-                        HStack(alignment: .center) {
-                            VStack {
-                                Text("Insurance")
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(white2)
-                                    .frame(width: 100,height: 50)
-                                    .overlay(
-                                        Text("$1,923")
-                                            .font(.system(size: 20, weight: .semibold))
-                                    )
-                            }.frame(width: 120)
-                            
-                            Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                            
-                            graph()
-                            
-                        }
-                    )
-                
-                
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(white)
-                    .frame(width: 370,height: 200)
-                    .overlay(
-                        HStack(alignment: .center) {
-                            VStack {
-                                Text("IDK")
-                                    .font(.system(size: 20, weight: .semibold))
-                                
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(white2)
-                                    .frame(width: 100,height: 50)
-                                    .overlay(
-                                        Text("$1,923")
-                                            .font(.system(size: 20, weight: .semibold))
-                                    )
-                            }.frame(width: 120)
-                            
-                            Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
-                            
-                            graph()
-                            
-                        }
-                    )
-            }
-        }
+		NavigationView(content: {
+			ScrollView(Axis.Set.vertical) {
+				VStack(alignment: .leading) {
+					
+					NavigationLink(destination: bills_inDepth(), label: {
+						RoundedRectangle(cornerRadius: 25)
+							.fill(white)
+							.frame(width: 370,height: 200)
+							.overlay(
+								HStack(alignment: .center) {
+									VStack {
+										Text("Gas")
+											.font(.system(size: 20, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 30)
+											.fill(white2)
+											.frame(width: 100,height: 50)
+											.overlay(
+												Text("$1,923")
+													.font(.system(size: 20, weight: .semibold))
+											)
+									}.frame(width: 130)
+									
+									Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+									
+									graph()
+									
+									
+									
+								}
+							)
+					})
+					.foregroundStyle(black)
+					.simultaneousGesture(TapGesture().onEnded({
+						cookie = "gas"
+					}))
+					
+					
+					NavigationLink(destination: bills_inDepth(), label: {
+						RoundedRectangle(cornerRadius: 25)
+							.fill(white)
+							.frame(width: 370,height: 200)
+							.overlay(
+								HStack(alignment: .center) {
+									VStack {
+										Text("Super Market")
+											.font(.system(size: 20, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 30)
+											.fill(white2)
+											.frame(width: 100,height: 50)
+											.overlay(
+												Text("$1,923")
+													.font(.system(size: 20, weight: .semibold))
+											)
+									}.frame(width: 130)
+									
+									Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+									
+									graph()
+									
+								}
+							
+							)
+					})
+					.foregroundStyle(black)
+					.simultaneousGesture(TapGesture().onEnded({
+						cookie = "super_market"
+					}))
+					
+					
+					NavigationLink(destination: bills_inDepth(), label: {
+						RoundedRectangle(cornerRadius: 25)
+							.fill(white)
+							.frame(width: 370,height: 200)
+							.overlay(
+								HStack(alignment: .center) {
+									VStack {
+										Text("Fast Food")
+											.font(.system(size: 20, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 30)
+											.fill(white2)
+											.frame(width: 100,height: 50)
+											.overlay(
+												Text("$1,923")
+													.font(.system(size: 20, weight: .semibold))
+											)
+									}.frame(width: 130)
+									
+									Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+									
+									graph()
+									
+								}
+							)
+					})
+					.foregroundStyle(black)
+					.simultaneousGesture(TapGesture().onEnded({
+						cookie = "fast_food"
+					}))
+					
+					
+					NavigationLink(destination: bills_inDepth(), label: {
+						RoundedRectangle(cornerRadius: 25)
+							.fill(white)
+							.frame(width: 370,height: 200)
+							.overlay(
+								HStack(alignment: .center) {
+									VStack {
+										Text("Insurance")
+											.font(.system(size: 20, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 30)
+											.fill(white2)
+											.frame(width: 100,height: 50)
+											.overlay(
+												Text("$1,923")
+													.font(.system(size: 20, weight: .semibold))
+											)
+									}.frame(width: 130)
+									
+									Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+									
+									graph()
+									
+								}
+							)
+					})
+					.foregroundStyle(black)
+					.simultaneousGesture(TapGesture().onEnded({
+						cookie = "insurance"
+					}))
+
+					
+					NavigationLink(destination: bills_inDepth(), label: {
+						RoundedRectangle(cornerRadius: 25)
+							.fill(white)
+							.frame(width: 370,height: 200)
+							.overlay(
+								HStack(alignment: .center) {
+									VStack {
+										Text("Subscriptions")
+											.font(.system(size: 20, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 30)
+											.fill(white2)
+											.frame(width: 100,height: 50)
+											.overlay(
+												Text("$1,923")
+													.font(.system(size: 20, weight: .semibold))
+											)
+									}.frame(width: 130)
+									
+									Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
+									
+									graph()
+									
+								}
+							)
+					})
+					.foregroundStyle(black)
+					.simultaneousGesture(TapGesture().onEnded({
+						cookie = "subscriptions"
+					}))
+					
+					
+				}
+			}
+		})
     }
 }
 
