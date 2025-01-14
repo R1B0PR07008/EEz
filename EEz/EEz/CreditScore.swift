@@ -29,15 +29,6 @@ struct graph_Pie_credit: View {
 		("Left to Improve", Double(ScoreLeft), red)
 	]
 	
-	/// Bills data
-	
-	let bills: [[String: String]] = [
-		["id": "1", "Spent": "100", "date": "12-3-2024", "place": "McDonalds"],
-		["id": "2", "Spent": "130", "date":  "12-5-2024", "place":  "Gas"],
-		["id": "3", "Spent": "150", "date":  "12-6-2024", "place":  "Walmart"],
-		["id": "4", "Spent": "170", "date":  "12-7-2024", "place":  "Decathlon"]
-	]
-	
 	/// first view stuff
 	
 	@AppStorage("first_open") var first_open : Bool = true
@@ -83,6 +74,8 @@ struct CreditScore: View {
 	
 	var percentDiffMonthly_credit = 10
 	
+	/// all dates are in DIN standart #8601
+	
 	let creditScoreHistory : [creditScoreHIstory] = [
 		creditScoreHIstory(date: "2021-01-15", score: 700),
 		creditScoreHIstory(date: "2021-02-15", score: 600),
@@ -108,32 +101,48 @@ struct CreditScore: View {
 					.overlay(
 						HStack {
 							VStack {
-								Text("Your Current \nCredit Score \nHistory")
+								Text("Your Current \nCredit Score")
 									.font(.system(size: 20, weight: .semibold))
 								
-								Spacer()
-									.frame(height: 30)
+//								Spacer()
+//									.frame(height: 30)
+//								
+//								Text("Up \(percentDiffMonthly_credit)% from last month")
 								
-								Text("Up \(percentDiffMonthly_credit)% from last month")
+								RoundedRectangle(cornerRadius: 20)
+									.fill(white2)
+									.frame(width: 120, height: 50)
+									.overlay(
+										Text("\(current_Score)")
+											.font(.system(size: 22, weight: .semibold))
+									)
+									.padding(.top, 12.5)
+								
 							}
 							
 							Divider().frame(width: 1, height: 170).overlay(Color(red: 176/255, green: 216/255, blue: 212/255))
-								.padding(.horizontal, 10)
+								.padding(.horizontal, 5)
 							
-							Chart(creditScoreHistory) { item in
-								LineMark(
-									x: .value("Date", item.date),
-									y: .value("Score", item.score)
-								)
-								.foregroundStyle(green)
-								AreaMark(
-									x: .value("Date", item.date),
-									y: .value("Score", item.score)
-								).foregroundStyle(
-									LinearGradient(colors: [green.opacity(0.8), green.opacity(0.1)], startPoint: .top, endPoint: .bottom)
-								)
+							VStack {
+								Text(" Credit Score History")
+									.font(.system(size: 18, weight: .semibold))
+									.padding(.bottom, 8)
+								
+								Chart(creditScoreHistory) { item in
+									LineMark(
+										x: .value("Date", item.date),
+										y: .value("Score", item.score)
+									)
+									.foregroundStyle(green)
+									AreaMark(
+										x: .value("Date", item.date),
+										y: .value("Score", item.score)
+									).foregroundStyle(
+										LinearGradient(colors: [green.opacity(0.8), green.opacity(0.1)], startPoint: .top, endPoint: .bottom)
+									)
+								}
+								.frame(width: 170, height: 130)
 							}
-							.frame(width: 170, height: 160)
 						}
 					)
 				
