@@ -10,9 +10,10 @@ import Charts
 
 /// vars
 
-var total = 850
-var current_Score = 600
-var ScoreLeft = total-current_Score
+
+nonisolated(unsafe) var total = 850
+nonisolated(unsafe) var current_Score = 600
+nonisolated(unsafe) var ScoreLeft = total-current_Score
 
 struct creditScoreHIstory : Identifiable {
 	let id = UUID()
@@ -41,15 +42,21 @@ struct graph_Pie_credit: View {
 		VStack {
 			Chart {
 				ForEach(Budget, id: \.0) { category, value, color in
-							SectorMark(
-								angle: .value("Value", value),
-								innerRadius: .ratio(0.6),
-								outerRadius: .ratio(1.0),
-								angularInset: 30
-							)
-							.foregroundStyle(color)
-							.cornerRadius(20)
-							.shadow(color: color.opacity(0.8),radius: 5)
+					if #available(iOS 17.0, *) {
+						SectorMark(
+							angle: .value("Value", value),
+							innerRadius: .ratio(0.6),
+							outerRadius: .ratio(1.0),
+							angularInset: 30
+						)
+						.foregroundStyle(color)
+						.cornerRadius(20)
+						.shadow(color: color.opacity(0.8),radius: 5)
+					} else {
+						// Fallback on earlier versions
+						
+						/// ADD OLD CHART HERE
+					}
 						}
 			}
 				.padding([Edge.Set.bottom], 20)

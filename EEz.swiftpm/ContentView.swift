@@ -1,0 +1,851 @@
+import SwiftUI
+import Charts
+import CSV
+
+let green = Color(UIColor(named: "Green")!)
+let green2 = Color(UIColor(named: "Green2")!)
+let white = Color(UIColor(named: "back")!)
+let white2 = Color(UIColor(named: "back2")!)
+let black = Color(UIColor(named: "text")!)
+let black2 = Color(UIColor(named: "black")!)
+let red = Color(UIColor(named: "red")!)
+let orange = Color(UIColor(named: "Orange")!)
+let purple = Color(UIColor(named: "Purple")!)
+let accent = Color(UIColor(named: "AccentColor")!)
+let divider = Color(UIColor(named: "Divider")!)
+
+/// pie graph data (AUTOMATE THIS!!)
+
+nonisolated(unsafe) var budget_monthly = 8300
+nonisolated(unsafe) var spent = 4000
+nonisolated(unsafe) var investment = 2000
+nonisolated(unsafe) var Left = budget_monthly-spent
+nonisolated(unsafe) var Credit_Score = 600
+nonisolated(unsafe) var Saving_Goal = 400
+
+/// CSV Data for Stocks
+
+struct dat : Identifiable, Decodable {
+	let id: UUID?
+	let Date: String
+	let Open: Double
+	let High: Double
+	let Low: Double
+	let Close: Double
+	let Volume: Double
+}
+
+/// var for func
+
+nonisolated(unsafe) var stream : InputStream!
+
+func getCSVData() -> Array<dat> {
+	var records = [dat] ()
+	
+
+		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/APPLE.csv")) /// Fix this
+		do {
+			let reader = try CSVReader(stream: stream, hasHeaderRow: true)
+			let decoder = CSVRowDecoder()
+			
+			while reader.next() != nil {
+				let row = try decoder.decode(dat.self, from: reader)
+				records.append(row)
+			}
+		}
+		catch {
+			print("Error reading CSV file: \(error)")
+		}
+		
+		return records
+}
+
+/// Data For bills list
+
+/// data structure
+
+struct bills_data : Identifiable, Codable {
+	let id: UUID
+	let category: String
+	let data_: [Data_]
+}
+
+struct Data_ : Identifiable, Codable {
+	let id: UUID
+	let month: String
+	let value: Double
+	let budget: Double
+}
+
+/// actual var
+
+var Bills_Data: [bills_data] {
+	get { loadFromFile() }
+	set { saveToFile(newValue) }
+}
+
+/// data for recent bills
+ 
+let bills: [[String: String]] = [
+	["id": "1", "Spent": "10", "date": "12-1-2024", "place": "McDonalds", "Category": "Fast Food"],
+	["id": "2", "Spent": "20", "date": "12-2-2024", "place": "McDonalds", "Category": "Fast Food"],
+	["id": "3", "Spent": "130", "date":  "12-3-2024", "place":  "Gas", "Category": "Gas"],
+	["id": "4", "Spent": "150", "date":  "12-4-2024", "place":  "Walmart", "Category": "Super Market"],
+	["id": "5", "Spent": "170", "date":  "12-5-2024", "place":  "Decathlon", "Category": "Clothes"],
+	["id": "6", "Spent": "40", "date":  "12-6-2024", "place":  "Zara", "Category": "Clothes"],
+	["id": "7", "Spent": "15", "date": "12-7-2024", "place": "KFC", "Category": "Fast Food"],
+	["id": "8", "Spent": "150", "date":  "12-8-2024", "place":  "Costco", "Category": "Super Market"],
+	["id": "9", "Spent": "30", "date":  "12-9-2024", "place":  "Gas", "Category": "Gas"],
+	["id": "10", "Spent": "40", "date":  "12-10-2024", "place":  "Gas", "Category": "Gas"],
+	["id": "11", "Spent": "60", "date":  "12-11-2024", "place":  "Zara", "Category": "Clothes"],
+	["id": "12", "Spent": "50", "date":  "12-12-2024", "place":  "Walmart", "Category": "Super Market"],
+	["id": "13", "Spent": "10", "date":  "12-13-2024", "place":  "Disney+", "Category": "Subscriptions"],
+	["id": "14", "Spent": "14", "date":  "12-14-2024", "place":  "HBO", "Category": "Subscriptions"],
+	["id": "15", "Spent": "10", "date":  "12-15-2024", "place":  "Paramount+", "Category": "Subscriptions"],
+	["id": "16", "Spent": "12", "date":  "12-16-2024", "place":  "Netflix", "Category": "Subscriptions"],
+	
+]
+
+/// data for monthly spending
+
+// function to preload these values is needed!
+// month, spent, budget
+let monthly_data = [
+	("Jan", 1234.0, 1500.0),
+	("Feb", 1233.0, 1500.0),
+	("Mar", 1332.0, 1500.0),
+	("Apr", 1345.0, 1500.0),
+	("May", 1467.0, 1500.0),
+	("Jun", 1345.0, 1500.0),
+	("Jul", 1334.0, 1500.0),
+	("Aug", 1444.0, 1500.0),
+	("Sep", 1654.0, 1500.0),
+	("Oct", 1235.0, 1500.0),
+	("Nov", 1145.0, 1500.0),
+	("Dec", 1545.0, 1500.0),
+		
+]
+
+// MARK: -Pie Graph View
+
+/// pie graph view
+
+struct graph_Pie: View {
+
+	// Pie chart data
+	let Budget = [
+		("Left", Double(Left), white),
+		("Spent", Double(spent), red),
+	]
+	
+	@State private var animatedAngles: [Double] = []
+	@AppStorage("first_open") var first_open: Bool = true
+	@AppStorage("Budget") var budget: String = ""
+
+	var body: some View {
+		VStack {
+			// Pie Chart
+			Chart {
+				ForEach(Budget, id: \.0) { category, value, color in
+					if #available(iOS 17.0, *) {
+						// Here, break down the logic into separate variables to avoid compiler overload
+						let targetValue = animatedAngles.first(where: { $0 == value }) ?? 0.0
+						SectorMark(
+							angle: .value("Value", targetValue),
+							innerRadius: .ratio(0.75),
+							outerRadius: .ratio(1.1),
+							angularInset: 3
+						)
+						.foregroundStyle(color)
+						.cornerRadius(30)
+						
+					} else {
+						// Fallback for earlier iOS versions
+					}
+				}
+			}
+			.onAppear {
+				// Initialize animation with zero values
+				withAnimation(.easeIn(duration: 10.0)) {
+					animatedAngles = Budget.map { _ in 0.0 }
+				}
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+					// After a brief delay, set the final animated values
+					withAnimation(.easeIn(duration: 10.0)) {
+						animatedAngles = Budget.map { $0.1 }
+					}
+				}
+			}
+			.padding([Edge.Set.bottom], 20)
+			
+			// Legend
+			HStack {
+				ForEach(Budget, id: \.0) { category, _, color in
+					HStack {
+						Circle()
+							.fill(color)
+							.frame(width: 10, height: 10)
+						Text(category)
+							.font(.system(size: 20))
+							.foregroundColor(black)
+					}
+				}
+			}
+		}
+	}
+}
+
+// MARK: -Spent this month thingies
+
+struct Graph_line1: View {
+	var body: some View {
+		Chart {
+			ForEach(bills, id: \.self) { item in
+				
+				let spent_double = Double(item["Spent"]!)
+			
+				LineMark(
+					x: .value("Date", item["date"]!),
+					y: .value("Spent", spent_double!)
+				)
+				
+				AreaMark(x: .value("Date", item["date"]!),
+						 y: .value("Spent", spent_double!)
+				)
+				.foregroundStyle(LinearGradient(colors: [green, green.opacity(0.2)], startPoint: .top, endPoint: .bottom))
+				
+			}
+		}
+	}
+}
+
+func SortedBills(category: String) -> [Data_] {
+	var data : [EEz.Data_] = []
+	
+	if let Bills = Bills_Data.first(where: { $0.category == category })?.data_ {
+		data = Bills
+		print(Bills)
+	} else {
+		print("No bill found for the \(category) category.")
+	}
+	
+	return data
+}
+
+func getTotalSpent(Categroy: String!) -> String {
+	let catg = Categroy
+	
+	let vills_data : [[String : String]] = bills.filter {$0["Category"] == catg}
+	let totalSpent = vills_data.compactMap { $0["Spent"] }.compactMap { Double($0) }.reduce(0, +)
+	let formattedTotalSpent = String(format: "%.2f", totalSpent)
+	
+	return formattedTotalSpent
+}
+
+func get_categories() -> [String] {
+	var cats : [String]
+	
+	cats = Array(Set(bills.compactMap { $0["Category"] })).sorted()
+	print(cats)
+	
+	return cats
+}
+
+func graph_line(category: String) -> some View {
+	
+	var data : [EEz.Data_] = []
+	
+	if let Bills = Bills_Data.first(where: { $0.category == category })?.data_ {
+		data = Bills
+		print(Bills)
+	} else {
+		print("No bill found for the \(category) category.")
+	}
+	
+	return
+	
+		VStack{
+			Chart {
+				ForEach(data, id: \.id) {item in
+					AreaMark(
+						x: .value("Month", item.month),
+						y: .value("Spent", item.budget)
+					)
+					.foregroundStyle(
+						LinearGradient (
+							gradient: Gradient(colors: [green,green.opacity(0.1)]),
+							startPoint: .top,
+							endPoint: .bottom
+						))
+					LineMark(
+						x: .value("Month", item.month),
+						y: .value("Sales", item.value)
+					)
+					.foregroundStyle(red)
+					
+				}
+			}.frame(width:180, height: 150)
+			
+			// X-Axis Stuff
+				.chartXAxis {
+					AxisMarks(values: .automatic) { _ in
+						AxisGridLine()
+						AxisTick()
+						AxisValueLabel()
+							.font(.system(size: 6, weight: .medium, design: .rounded)) // X-axis label font
+					}
+				}
+			
+				.chartXAxisLabel("Month")
+				.chartYAxisLabel("$ (USD)")
+			
+			// Y-Axis Stuff
+				.chartYAxis {
+					AxisMarks(values: .automatic) { _ in
+						AxisGridLine()
+						AxisTick()
+						AxisValueLabel()
+							.font(.system(size: 7, weight: .medium, design: .rounded)) // Y-axis label font
+					}
+				}
+			
+			HStack(spacing: 6) {
+				
+				Circle()
+					.fill(red)
+					.frame(width: 8, height: 8)
+				
+				Text("Spent")
+					.font(.system(size: 14))
+				
+				Circle()
+					.fill(green)
+					.frame(width: 8, height: 8)
+				
+				Text("Budget")
+					.font(.system(size: 14))
+				
+			}
+		}
+}
+
+struct Sorted_bills_list: View {
+	var body: some View {
+		ScrollView {
+			VStack {
+				ForEach(get_categories(), id: \.self) { category in
+
+					
+					RoundedRectangle(cornerRadius: 20)
+						.fill(white)
+						.frame(width: 470, height: 200)
+						.overlay(
+							HStack (spacing: 15) {
+								VStack (spacing: 15){
+									Text("\(category)")
+										.font(.system(size: 30, weight: .bold, design: .default))
+									
+									RoundedRectangle(cornerRadius: 20)
+										.fill(white2)
+										.frame(width: 100, height: 60)
+										.overlay(
+											Text("\(getTotalSpent(Categroy: category))")
+										)
+								}
+								
+								Divider().frame(width: 1, height: 130).background(Color.gray)
+									.padding(.horizontal, 20)
+								
+								graph_line(category: category)
+								
+							}
+						)
+				}
+			}
+		}
+	}
+}
+
+// MARK: -View for list animation
+
+struct AnimatedBillRow: View {
+	let index: Int
+	let bill: [String: String]
+	@Binding var appearIndices: Set<Int>
+	
+	var body: some View {
+		RoundedRectangle(cornerRadius: 40)
+			.fill(white2) // Use your custom color `white2`
+			.frame(width: 510, height: 57)
+			.overlay(
+				billContent
+			)
+			.opacity(appearIndices.contains(index) ? 1 : 0) // Control opacity based on the state
+			.offset(y: appearIndices.contains(index) ? 0 : 30) // Slide-in effect
+			.animation(.easeIn(duration: 0.5).delay(Double(index) * 0.2), value: appearIndices) // Gradual appearance with delay
+			.onAppear {
+				withAnimation {
+					_ = appearIndices.insert(index)
+				}
+			}
+	}
+	
+	// Extract the content of the bill row into a computed property
+	var billContent: some View {
+		HStack {
+			if let spnt = bill["Spent"] {
+				Text("\(spnt)")
+					.foregroundColor(black)
+					.frame(width: 160)
+					.font(.system(size: 22, weight: .semibold))
+			}
+
+			Divider().frame(width: 1, height: 25).background(Color.gray)
+
+			if let spnt = bill["date"] {
+				Text("\(spnt)")
+					.foregroundColor(black)
+					.frame(width: 160)
+					.font(.system(size: 22, weight: .semibold))
+			}
+
+			Divider().frame(width: 1, height: 25).background(Color.gray)
+
+			if let spnt = bill["place"] {
+				Text("\(spnt)")
+					.foregroundColor(black)
+					.frame(width: 160)
+					.font(.system(size: 22, weight: .semibold))
+			}
+		}
+	}
+}
+
+// MARK: -Dashboard View
+
+@available(iOS 17.0, *)
+struct ContentView: View {
+	
+	/// function to animate the graph
+	
+	@State private var animatedData: [(String, Double, Double)] = []
+	
+	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
+
+	
+	private func animateData() {
+			for (index, dataPoint) in monthly_data.enumerated() {
+				DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.2) {
+					withAnimation(.easeInOut(duration: 1)) {
+						animatedData.append((dataPoint.0, dataPoint.1, dataPoint.2))
+				}
+			}
+		}
+	}
+	
+	@State var stocks: [dat] = getCSVData()
+	
+	@State private var tog1 : Bool = false // spent this month square
+	@State private var tog2 : Bool = false // saving goal square
+	
+	@State private var appearIndices: Set<Int> = []
+	
+    var body: some View {
+			ScrollView {
+				HStack (spacing: 15) {
+					VStack (spacing: 15) {
+						
+						
+						HStack (spacing: 15) {
+							RoundedRectangle(cornerRadius: 20)
+								.fill(white)
+								.opacity(tog2 ? 0 : 1)
+								.zIndex(1)
+								.frame(width: tog1 ? 1100 : 270, height: tog1 ? 650 :  250)
+								.position(
+									x: tog1 ?  UIScreen.main.bounds.width / 2  : 168,
+									y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
+								)
+								.overlay(
+									VStack {
+										
+										if !tog1 {
+											Text("Spent This \nMonth")
+												.font(.system(size: 35, weight: .semibold))
+												.padding(.top, 20)
+												
+											RoundedRectangle(cornerRadius: 20)
+												.fill(white2)
+												.frame(width: 150, height: 80)
+												.overlay(
+													Text("$\(spent)")
+														.font(.system(size: 30, weight: .semibold))
+												)
+										} else {
+											VStack (alignment: .leading, spacing: 15) {
+												
+												HStack(spacing: 15) {
+													VStack(alignment: .leading, spacing: 15) {
+														
+														Text("This Month's Spending")
+															.font(.system(size: 45, weight: .semibold))
+															.frame(width: 470)
+														Text("Daily Data")
+															.font(.system(size: 20, weight: .semibold))
+														
+														Graph_line1()
+															.frame(width: 500, height: 200)
+														
+														RoundedRectangle(cornerRadius: 20)
+															.fill(white2)
+															.frame(width: 500, height: 200)
+															.overlay(
+																HStack (spacing: 15) {
+																	VStack {
+																		Text("This Month \nYou've Spent:")
+																			.font(.system(size: 25, weight: .semibold))
+																		
+																		RoundedRectangle(cornerRadius: 20)
+																			.fill(white)
+																			.frame(width: 150, height: 60)
+																			.overlay(
+																				Text("$\(spent)")
+																					.font(.system(size: 25, weight: .semibold))
+																			)
+																		
+																	}
+																	
+																	Divider().frame(width: 1, height: 130).background(Color.gray)
+																		.padding(.horizontal, 20)
+																	
+																	/// GOTTA ADD SOMETHING HERE!!
+																	
+																}
+															)
+													}
+													
+													VStack(spacing: 15) {
+														RoundedRectangle(cornerRadius: 20)
+															.fill(white2)
+															.frame(width: 500, height: 525)
+															
+															.overlay(
+																VStack (alignment: .leading) {
+																	Text("Your Bills, Sorted:")
+																		.font(.system(size: 40, weight: .semibold))
+																		.padding(.top, 36)
+																		.padding(.bottom, 20)
+																	
+																	Sorted_bills_list()
+																}
+															)
+															
+													}
+												}
+												
+											}
+										}
+									}
+										.opacity(tog2 ? 0 : 1)
+										.position(
+											x: tog1 ? UIScreen.main.bounds.width / 2  : 168,
+											y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
+										)
+								)
+								.onTapGesture {
+									withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
+										tog1.toggle()
+									}
+								}
+								.animation(.easeInOut, value: tog1)
+							
+							
+							
+							RoundedRectangle(cornerRadius: 20)
+								.fill(white)
+								.position(
+									x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
+									y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
+								)
+								.frame(width: tog2 ? 1100 : 230, height: tog2 ? 650 :  250)
+								.opacity(tog1 ? 0 : 1)
+								.overlay(
+									VStack {
+										if !tog2 {
+											Text("Your Saving Goal")
+												.font(.system(size: 35, weight: .semibold))
+												.padding(.top, 20)
+											
+											RoundedRectangle(cornerRadius: 20)
+												.fill(white2)
+												.frame(width: 150, height: 80)
+												.overlay (
+													Text("$\(Saving_Goal)")
+														.font(.system(size: 30, weight: .semibold))
+												)
+										} else {
+											Text("Your Saving Goal")
+												.font(.system(size: 50, weight: .semibold))
+										}
+										
+									}
+										.opacity(tog1 ? 0 : 1)
+										.position(
+											x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
+											y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
+										)
+									
+								)
+								.onTapGesture {
+									withAnimation (.easeInOut(duration: 0.45)) {
+										tog2.toggle()
+									}
+								}
+						}
+						
+						
+						
+						HStack (spacing: 15) {
+							RoundedRectangle(cornerRadius: 20)
+								.fill(white2)
+								.opacity(tog1 ? 0 : 1)
+								.opacity(tog2 ? 0 : 1)
+								.frame(width: 230, height: 250)
+								.overlay(
+									VStack {
+										Text("Your Credit Score")
+											.font(.system(size: 35, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 20)
+											.fill(white)
+											.frame(width: 150, height: 80)
+											.overlay(
+												Text("600")
+													.font(.system(size: 30, weight: .semibold))
+											)
+									}
+										.opacity(tog1 ? 0 : 1)
+										.opacity(tog2 ? 0 : 1)
+								)
+							
+							RoundedRectangle(cornerRadius: 20)
+								.fill(white2)
+								.opacity(tog1 ? 0 : 1)
+								.opacity(tog2 ? 0 : 1)
+								.frame(width: 270, height: 250)
+								.overlay(
+									VStack {
+										Text("Stocks Performance")
+											.padding(.top, 20)
+											.font(.system(size: 35, weight: .semibold))
+											.padding(.bottom, 5)
+										
+										/// Stocks Data Graph
+										
+										RoundedRectangle(cornerRadius: 20)
+											.fill(white)
+											.frame(width: 240, height: 120)
+											.padding(.bottom, 10)
+											.overlay(
+												HStack (spacing: 10) {
+														Text("APPL")
+															.font(.system(size: 23, weight: .semibold))
+														
+													Divider()
+														.frame(width: 1, height: 90)
+														.overlay(divider)
+													
+														Text("Up 2.5% \nfrom yesturday")
+															.font(.system(size: 18,weight: .semibold))
+												}
+													.padding(.bottom, 10)
+												
+											)
+										
+										
+									}
+										.opacity(tog1 ? 0 : 1)
+										.opacity(tog2 ? 0 : 1)
+								)
+						}
+						
+						
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white)
+							.opacity(tog1 ? 0 : 1)
+							.opacity(tog2 ? 0 : 1)
+							.frame(width: 515, height: 400)
+							.overlay(
+								VStack (alignment: .leading) {
+									Text("Spending Summary")
+										.font(.system(size: 35, weight: .semibold))
+										
+									
+										Chart {
+											ForEach(animatedData, id: \.0) { month, spent, budget in
+												Plot {
+													BarMark(
+														x: .value("month", month),
+														yStart: .value("start", 0),
+														yEnd: .value("spent", spent)
+													)
+													.foregroundStyle(
+														LinearGradient(colors: [green, accent.opacity(0.4)], startPoint: .top, endPoint: .bottom)
+													)
+													.cornerRadius(5)
+													
+													RuleMark(
+														y: .value("budget", budget)
+													)
+													.lineStyle(StrokeStyle(lineWidth: 2))
+													.foregroundStyle(red)
+													.annotation(position: .top, alignment: .leading,content: {
+														RoundedRectangle(cornerRadius: 10)
+															.fill(white2)
+															.frame(width: 150, height: 30)
+															.overlay(content: {
+																Text("Budget: $1500")
+															})
+															.padding(.bottom, 10)
+													})
+													
+												}
+											}
+										}
+										.frame(width: 460, height: 300)
+										.chartYScale(domain: [0,1800])
+										.onAppear {
+													animateData()
+												}
+									
+									/// ADD "HOVER FOR INFO" TO GRAPH
+										
+								}
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog2 ? 0 : 1)
+							)
+							
+					}
+					.padding(.top, 30)
+					
+					
+					VStack (spacing: 15) {
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white2)
+							.opacity(tog1 ? 0 : 1)
+							.opacity(tog2 ? 0 : 1)
+							.frame(width: 550, height: 300)
+							.position(x: 240, y: 150)
+							.overlay(
+								HStack {
+									
+									VStack {
+										HStack {
+											Text("Your Data, Visualized")
+												.font(.system(size: 45, weight: .semibold))
+												.padding(.top, 20)
+												.padding(.bottom,15)
+												.padding(.horizontal, 15)
+											
+											Spacer()
+										}
+											
+									}
+									.padding(.horizontal, 20)
+									
+									graph_Pie()
+										.frame(width: 240, height: 260)
+										.padding(.horizontal, 20)
+								}
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog2 ? 0 : 1)
+									.position(x: 240, y: 150)
+								
+								
+								
+							)
+						
+						/// Recent Bills (uncategorized)
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white)
+							.opacity(tog1 ? 0 : 1)
+							.opacity(tog2 ? 0 : 1)
+							.frame(width: 550, height: 615)
+							.position(x: 240, y: 150)
+							.overlay(
+								
+								VStack {
+									
+									HStack {
+										Text("Recent Bills")
+											.font(.system(size: 35, weight: .semibold))
+											.padding(.horizontal, 30)
+											.padding(.top, 30)
+										
+										Spacer()
+									}
+									
+									HStack() {
+										
+										VStack {
+											Text("Spent")
+												.foregroundColor(black)
+												.font(.system(size: 22, weight: .semibold))
+												.frame(width: 160)
+										}
+										
+										
+										Divider().frame(width: 1).overlay(divider)
+										
+										
+										VStack {
+											Text("Date")
+												.foregroundColor(black)
+												.font(.system(size: 22, weight: .semibold))
+												.frame(width: 160)
+										}
+										
+										
+										Divider().frame(width: 1).overlay(divider)
+										
+										
+										VStack {
+											Text("Place")
+												.foregroundColor(black)
+												.font(.system(size: 22, weight: .semibold))
+												.frame(width: 160)
+										}
+										
+										
+									}
+									.padding()
+									.padding(.bottom, 0)
+									.frame(width: 350, height: 60)
+									
+									ScrollView {
+										VStack {
+											
+											ForEach(bills.indices, id: \.self) { index in
+															AnimatedBillRow(index: index, bill: bills[index], appearIndices: $appearIndices)
+														}
+										}
+									}
+								}
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog2 ? 0 : 1)
+									.position(x: 240, y: 70)
+									.frame(height: 615)
+									.padding(.top, 300)
+							)
+						
+					}
+					.padding(.top, 30)
+					
+					
+					}
+			}
+
+    }
+}

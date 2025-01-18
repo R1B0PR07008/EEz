@@ -10,7 +10,7 @@ import Charts
 
 /// "cookie" var
 
-var cookie: String = "Gas"
+nonisolated(unsafe) var cookie: String = "Gas"
 
 /// data structure
 
@@ -27,50 +27,12 @@ struct Data_ : Identifiable, Codable {
 	let budget: Double
 }
 
-/// data:
+/// Bills data
 
-var Bills_Data: [bills_data] = [
-	bills_data(id: UUID(), category: "Gas",data_: [
-		Data_(id: UUID(), month: "1", value: 12343, budget: 23353),
-		Data_(id: UUID(), month: "2", value: 12332, budget: 23343),
-		Data_(id: UUID(), month: "3", value: 23324, budget: 34334),
-		Data_(id: UUID(), month: "4", value: 23455, budget: 34465),
-		Data_(id: UUID(), month: "5", value: 45675, budget: 55685),
-		Data_(id: UUID(), month: "6", value: 13456, budget: 24466)
-	]),
-	bills_data(id: UUID(), category: "Super Market",data_: [
-		Data_(id: UUID(), month: "1", value: 12343, budget: 23353),
-		Data_(id: UUID(), month: "2", value: 12332, budget: 23343),
-		Data_(id: UUID(), month: "3", value: 23324, budget: 34334),
-		Data_(id: UUID(), month: "4", value: 23455, budget: 34465),
-		Data_(id: UUID(), month: "5", value: 45675, budget: 55685),
-		Data_(id: UUID(), month: "6", value: 13456, budget: 24466)
-	]),
-	bills_data(id: UUID(), category: "Fast Food",data_: [
-		Data_(id: UUID(), month: "1", value: 12343, budget: 23353),
-		Data_(id: UUID(), month: "2", value: 12332, budget: 23343),
-		Data_(id: UUID(), month: "3", value: 23324, budget: 34334),
-		Data_(id: UUID(), month: "4", value: 23455, budget: 34465),
-		Data_(id: UUID(), month: "5", value: 45675, budget: 55685),
-		Data_(id: UUID(), month: "6", value: 13456, budget: 24466)
-	]),
-	bills_data(id: UUID(), category: "Clothes",data_: [
-		Data_(id: UUID(), month: "1", value: 12343, budget: 23353),
-		Data_(id: UUID(), month: "2", value: 12332, budget: 23343),
-		Data_(id: UUID(), month: "3", value: 23324, budget: 34334),
-		Data_(id: UUID(), month: "4", value: 23455, budget: 34465),
-		Data_(id: UUID(), month: "5", value: 45675, budget: 55685),
-		Data_(id: UUID(), month: "6", value: 13456, budget: 24466)
-	]),
-	bills_data(id: UUID(), category: "Subscriptions",data_: [
-		Data_(id: UUID(), month: "1", value: 12343, budget: 23353),
-		Data_(id: UUID(), month: "2", value: 12332, budget: 23343),
-		Data_(id: UUID(), month: "3", value: 23324, budget: 34334),
-		Data_(id: UUID(), month: "4", value: 23455, budget: 34465),
-		Data_(id: UUID(), month: "5", value: 45675, budget: 55685),
-		Data_(id: UUID(), month: "6", value: 13456, budget: 24466)
-	])
-]
+var Bills_Data: [bills_data] {
+	get { loadFromFile() }
+	set { saveToFile(newValue) }
+}
 
 /// func for graph by category
 
@@ -163,7 +125,6 @@ func getTotalSpent(Categroy: String!) -> String {
 }
 
 struct billChart: View {
-    
     var body: some View {
 		
 		NavigationView(content: {
@@ -192,6 +153,11 @@ struct billChart: View {
 															Text(getTotalSpent(Categroy: "Gas"))
 																.font(.system(size: 20, weight: .semibold))
 														)
+													
+													Button(action: {print(Bills_Data)}, label: {
+														Text("hello")
+													})
+													
 												}.frame(width: 130)
 												
 												Divider().frame(width: 1, height: 160).overlay(Color(red: 176/255, green: 216/255, blue: 212/255)) /// adjust this color!!!
