@@ -2,6 +2,9 @@ import SwiftUI
 import Charts
 import CSV
 
+
+/// Maybe Change colors to match tabbar. 
+
 let green = Color(UIColor(named: "Green")!)
 let green2 = Color(UIColor(named: "Green2")!)
 let white = Color(UIColor(named: "back")!)
@@ -20,12 +23,12 @@ nonisolated(unsafe) var budget_monthly = 8300
 nonisolated(unsafe) var spent = 4000
 nonisolated(unsafe) var investment = 2000
 nonisolated(unsafe) var Left = budget_monthly-spent
+
 nonisolated(unsafe) var Credit_Score = 600
-nonisolated(unsafe) var Saving_Goal = 400
 
 /// CSV Data for Stocks
 
-struct dat : Identifiable, Decodable {
+struct dat : Identifiable, Decodable, Hashable {
 	let id: UUID?
 	let Date: String
 	let Open: Double
@@ -33,32 +36,13 @@ struct dat : Identifiable, Decodable {
 	let Low: Double
 	let Close: Double
 	let Volume: Double
+	let Diff: Double
+	let isLarger: String
 }
 
 /// var for func
 
 nonisolated(unsafe) var stream : InputStream!
-
-func getCSVData() -> Array<dat> {
-	var records = [dat] ()
-	
-
-		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/APPLE.csv")) /// Fix this
-		do {
-			let reader = try CSVReader(stream: stream, hasHeaderRow: true)
-			let decoder = CSVRowDecoder()
-			
-			while reader.next() != nil {
-				let row = try decoder.decode(dat.self, from: reader)
-				records.append(row)
-			}
-		}
-		catch {
-			print("Error reading CSV file: \(error)")
-		}
-		
-		return records
-}
 
 /// Data For bills list
 
@@ -77,6 +61,27 @@ struct Data_ : Identifiable, Codable {
 	let budget: Double
 }
 
+
+/// data structure for news
+
+struct source : Identifiable, Codable, Hashable {
+	let Id: UUID = UUID()
+	let id: String?
+	let name: String
+}
+
+struct newsDataStructure : Identifiable, Codable, Hashable {
+	let id: UUID = UUID()
+	let source: source
+	let author: String?
+	let title: String
+	let description: String
+	let url: String
+	let urlToImage: String?
+	let publishedAt: String
+	let content: String
+}
+
 /// actual var
 
 var Bills_Data: [bills_data] {
@@ -84,8 +89,15 @@ var Bills_Data: [bills_data] {
 	set { saveToFile(newValue) }
 }
 
+var newsData: [newsDataStructure] {
+	get { loadFromFileNews() }
+	set { saveToFileNews(newValue) }
+}
+
 /// data for recent bills
  
+let news: [newsDataStructure] = []
+
 let bills: [[String: String]] = [
 	["id": "1", "Spent": "10", "date": "12-1-2024", "place": "McDonalds", "Category": "Fast Food"],
 	["id": "2", "Spent": "20", "date": "12-2-2024", "place": "McDonalds", "Category": "Fast Food"],
@@ -166,12 +178,12 @@ struct graph_Pie: View {
 			}
 			.onAppear {
 				// Initialize animation with zero values
-				withAnimation(.easeIn(duration: 10.0)) {
+				withAnimation(.easeIn(duration: 0.5)) {
 					animatedAngles = Budget.map { _ in 0.0 }
 				}
 				DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 					// After a brief delay, set the final animated values
-					withAnimation(.easeIn(duration: 10.0)) {
+					withAnimation(.easeIn(duration: 1.0)) {
 						animatedAngles = Budget.map { $0.1 }
 					}
 				}
@@ -208,10 +220,12 @@ struct Graph_line1: View {
 					x: .value("Date", item["date"]!),
 					y: .value("Spent", spent_double!)
 				)
+				.interpolationMethod(.cardinal)
 				
 				AreaMark(x: .value("Date", item["date"]!),
 						 y: .value("Spent", spent_double!)
 				)
+				.interpolationMethod(.cardinal)
 				.foregroundStyle(LinearGradient(colors: [green, green.opacity(0.2)], startPoint: .top, endPoint: .bottom))
 				
 			}
@@ -246,7 +260,6 @@ func get_categories() -> [String] {
 	var cats : [String]
 	
 	cats = Array(Set(bills.compactMap { $0["Category"] })).sorted()
-	print(cats)
 	
 	return cats
 }
@@ -257,7 +270,6 @@ func graph_line(category: String) -> some View {
 	
 	if let Bills = Bills_Data.first(where: { $0.category == category })?.data_ {
 		data = Bills
-		print(Bills)
 	} else {
 		print("No bill found for the \(category) category.")
 	}
@@ -271,6 +283,7 @@ func graph_line(category: String) -> some View {
 						x: .value("Month", item.month),
 						y: .value("Spent", item.budget)
 					)
+					.interpolationMethod(.cardinal)
 					.foregroundStyle(
 						LinearGradient (
 							gradient: Gradient(colors: [green,green.opacity(0.1)]),
@@ -282,6 +295,7 @@ func graph_line(category: String) -> some View {
 						y: .value("Sales", item.value)
 					)
 					.foregroundStyle(red)
+					.interpolationMethod(.cardinal)
 					
 				}
 			}.frame(width:180, height: 150)
@@ -327,43 +341,6 @@ func graph_line(category: String) -> some View {
 				
 			}
 		}
-}
-
-struct Sorted_bills_list: View {
-	var body: some View {
-		ScrollView {
-			VStack {
-				ForEach(get_categories(), id: \.self) { category in
-
-					
-					RoundedRectangle(cornerRadius: 20)
-						.fill(white)
-						.frame(width: 470, height: 200)
-						.overlay(
-							HStack (spacing: 15) {
-								VStack (spacing: 15){
-									Text("\(category)")
-										.font(.system(size: 30, weight: .bold, design: .default))
-									
-									RoundedRectangle(cornerRadius: 20)
-										.fill(white2)
-										.frame(width: 100, height: 60)
-										.overlay(
-											Text("\(getTotalSpent(Categroy: category))")
-										)
-								}
-								
-								Divider().frame(width: 1, height: 130).background(Color.gray)
-									.padding(.horizontal, 20)
-								
-								graph_line(category: category)
-								
-							}
-						)
-				}
-			}
-		}
-	}
 }
 
 // MARK: -View for list animation
@@ -421,45 +398,238 @@ struct AnimatedBillRow: View {
 	}
 }
 
-// MARK: -Dashboard View
+// MARK: -Stocks stuff
 
-@available(iOS 17.0, *)
-struct ContentView: View {
+func getCSVData(ticker : String) -> Array<dat> {
+	var records = [dat] ()
 	
-	/// function to animate the graph
+
+		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/\(ticker).csv")) /// Fix this
+		do {
+			let reader = try CSVReader(stream: stream, hasHeaderRow: true)
+			let decoder = CSVRowDecoder()
+			
+			while reader.next() != nil {
+				let row = try decoder.decode(dat.self, from: reader)
+				records.append(row)
+			}
+		}
+		catch {
+			print("Error reading CSV file: \(error)")
+		}
+		
+		return records
+}
+
+struct graph_stock: View {
+	
+	@State var stocks: [dat] = getCSVData(ticker: "aapl")
+	
+	var body: some View {
+		
+		let topXvalues = Array(stocks.prefix(90))
+
+
+		Chart {
+			ForEach(topXvalues, id: \.self) {item in
+				
+				let condition: Bool = item.isLarger == "0"
+				
+				LineMark(
+					x: .value("Date", item.Date),
+					y: .value("Close Price", item.Close)
+				)
+				.interpolationMethod(.cardinal)
+				.foregroundStyle(condition ? red : green)
+				.annotation(position: .topTrailing,content: {
+					RoundedRectangle(cornerRadius: 20)
+						.fill(white2)
+						.frame(width: 110, height: 55)
+						.overlay(
+							Text("AAPL")
+								.font(.system(size: 25, weight: .semibold))
+						)
+						.padding(.bottom, 10)
+						.padding(.leading, 95)
+				})
+				
+				
+				
+			}
+		}.frame(width: 600, height: 350)
+			.chartYScale(domain: [150,300]) /// automate the max value
+			.padding(.bottom, 10)
+			.chartXAxis(.hidden)
+		
+	}
+}
+
+func stockPerf() -> (str: String, double: Double) {
+	let top1 = Array(getCSVData(ticker: "aapl").prefix(2))
+	
+	let stockPerf = top1[1].Diff
+	
+	let formated = String(format: "%.2f", stockPerf)
+	
+	return (str: formated, double: stockPerf)
+}
+
+struct stockPerfView: View {
+	var body: some View {
+		if Int(stockPerf().double) > 0 {
+			Text("Up \(stockPerf().str)% \nfrom yesturday")
+				.font(.system(size: 18,weight: .semibold))
+		}
+		else {
+			Text("Down \(stockPerf().str)% \nfrom yesturday" )
+				.font(.system(size: 18,weight: .semibold))
+		}
+	}
+}
+
+struct NewsView: View {
+	var body: some View {
+		
+		let maxLoadedNews = 10
+		
+		let articles = newsData[0...maxLoadedNews]
+		
+		ScrollView {
+			VStack () {
+				ForEach(articles, id: \.self) { news in
+					
+					RoundedRectangle(cornerRadius: 20)
+						.fill(white2)
+						.frame(minWidth: 330, idealWidth: 330, maxWidth: 330, minHeight: 120, idealHeight: 160, maxHeight: 200)
+						.padding(.horizontal, 15)
+						.overlay(
+							VStack (alignment: .leading) {
+								Text("\(news.title)")
+									.font(.system(size: 20, weight: .semibold))
+								Text("Source: \(news.source.name)")
+									.font(.system(size: 20))
+									
+								
+							}
+								.frame(width: 310)
+								.padding(20)
+						)
+					
+				}
+				
+//				RoundedRectangle(cornerRadius: 20)
+//					.fill(white2)
+//					.frame(width: 150, height: 60)
+//					.overlay(
+//						Text("Load More")
+//							.font(.system(size: 25, weight: .semibold))
+//					)
+//					.padding(.top, 20)
+//					.padding(.bottom, 20)
+//					.onTapGesture {
+//						withAnimation {
+//							maxLoadedNews = maxLoadedNews + 10
+//						}
+//					}
+				
+			}
+		}
+	}
+}
+
+// MARK: -Speding Summary stuff
+
+struct graph_spendingSummary: View {
 	
 	@State private var animatedData: [(String, Double, Double)] = []
-	
-	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
-
 	
 	private func animateData() {
 			for (index, dataPoint) in monthly_data.enumerated() {
 				DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.2) {
-					withAnimation(.easeInOut(duration: 1)) {
+					withAnimation(.easeInOut(duration: 0.5)) {
 						animatedData.append((dataPoint.0, dataPoint.1, dataPoint.2))
 				}
 			}
 		}
 	}
 	
-	@State var stocks: [dat] = getCSVData()
+	@State private var line_width = 2
+	
+	var body : some View {
+		Chart {
+			ForEach(animatedData, id: \.0) { month, spent, budget in
+				Plot {
+					BarMark(
+						x: .value("month", month),
+						yStart: .value("start", 0),
+						yEnd: .value("spent", spent)
+					)
+					.foregroundStyle(
+						LinearGradient(colors: [green, accent.opacity(0.4)], startPoint: .top, endPoint: .bottom)
+					)
+					.cornerRadius(5)
+					
+					RuleMark(
+						y: .value("budget", budget)
+					)
+					.lineStyle(StrokeStyle(lineWidth: CGFloat(line_width)))
+					.foregroundStyle(red)
+					.annotation(position: .top, alignment: .leading,content: {
+						RoundedRectangle(cornerRadius: 10)
+							.fill(white2)
+							.frame(width: 150, height: 30)
+							.overlay(content: {
+								Text("Budget: $1500")
+							})
+							.padding(.bottom, 10)
+					})
+					
+				}
+			}
+		}
+		.frame(width: 460, height: 300)
+		.chartYScale(domain: [0,1800])
+		.onAppear {
+					animateData()
+				}
+	}
+}
+
+// MARK: -Dashboard View
+
+@available(iOS 17.0, *)
+struct ContentView: View {
+	
+	/// Vars
+
+	@AppStorage("SavingGoal") var SavingGoal : String = ""
+	
+	@AppStorage("first_open") var first_open : Bool = true
+	
+	/// function to animate the graph
+	
+	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
+	
+	@State var stocks: [dat] = getCSVData(ticker: "aapl")
 	
 	@State private var tog1 : Bool = false // spent this month square
 	@State private var tog2 : Bool = false // saving goal square
+	@State private var tog3 : Bool = false // Stocks page
 	
 	@State private var appearIndices: Set<Int> = []
 	
     var body: some View {
 			ScrollView {
 				HStack (spacing: 15) {
+					
 					VStack (spacing: 15) {
 						
-						
 						HStack (spacing: 15) {
+							
 							RoundedRectangle(cornerRadius: 20)
 								.fill(white)
 								.opacity(tog2 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
 								.zIndex(1)
 								.frame(width: tog1 ? 1100 : 270, height: tog1 ? 650 :  250)
 								.position(
@@ -470,7 +640,7 @@ struct ContentView: View {
 									VStack {
 										
 										if !tog1 {
-											Text("Spent This \nMonth")
+											Text("Monthly \nSpending")
 												.font(.system(size: 35, weight: .semibold))
 												.padding(.top, 20)
 												
@@ -482,15 +652,16 @@ struct ContentView: View {
 														.font(.system(size: 30, weight: .semibold))
 												)
 										} else {
+
 											VStack (alignment: .leading, spacing: 15) {
 												
 												HStack(spacing: 15) {
 													VStack(alignment: .leading, spacing: 15) {
 														
-														Text("This Month's Spending")
+														Text("Your Monthly Spending")
 															.font(.system(size: 45, weight: .semibold))
 															.frame(width: 470)
-														Text("Daily Data")
+														Text("Daily Data:")
 															.font(.system(size: 20, weight: .semibold))
 														
 														Graph_line1()
@@ -518,7 +689,23 @@ struct ContentView: View {
 																	Divider().frame(width: 1, height: 130).background(Color.gray)
 																		.padding(.horizontal, 20)
 																	
-																	/// GOTTA ADD SOMETHING HERE!!
+																	VStack {
+																		Text("You are:")
+																				.font(.system(size: 25, weight: .semibold))
+																			
+																			RoundedRectangle(cornerRadius: 20)
+																				.fill(white)
+																				.frame(width: 150, height: 60)
+																				.overlay(
+																					Text("$\(Left)")
+																				).font(.system(size: 25, weight: .semibold))
+																		
+																		if Left > 0 {
+																			Text("Under budget").font(.system(size: 25, weight: .semibold))
+																		} else {
+																			Text("Over budget").font(.system(size: 25, weight: .semibold))
+																		}
+																	}
 																	
 																}
 															)
@@ -536,7 +723,40 @@ struct ContentView: View {
 																		.padding(.top, 36)
 																		.padding(.bottom, 20)
 																	
-																	Sorted_bills_list()
+																	ScrollView {
+																		VStack {
+																			ForEach(get_categories(), id: \.self) { category in
+
+																				
+																				RoundedRectangle(cornerRadius: 20)
+																					.fill(white)
+																					.frame(width: 470, height: 200)
+																					.overlay(
+																						HStack (spacing: 15) {
+																							VStack (spacing: 15){
+																								Text("\(category)")
+																									.font(.system(size: 30, weight: .bold, design: .default))
+																								
+																								RoundedRectangle(cornerRadius: 20)
+																									.fill(white2)
+																									.frame(width: 130, height: 60)
+																									.overlay(
+																										Text("$\(getTotalSpent(Categroy: category))")
+																											.font(.system(size: 25, weight: .semibold))
+																									)
+																							}
+																							
+																							Divider().frame(width: 1, height: 130).background(Color.gray)
+																								.padding(.horizontal, 20)
+																							
+																							graph_line(category: category)
+																							
+																						}
+																					)
+																			}
+																		}
+																	}
+																	
 																}
 															)
 															
@@ -547,6 +767,7 @@ struct ContentView: View {
 										}
 									}
 										.opacity(tog2 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
 										.position(
 											x: tog1 ? UIScreen.main.bounds.width / 2  : 168,
 											y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
@@ -569,6 +790,7 @@ struct ContentView: View {
 								)
 								.frame(width: tog2 ? 1100 : 230, height: tog2 ? 650 :  250)
 								.opacity(tog1 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
 								.overlay(
 									VStack {
 										if !tog2 {
@@ -580,16 +802,14 @@ struct ContentView: View {
 												.fill(white2)
 												.frame(width: 150, height: 80)
 												.overlay (
-													Text("$\(Saving_Goal)")
+													Text("$\(SavingGoal)")
 														.font(.system(size: 30, weight: .semibold))
 												)
-										} else {
-											Text("Your Saving Goal")
-												.font(.system(size: 50, weight: .semibold))
 										}
 										
 									}
 										.opacity(tog1 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
 										.position(
 											x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
 											y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
@@ -598,7 +818,7 @@ struct ContentView: View {
 								)
 								.onTapGesture {
 									withAnimation (.easeInOut(duration: 0.45)) {
-										tog2.toggle()
+//										tog2.toggle()
 									}
 								}
 						}
@@ -610,6 +830,7 @@ struct ContentView: View {
 								.fill(white2)
 								.opacity(tog1 ? 0 : 1)
 								.opacity(tog2 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
 								.frame(width: 230, height: 250)
 								.overlay(
 									VStack {
@@ -626,108 +847,138 @@ struct ContentView: View {
 									}
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
 								)
 							
 							RoundedRectangle(cornerRadius: 20)
 								.fill(white2)
 								.opacity(tog1 ? 0 : 1)
 								.opacity(tog2 ? 0 : 1)
-								.frame(width: 270, height: 250)
+								.position(
+									x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
+									y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
+								)
+								.frame(width: tog3 ? 1100 : 270, height: tog3 ? 650 :  250)
 								.overlay(
-									VStack {
-										Text("Stocks Performance")
+									VStack (alignment: tog3 ? .leading : .center) {
+										Text("Stock Performance")
 											.padding(.top, 20)
-											.font(.system(size: 35, weight: .semibold))
+											.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
 											.padding(.bottom, 5)
 										
 										/// Stocks Data Graph
 										
-										RoundedRectangle(cornerRadius: 20)
-											.fill(white)
-											.frame(width: 240, height: 120)
-											.padding(.bottom, 10)
-											.overlay(
-												HStack (spacing: 10) {
-														Text("APPL")
-															.font(.system(size: 23, weight: .semibold))
-														
-													Divider()
-														.frame(width: 1, height: 90)
-														.overlay(divider)
+										if !tog3 {
+											RoundedRectangle(cornerRadius: 20)
+												.fill(white)
+												.frame(width: 240, height: 120)
+												.padding(.bottom, 10)
+												.overlay(
+													HStack (spacing: 10) {
+															Text("AAPL")
+																.font(.system(size: 23, weight: .semibold))
+															
+														Divider()
+															.frame(width: 1, height: 90)
+															.overlay(divider)
+
+														stockPerfView()
+													}
+														.padding(.bottom, 10)
 													
-														Text("Up 2.5% \nfrom yesturday")
-															.font(.system(size: 18,weight: .semibold))
-												}
-													.padding(.bottom, 10)
+												)
+										} else if tog3 {
+											
+											HStack(spacing: 15) {
+												RoundedRectangle(cornerRadius: 20)
+													.fill(white)
+													.frame(width: 650, height: 500)
+													.overlay(
+														VStack (alignment: .leading){
+															Text("AAPL Stock")
+																.font(.system(size: 35, weight: .semibold))
+															Text("Data for the last 3 months (90 days) of 2024")
+																.font(.system(size: 20))
+																.padding(.bottom, 30)
+															
+															graph_stock()
+															
+														}
+													)
 												
-											)
-										
-										
+												RoundedRectangle(cornerRadius: 20)
+													.fill(white)
+													.frame(width: 360, height: 500)
+													.overlay(
+														VStack (alignment: .leading){
+															HStack {
+																Text("Stock \nPerformance \nToday")
+																	.font(.system(size: 30, weight: .semibold))
+																	.padding(.leading, 20)
+																
+																Divider()
+																	.frame(width: 1, height: 90)
+																	.overlay(divider)
+																
+																RoundedRectangle(cornerRadius: 20)
+																	.fill(white2)
+																	.frame(width: 120, height: 60)
+																	.overlay(content: {
+																		Text("\(stockPerf().str)%")
+																			.font(.system(size: 30, weight: .semibold))
+																	})
+																
+															}
+															.padding([.top, .bottom], 20)
+															
+															Text("Recent News")
+																.font(.system(size: 35, weight: .semibold))
+																.padding(.leading, 15)
+															
+															NewsView()
+															
+														}
+													)
+											}
+										}
 									}
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
+										.position(
+											x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
+											y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
+										)
 								)
+							
+								.onTapGesture {
+									withAnimation {
+										tog3.toggle()
+									}
+								}
 						}
-						
-						
 						
 						RoundedRectangle(cornerRadius: 20)
 							.fill(white)
 							.opacity(tog1 ? 0 : 1)
 							.opacity(tog2 ? 0 : 1)
+							.opacity(tog3 ? 0 : 1)
 							.frame(width: 515, height: 400)
 							.overlay(
 								VStack (alignment: .leading) {
 									Text("Spending Summary")
 										.font(.system(size: 35, weight: .semibold))
 										
-									
-										Chart {
-											ForEach(animatedData, id: \.0) { month, spent, budget in
-												Plot {
-													BarMark(
-														x: .value("month", month),
-														yStart: .value("start", 0),
-														yEnd: .value("spent", spent)
-													)
-													.foregroundStyle(
-														LinearGradient(colors: [green, accent.opacity(0.4)], startPoint: .top, endPoint: .bottom)
-													)
-													.cornerRadius(5)
-													
-													RuleMark(
-														y: .value("budget", budget)
-													)
-													.lineStyle(StrokeStyle(lineWidth: 2))
-													.foregroundStyle(red)
-													.annotation(position: .top, alignment: .leading,content: {
-														RoundedRectangle(cornerRadius: 10)
-															.fill(white2)
-															.frame(width: 150, height: 30)
-															.overlay(content: {
-																Text("Budget: $1500")
-															})
-															.padding(.bottom, 10)
-													})
-													
-												}
-											}
-										}
-										.frame(width: 460, height: 300)
-										.chartYScale(domain: [0,1800])
-										.onAppear {
-													animateData()
-												}
+									graph_spendingSummary()
 									
 									/// ADD "HOVER FOR INFO" TO GRAPH
 										
 								}
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
 							)
 							
 					}
-					.padding(.top, 30)
 					
 					
 					VStack (spacing: 15) {
@@ -735,6 +986,7 @@ struct ContentView: View {
 							.fill(white2)
 							.opacity(tog1 ? 0 : 1)
 							.opacity(tog2 ? 0 : 1)
+							.opacity(tog3 ? 0 : 1)
 							.frame(width: 550, height: 300)
 							.position(x: 240, y: 150)
 							.overlay(
@@ -760,6 +1012,7 @@ struct ContentView: View {
 								}
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
 									.position(x: 240, y: 150)
 								
 								
@@ -772,6 +1025,7 @@ struct ContentView: View {
 							.fill(white)
 							.opacity(tog1 ? 0 : 1)
 							.opacity(tog2 ? 0 : 1)
+							.opacity(tog3 ? 0 : 1)
 							.frame(width: 550, height: 615)
 							.position(x: 240, y: 150)
 							.overlay(
@@ -835,17 +1089,58 @@ struct ContentView: View {
 								}
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
 									.position(x: 240, y: 70)
 									.frame(height: 615)
 									.padding(.top, 300)
 							)
 						
 					}
-					.padding(.top, 30)
-					
-					
+				}
+			}.scrollDisabled(tog1)
+			.scrollDisabled(tog2)
+			.scrollDisabled(tog3)
+			.onTapGesture(perform: {
+				withAnimation{
+					if tog1 {
+						tog1.toggle()
 					}
-			}
-
+					else if tog2 {
+						tog2.toggle()
+					}
+					else if tog3 {
+						tog3.toggle()
+					}
+				}
+			})
     }
+}
+
+struct tabView: View {
+	var body: some View {
+		if #available(iOS 18.0, *) {
+			TabView {
+				Tab("Dashboard", systemImage: "house.fill") {
+					ContentView()
+				}
+
+				Tab("Portfolio", systemImage: "briefcase") {
+					portfolioPage()
+				}
+
+				Tab("Acount", systemImage: "person.crop.circle.fill") {
+					Account()
+				}
+				
+			}
+			.onAppear() {
+				UITabBar.appearance().barTintColor = UIColor(white)
+				UITabBar.appearance().backgroundColor = UIColor(white)
+				UITabBar.appearance().unselectedItemTintColor = UIColor(black2)
+				UITabBar.appearance().barTintColor = UIColor(white)
+				}
+		} else {
+			// Fallback on earlier versions
+		}
+	}
 }

@@ -399,7 +399,9 @@ struct ContentView2: View {
 											
 										}
 											.onLongPressGesture {
-												UserDefaults.standard.set(false , forKey: "ModularSmallRectangle")
+												withAnimation {
+													UserDefaults.standard.set(false , forKey: "ModularSmallRectangle")
+												}
 											}
 											
 									)
