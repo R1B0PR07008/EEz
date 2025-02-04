@@ -9,10 +9,10 @@ import SwiftUI
 import Charts
 
 let Investment_list = [ /// Name, Category, Value ($), Performance, Beta risk, Color
-	("AAPL", "Stock", 15000, 10, 1.24,green),
-	("Beach House", "Real State", 150000, -9999999, -9999999, purple),
-	("Accenture", "Stock", 10000, -3, 1.25, red),
-	("IBM", "Stock", 9000, 20, 0.71, orange)
+	("AAPL", "Stock", 15000.0, 10, 1.24,green, ""),
+	("Beach House", "Real State", 150000.0, -9999999, -9999999, purple, ""),
+	("Accenture", "Stock", 10000.0, -3, 1.25, red, ""),
+	("IBM", "Stock", 9000.0, 20, 0.71, orange, "")
 ]
 
 nonisolated(unsafe) var stocks_aapl: [dat] = getCSVData(ticker: "aapl")
@@ -51,7 +51,7 @@ struct graph_Pie_InP: View {
 			animatedValues = Array(repeating: 0, count: Investment_list.count)
 
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-				withAnimation(.easeInOut(duration: 1.0)) {
+				withAnimation(.easeInOut(duration: 0.8)) {
 					animatedValues = Investment_list.map { Double($0.2) } /// Animate to actual values
 				}
 			}
@@ -90,7 +90,7 @@ struct graph_Pie_InP: View {
 				.frame(width: 200, height: 455)
 				.overlay(
 					VStack (alignment: .leading) {
-						ForEach(Investment_list, id: \.0) { name, _, _, _, _, color in
+						ForEach(Investment_list, id: \.0) { name, _, _, _, _, color, _ in
 							HStack {
 								Circle()
 									.fill(color)
@@ -107,6 +107,62 @@ struct graph_Pie_InP: View {
 
 				)
 		}
+	}
+}
+
+struct investment_list_view: View {
+	
+	@State private var showItems = false // Controls the animation
+	
+	var body: some View {
+		ForEach(Array(Investment_list.enumerated()), id: \.element.0) { index, investment in
+				  let (name, category, value, perf, risk, _, _) = investment
+			
+				let formattedValue = formatWithCommas(number: value)
+			
+				  RoundedRectangle(cornerRadius: 20)
+					  .fill(white)
+					  .frame(width: 460, height: 150)
+					  .overlay(
+						  HStack {
+							  VStack {
+								  Text(name)
+									  .font(.system(size: 30, weight: .semibold))
+								  
+								  Text(category)
+									  .font(.system(size: 20, weight: .semibold))
+							  }
+							  .frame(width: 150)
+							  
+							  Divider().frame(width: 1, height: 100).background(Color.gray)
+								  .padding(.horizontal, 20)
+							  
+							  VStack {
+								  Text("Value: $\(formattedValue)")
+									  .font(.system(size: 30, weight: .semibold))
+								  
+								  if perf != -9999999 {
+									  Text("Performance: \(perf)")
+										  .font(.system(size: 20, weight: .semibold))
+								  } else {
+									  Text("Performance: N/A")
+										  .font(.system(size: 20, weight: .semibold))
+								  }
+							  }
+							  .frame(width: 210)
+						  }
+					  )
+					  .padding(.bottom, 2)
+					  .opacity(showItems ? 1 : 0) // Start invisible
+					  .offset(y: showItems ? 0 : 20) // Start lower
+					  .animation(.easeOut(duration: 0.5).delay(Double(index) * 0.2), value: showItems) // Delay each item
+			  }
+		  .onAppear {
+			  showItems = true // Triggers the animation when the view appears
+		  }
+		  .onDisappear {
+			  showItems = false
+		  }
 	}
 }
 
@@ -220,45 +276,7 @@ struct portfolioPage: View {
 							.overlay(
 								ScrollView {
 									VStack {
-										ForEach(Investment_list, id: \.0) {name, category, value, perf, betaRisk, _ in
-										
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white)
-												.frame(width: 460, height: 150)
-												.overlay(
-													
-													HStack {
-														VStack {
-															Text(name)
-																.font(.system(size: 30, weight: .semibold))
-															
-															Text(category)
-																.font(.system(size: 20, weight: .semibold))
-														}
-														.frame(width: 150)
-														
-														Divider().frame(width: 1, height: 100).background(Color.gray)
-															.padding(.horizontal, 20)
-														
-														VStack {
-															Text("Value: $\(value)")
-																.font(.system(size: 30, weight: .semibold))
-															
-															if perf != -9999999 {
-																Text("Performance: \(perf)")
-																	.font(.system(size: 20, weight: .semibold))
-															} else {
-																Text("Performance: N/A")
-																	.font(.system(size: 20, weight: .semibold))
-															}
-															
-														}
-														.frame(width: 210)
-													}
-												)
-												.padding(.bottom, 2)
-											
-										}
+										investment_list_view()
 									}
 								}
 									.padding(.top, 20)

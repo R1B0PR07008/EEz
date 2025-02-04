@@ -16,6 +16,8 @@ struct Account: View {
 	
 	@AppStorage("SavingGoal") var SavingGoal : String = ""
 	
+	@AppStorage("MonthlyBudget") var monthly_budget : String = "1500"
+	
 	@AppStorage("first_open") var first_open : Bool = true
 	
     var body: some View {
@@ -148,7 +150,7 @@ struct Account: View {
 									.frame(width: 450, height:100)
 									.overlay(content: {
 										HStack {
-											Text("Saving/Spending Budget: ($)")
+											Text("Saving Goal: ($)")
 												.foregroundColor(black)
 												.font(.system(size: 25, weight: .semibold))
 											
@@ -157,6 +159,30 @@ struct Account: View {
 												.frame(width: 190, height: 60)
 												.overlay(content: {
 													TextField("$1,234", text: $SavingGoal)
+														.padding()
+														.font(.system(size: 20, weight: .semibold))
+														.padding(.leading, 10)
+												})
+											
+										}
+										.padding(.horizontal, 20)
+									})
+									.padding(.bottom, 10)
+								
+								RoundedRectangle(cornerRadius: 20)
+									.fill(white2)
+									.frame(width: 450, height:100)
+									.overlay(content: {
+										HStack {
+											Text("Monthly Budget: ($)")
+												.foregroundColor(black)
+												.font(.system(size: 25, weight: .semibold))
+											
+											RoundedRectangle(cornerRadius: 40)
+												.fill(white)
+												.frame(width: 190, height: 60)
+												.overlay(content: {
+													TextField("$1,234", text: $monthly_budget)
 														.padding()
 														.font(.system(size: 20, weight: .semibold))
 														.padding(.leading, 10)

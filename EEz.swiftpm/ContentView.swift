@@ -1,6 +1,7 @@
 import SwiftUI
 import Charts
 import CSV
+import Foundation
 
 
 /// Maybe Change colors to match tabbar. 
@@ -16,15 +17,6 @@ let orange = Color(UIColor(named: "Orange")!)
 let purple = Color(UIColor(named: "Purple")!)
 let accent = Color(UIColor(named: "AccentColor")!)
 let divider = Color(UIColor(named: "Divider")!)
-
-/// pie graph data (AUTOMATE THIS!!)
-
-nonisolated(unsafe) var budget_monthly = 8300
-nonisolated(unsafe) var spent = 4000
-nonisolated(unsafe) var investment = 2000
-nonisolated(unsafe) var Left = budget_monthly-spent
-
-nonisolated(unsafe) var Credit_Score = 600
 
 /// CSV Data for Stocks
 
@@ -44,9 +36,9 @@ struct dat : Identifiable, Decodable, Hashable {
 
 nonisolated(unsafe) var stream : InputStream!
 
-/// Data For bills list
+/// Data For bills (monthly) list
 
-/// data structure
+/// data structure for bills (monthly)
 
 struct bills_data : Identifiable, Codable {
 	let id: UUID
@@ -82,41 +74,95 @@ struct newsDataStructure : Identifiable, Codable, Hashable {
 	let content: String
 }
 
-/// actual var
+/// data structure for bills (monthly)
 
-var Bills_Data: [bills_data] {
-	get { loadFromFile() }
-	set { saveToFile(newValue) }
+struct RecentBillsData : Identifiable, Codable, Hashable {
+	 let id: UUID = UUID()
+	 let spent : Double
+	 let date : String
+	 let place : String
+	 let category: String
 }
+
+/// Imported vars
 
 var newsData: [newsDataStructure] {
 	get { loadFromFileNews() }
 	set { saveToFileNews(newValue) }
 }
 
+var bills : [RecentBillsData] {
+	get {loadFromFileBills()}
+	set {saveToFileBills(newValue)}
+}
+
+/// function for monthly spending
+
+func formatWithCommas(number: Double) -> String {
+	let formatter = NumberFormatter()
+	formatter.numberStyle = .decimal // Use the decimal style to add commas
+	formatter.groupingSeparator = "," // Set the separator to commas
+	formatter.minimumFractionDigits = 0 // Remove decimals if not needed
+	formatter.maximumFractionDigits = 2 // Set a limit for decimal places if needed
+	
+	if let formattedNumber = formatter.string(from: NSNumber(value: number)) {
+		return formattedNumber
+	}
+	
+	return "\(number)"
+}
+
+func getMonthlySpending(bills: [RecentBillsData]) -> [String: Double] {
+	var spendingByMonth: [String: Double] = [:]
+	
+	for bill in bills {
+		// Extract the year and month from the date (e.g., "2024-12")
+		let dateComponents = bill.date.prefix(7) // Get the first 7 characters "YYYY-MM"
+		
+		// Add the "spent" value to the corresponding month
+		spendingByMonth[String(dateComponents), default: 0] += bill.spent
+	}
+	
+	return spendingByMonth
+}
+
+func budget() -> Double {
+	@AppStorage("MonthlyBudget") var monthly_budget : String = "1500"
+	
+	return monthly_budget.isEmpty ? 1500 : Double(monthly_budget) ?? 1500
+}
+
+func sumInvestmentValues(investments: [(String, String, Double, Int, Double, Color, String)]) -> Double {
+	var totalValue: Double = 0.0
+	
+	for investment in investments {
+		totalValue += investment.2 // The third element is the value in dollars
+	}
+	
+	print(totalValue)
+	
+	return totalValue
+}
+
+/// vars
+
+nonisolated(unsafe) var budget_monthly : Double = budget()
+nonisolated(unsafe) var spent = getMonthlySpending(bills: bills)["2024-12"] ?? 0
+nonisolated(unsafe) var investment : Double = sumInvestmentValues(investments: Investment_list)
+nonisolated(unsafe) var Left : Double = budget_monthly-spent
+
+let formattedSpent = formatWithCommas(number: spent)
+let formattedleft = formatWithCommas(number: Left)
+
+nonisolated(unsafe) var Credit_Score = 600
+
 /// data for recent bills
  
 let news: [newsDataStructure] = []
 
-let bills: [[String: String]] = [
-	["id": "1", "Spent": "10", "date": "12-1-2024", "place": "McDonalds", "Category": "Fast Food"],
-	["id": "2", "Spent": "20", "date": "12-2-2024", "place": "McDonalds", "Category": "Fast Food"],
-	["id": "3", "Spent": "130", "date":  "12-3-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "4", "Spent": "150", "date":  "12-4-2024", "place":  "Walmart", "Category": "Super Market"],
-	["id": "5", "Spent": "170", "date":  "12-5-2024", "place":  "Decathlon", "Category": "Clothes"],
-	["id": "6", "Spent": "40", "date":  "12-6-2024", "place":  "Zara", "Category": "Clothes"],
-	["id": "7", "Spent": "15", "date": "12-7-2024", "place": "KFC", "Category": "Fast Food"],
-	["id": "8", "Spent": "150", "date":  "12-8-2024", "place":  "Costco", "Category": "Super Market"],
-	["id": "9", "Spent": "30", "date":  "12-9-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "10", "Spent": "40", "date":  "12-10-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "11", "Spent": "60", "date":  "12-11-2024", "place":  "Zara", "Category": "Clothes"],
-	["id": "12", "Spent": "50", "date":  "12-12-2024", "place":  "Walmart", "Category": "Super Market"],
-	["id": "13", "Spent": "10", "date":  "12-13-2024", "place":  "Disney+", "Category": "Subscriptions"],
-	["id": "14", "Spent": "14", "date":  "12-14-2024", "place":  "HBO", "Category": "Subscriptions"],
-	["id": "15", "Spent": "10", "date":  "12-15-2024", "place":  "Paramount+", "Category": "Subscriptions"],
-	["id": "16", "Spent": "12", "date":  "12-16-2024", "place":  "Netflix", "Category": "Subscriptions"],
-	
-]
+let bills_: [RecentBillsData] = []
+
+/// func to create swift data values of bills list
 
 /// data for monthly spending
 
@@ -146,7 +192,7 @@ struct graph_Pie: View {
 
 	// Pie chart data
 	let Budget = [
-		("Left", Double(Left), white),
+		("Left", Double(Left), green2),
 		("Spent", Double(spent), red),
 	]
 	
@@ -212,18 +258,18 @@ struct graph_Pie: View {
 struct Graph_line1: View {
 	var body: some View {
 		Chart {
-			ForEach(bills, id: \.self) { item in
+			ForEach(bills, id: \.id) { item in
 				
-				let spent_double = Double(item["Spent"]!)
+				 let spent_double = Double(item.spent)
 			
 				LineMark(
-					x: .value("Date", item["date"]!),
-					y: .value("Spent", spent_double!)
+					 x: .value("Date", item.date),
+					y: .value("Spent", spent_double)
 				)
 				.interpolationMethod(.cardinal)
 				
-				AreaMark(x: .value("Date", item["date"]!),
-						 y: .value("Spent", spent_double!)
+				 AreaMark(x: .value("Date", item.date),
+						 y: .value("Spent", spent_double)
 				)
 				.interpolationMethod(.cardinal)
 				.foregroundStyle(LinearGradient(colors: [green, green.opacity(0.2)], startPoint: .top, endPoint: .bottom))
@@ -233,24 +279,16 @@ struct Graph_line1: View {
 	}
 }
 
-func SortedBills(category: String) -> [Data_] {
-	var data : [EEz.Data_] = []
-	
-	if let Bills = Bills_Data.first(where: { $0.category == category })?.data_ {
-		data = Bills
-		print(Bills)
-	} else {
-		print("No bill found for the \(category) category.")
-	}
-	
-	return data
+func getBillsByCategory(category: String) -> [RecentBillsData] {
+	let allBills = loadFromFileBills() // Load all stored bills
+	return allBills.filter { $0.category == category }
 }
 
 func getTotalSpent(Categroy: String!) -> String {
 	let catg = Categroy
 	
-	let vills_data : [[String : String]] = bills.filter {$0["Category"] == catg}
-	let totalSpent = vills_data.compactMap { $0["Spent"] }.compactMap { Double($0) }.reduce(0, +)
+	 let vills_data : [RecentBillsData] = bills.filter {$0.category == catg}
+	 let totalSpent = vills_data.compactMap { $0.spent }.compactMap { Double($0) }.reduce(0, +)
 	let formattedTotalSpent = String(format: "%.2f", totalSpent)
 	
 	return formattedTotalSpent
@@ -259,29 +297,22 @@ func getTotalSpent(Categroy: String!) -> String {
 func get_categories() -> [String] {
 	var cats : [String]
 	
-	cats = Array(Set(bills.compactMap { $0["Category"] })).sorted()
+	 cats = Array(Set(bills.compactMap { $0.category })).sorted()
 	
 	return cats
 }
 
 func graph_line(category: String) -> some View {
 	
-	var data : [EEz.Data_] = []
-	
-	if let Bills = Bills_Data.first(where: { $0.category == category })?.data_ {
-		data = Bills
-	} else {
-		print("No bill found for the \(category) category.")
-	}
-	
+	let data = getBillsByCategory(category: category)
+
 	return
-	
 		VStack{
 			Chart {
 				ForEach(data, id: \.id) {item in
 					AreaMark(
-						x: .value("Month", item.month),
-						y: .value("Spent", item.budget)
+						x: .value("Month", item.date),
+						y: .value("Budget", item.spent+10)
 					)
 					.interpolationMethod(.cardinal)
 					.foregroundStyle(
@@ -291,8 +322,8 @@ func graph_line(category: String) -> some View {
 							endPoint: .bottom
 						))
 					LineMark(
-						x: .value("Month", item.month),
-						y: .value("Sales", item.value)
+						x: .value("Month", item.date),
+						y: .value("Spent", item.spent)
 					)
 					.foregroundStyle(red)
 					.interpolationMethod(.cardinal)
@@ -343,13 +374,135 @@ func graph_line(category: String) -> some View {
 		}
 }
 
+struct billsList: View {
+	 var body: some View {
+		  ScrollView {
+			  VStack {
+				  ForEach(get_categories(), id: \.self) { category in
+
+					  
+					  RoundedRectangle(cornerRadius: 20)
+						  .fill(white)
+						  .frame(width: 470, height: 200)
+						  .overlay(
+							  HStack (spacing: 15) {
+								  VStack (spacing: 15){
+									  Text("\(category)")
+										  .font(.system(size: 30, weight: .bold, design: .default))
+									  
+									  RoundedRectangle(cornerRadius: 20)
+										  .fill(white2)
+										  .frame(width: 130, height: 60)
+										  .overlay(
+											  Text("$\(getTotalSpent(Categroy: category))")
+												  .font(.system(size: 25, weight: .semibold))
+										  )
+								  }
+								  
+								  Divider().frame(width: 1, height: 130).background(Color.gray)
+									  .padding(.horizontal, 20)
+								  
+								  graph_line(category: category)
+								  
+							  }
+						  )
+				  }
+			  }
+		  }
+	 }
+}
+
+struct expandedSpentView: View {
+	 var body: some View {
+		  VStack (alignment: .leading, spacing: 15) {
+			  
+			  HStack(spacing: 15) {
+				  VStack(alignment: .leading, spacing: 15) {
+					  
+					  Text("Your Monthly Spending")
+						  .font(.system(size: 45, weight: .semibold))
+						  .frame(width: 470)
+					  Text("Daily Data:")
+						  .font(.system(size: 20, weight: .semibold))
+					  
+					  Graph_line1()
+						  .frame(width: 500, height: 200)
+					  
+					  RoundedRectangle(cornerRadius: 20)
+						  .fill(white2)
+						  .frame(width: 500, height: 200)
+						  .overlay(
+							  HStack (spacing: 15) {
+								  VStack {
+									  Text("This Month \nYou've Spent:")
+										  .font(.system(size: 25, weight: .semibold))
+									  
+									  RoundedRectangle(cornerRadius: 20)
+										  .fill(white)
+										  .frame(width: 150, height: 60)
+										  .overlay(
+											  Text("$\(formattedSpent)")
+												  .font(.system(size: 25, weight: .semibold))
+										  )
+									  
+								  }
+								  
+								  Divider().frame(width: 1, height: 130).background(Color.gray)
+									  .padding(.horizontal, 20)
+								  
+								  VStack {
+									  Text("You are:")
+											  .font(.system(size: 25, weight: .semibold))
+										  
+										  RoundedRectangle(cornerRadius: 20)
+											  .fill(white)
+											  .frame(width: 150, height: 60)
+											  .overlay(
+												  Text("$\(formattedleft)")
+											  ).font(.system(size: 25, weight: .semibold))
+									  
+									  if Left > 0 {
+										  Text("Under budget").font(.system(size: 25, weight: .semibold))
+									  } else {
+										  Text("Over budget").font(.system(size: 25, weight: .semibold))
+									  }
+								  }
+								  
+							  }
+						  )
+				  }
+				  
+				  VStack(spacing: 15) {
+					  RoundedRectangle(cornerRadius: 20)
+						  .fill(white2)
+						  .frame(width: 500, height: 525)
+						  
+						  .overlay(
+							  VStack (alignment: .leading) {
+								  Text("Your Bills, Sorted:")
+									  .font(.system(size: 40, weight: .semibold))
+									  .padding(.top, 36)
+									  .padding(.bottom, 20)
+								  
+									billsList()
+								  
+							  }
+						  )
+						  
+				  }
+			  }
+			  
+		  }
+	 }
+}
+
 // MARK: -View for list animation
 
 struct AnimatedBillRow: View {
 	let index: Int
-	let bill: [String: String]
+	let bill: RecentBillsData
 	@Binding var appearIndices: Set<Int>
-	
+
 	var body: some View {
 		RoundedRectangle(cornerRadius: 40)
 			.fill(white2) // Use your custom color `white2`
@@ -366,34 +519,28 @@ struct AnimatedBillRow: View {
 				}
 			}
 	}
-	
+
 	// Extract the content of the bill row into a computed property
 	var billContent: some View {
 		HStack {
-			if let spnt = bill["Spent"] {
-				Text("\(spnt)")
-					.foregroundColor(black)
-					.frame(width: 160)
-					.font(.system(size: 22, weight: .semibold))
-			}
+			Text("$\(bill.spent, specifier: "%.2f")") // Convert Double to formatted string
+				.foregroundColor(black)
+				.frame(width: 160)
+				.font(.system(size: 22, weight: .semibold))
 
 			Divider().frame(width: 1, height: 25).background(Color.gray)
 
-			if let spnt = bill["date"] {
-				Text("\(spnt)")
-					.foregroundColor(black)
-					.frame(width: 160)
-					.font(.system(size: 22, weight: .semibold))
-			}
+			Text("\(bill.date)") // Date is already a string
+				.foregroundColor(black)
+				.frame(width: 160)
+				.font(.system(size: 22, weight: .semibold))
 
 			Divider().frame(width: 1, height: 25).background(Color.gray)
 
-			if let spnt = bill["place"] {
-				Text("\(spnt)")
-					.foregroundColor(black)
-					.frame(width: 160)
-					.font(.system(size: 22, weight: .semibold))
-			}
+			Text("\(bill.place)") // Place is already a string
+				.foregroundColor(black)
+				.frame(width: 160)
+				.font(.system(size: 22, weight: .semibold))
 		}
 	}
 }
@@ -404,7 +551,7 @@ func getCSVData(ticker : String) -> Array<dat> {
 	var records = [dat] ()
 	
 
-		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/\(ticker).csv")) /// Fix this
+		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/\(ticker).csv")) /// Fix this
 		do {
 			let reader = try CSVReader(stream: stream, hasHeaderRow: true)
 			let decoder = CSVRowDecoder()
@@ -537,6 +684,85 @@ struct NewsView: View {
 	}
 }
 
+struct ExpandedStocksView: View {
+	 var body: some View {
+		  HStack(spacing: 15) {
+			  RoundedRectangle(cornerRadius: 20)
+				  .fill(white)
+				  .frame(width: 650, height: 500)
+				  .overlay(
+					  VStack (alignment: .leading){
+						  Text("AAPL Stock")
+							  .font(.system(size: 35, weight: .semibold))
+						  Text("Data for the last 3 months (90 days) of 2024")
+							  .font(.system(size: 20))
+							  .padding(.bottom, 30)
+						  
+						  graph_stock()
+						  
+					  }
+				  )
+			  
+			  RoundedRectangle(cornerRadius: 20)
+				  .fill(white)
+				  .frame(width: 360, height: 500)
+				  .overlay(
+					  VStack (alignment: .leading){
+						  HStack {
+							  Text("Stock \nPerformance \nToday")
+								  .font(.system(size: 30, weight: .semibold))
+								  .padding(.leading, 20)
+							  
+							  Divider()
+								  .frame(width: 1, height: 90)
+								  .overlay(divider)
+							  
+							  RoundedRectangle(cornerRadius: 20)
+								  .fill(white2)
+								  .frame(width: 120, height: 60)
+								  .overlay(content: {
+									  Text("\(stockPerf().str)%")
+										  .font(.system(size: 30, weight: .semibold))
+								  })
+							  
+						  }
+						  .padding([.top, .bottom], 20)
+						  
+						  HStack {
+							  Text("Beta (β) \nRisk")
+								  .font(.system(size: 30, weight: .semibold))
+								  .padding(.leading, -30)
+								  .frame(width: 200)
+							  
+							  Divider()
+								  .frame(width: 1, height: 90)
+								  .overlay(divider)
+							  
+							  RoundedRectangle(cornerRadius: 20)
+								  .fill(white2)
+								  .frame(width: 120, height: 60)
+								  .overlay(content: {
+									  Text("1.24")
+										  .font(.system(size: 30, weight: .semibold))
+								  })
+								  .padding(.trailing, 20)
+								  .padding(.leading, 10)
+						  }
+						  .padding(.bottom, 07)
+						  
+						  Text("Recent News")
+							  .font(.system(size: 35, weight: .semibold))
+							  .padding(.leading, 15)
+						  
+						  NewsView()
+						  
+					  }
+				  )
+		  }
+	 }
+}
+
+
 // MARK: -Speding Summary stuff
 
 struct graph_spendingSummary: View {
@@ -546,7 +772,7 @@ struct graph_spendingSummary: View {
 	private func animateData() {
 			for (index, dataPoint) in monthly_data.enumerated() {
 				DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.2) {
-					withAnimation(.easeInOut(duration: 0.5)) {
+					withAnimation(.easeOut(duration: 0.5)) {
 						animatedData.append((dataPoint.0, dataPoint.1, dataPoint.2))
 				}
 			}
@@ -618,6 +844,69 @@ struct ContentView: View {
 	
 	@State private var appearIndices: Set<Int> = []
 	
+	var billsList_: some View {
+		
+		VStack {
+			HStack {
+				Text("Recent Bills")
+					.font(.system(size: 35, weight: .semibold))
+					.padding(.horizontal, 30)
+					.padding(.top, 30)
+				
+				Spacer()
+			}
+			
+			HStack() {
+				
+				VStack {
+					Text("Spent")
+						.foregroundColor(black)
+						.font(.system(size: 22, weight: .semibold))
+						.frame(width: 160)
+				}
+				
+				
+				Divider().frame(width: 1).overlay(divider)
+				
+				
+				VStack {
+					Text("Date")
+						.foregroundColor(black)
+						.font(.system(size: 22, weight: .semibold))
+						.frame(width: 160)
+				}
+				
+				
+				Divider().frame(width: 1).overlay(divider)
+				
+				
+				VStack {
+					Text("Place")
+						.foregroundColor(black)
+						.font(.system(size: 22, weight: .semibold))
+						.frame(width: 160)
+				}
+				
+				
+			}
+			.padding()
+			.padding(.bottom, 0)
+			.frame(width: 350, height: 60)
+			
+			ScrollView {
+				VStack {
+					
+					ForEach(bills) { bill in
+						AnimatedBillRow(index: bills.firstIndex(where: { $0.id == bill.id }) ?? 0, bill: bill, appearIndices: $appearIndices)
+					}
+
+					
+					
+				}
+			}
+		}
+	}
+	
     var body: some View {
 			ScrollView {
 				HStack (spacing: 15) {
@@ -648,122 +937,12 @@ struct ContentView: View {
 												.fill(white2)
 												.frame(width: 150, height: 80)
 												.overlay(
-													Text("$\(spent)")
+													Text("$\(formattedSpent)")
 														.font(.system(size: 30, weight: .semibold))
 												)
 										} else {
 
-											VStack (alignment: .leading, spacing: 15) {
-												
-												HStack(spacing: 15) {
-													VStack(alignment: .leading, spacing: 15) {
-														
-														Text("Your Monthly Spending")
-															.font(.system(size: 45, weight: .semibold))
-															.frame(width: 470)
-														Text("Daily Data:")
-															.font(.system(size: 20, weight: .semibold))
-														
-														Graph_line1()
-															.frame(width: 500, height: 200)
-														
-														RoundedRectangle(cornerRadius: 20)
-															.fill(white2)
-															.frame(width: 500, height: 200)
-															.overlay(
-																HStack (spacing: 15) {
-																	VStack {
-																		Text("This Month \nYou've Spent:")
-																			.font(.system(size: 25, weight: .semibold))
-																		
-																		RoundedRectangle(cornerRadius: 20)
-																			.fill(white)
-																			.frame(width: 150, height: 60)
-																			.overlay(
-																				Text("$\(spent)")
-																					.font(.system(size: 25, weight: .semibold))
-																			)
-																		
-																	}
-																	
-																	Divider().frame(width: 1, height: 130).background(Color.gray)
-																		.padding(.horizontal, 20)
-																	
-																	VStack {
-																		Text("You are:")
-																				.font(.system(size: 25, weight: .semibold))
-																			
-																			RoundedRectangle(cornerRadius: 20)
-																				.fill(white)
-																				.frame(width: 150, height: 60)
-																				.overlay(
-																					Text("$\(Left)")
-																				).font(.system(size: 25, weight: .semibold))
-																		
-																		if Left > 0 {
-																			Text("Under budget").font(.system(size: 25, weight: .semibold))
-																		} else {
-																			Text("Over budget").font(.system(size: 25, weight: .semibold))
-																		}
-																	}
-																	
-																}
-															)
-													}
-													
-													VStack(spacing: 15) {
-														RoundedRectangle(cornerRadius: 20)
-															.fill(white2)
-															.frame(width: 500, height: 525)
-															
-															.overlay(
-																VStack (alignment: .leading) {
-																	Text("Your Bills, Sorted:")
-																		.font(.system(size: 40, weight: .semibold))
-																		.padding(.top, 36)
-																		.padding(.bottom, 20)
-																	
-																	ScrollView {
-																		VStack {
-																			ForEach(get_categories(), id: \.self) { category in
-
-																				
-																				RoundedRectangle(cornerRadius: 20)
-																					.fill(white)
-																					.frame(width: 470, height: 200)
-																					.overlay(
-																						HStack (spacing: 15) {
-																							VStack (spacing: 15){
-																								Text("\(category)")
-																									.font(.system(size: 30, weight: .bold, design: .default))
-																								
-																								RoundedRectangle(cornerRadius: 20)
-																									.fill(white2)
-																									.frame(width: 130, height: 60)
-																									.overlay(
-																										Text("$\(getTotalSpent(Categroy: category))")
-																											.font(.system(size: 25, weight: .semibold))
-																									)
-																							}
-																							
-																							Divider().frame(width: 1, height: 130).background(Color.gray)
-																								.padding(.horizontal, 20)
-																							
-																							graph_line(category: category)
-																							
-																						}
-																					)
-																			}
-																		}
-																	}
-																	
-																}
-															)
-															
-													}
-												}
-												
-											}
+											 expandedSpentView()
 										}
 									}
 										.opacity(tog2 ? 0 : 1)
@@ -850,6 +1029,8 @@ struct ContentView: View {
 										.opacity(tog3 ? 0 : 1)
 								)
 							
+							
+							
 							RoundedRectangle(cornerRadius: 20)
 								.fill(white2)
 								.opacity(tog1 ? 0 : 1)
@@ -887,59 +1068,9 @@ struct ContentView: View {
 														.padding(.bottom, 10)
 													
 												)
-										} else if tog3 {
+										} else {
 											
-											HStack(spacing: 15) {
-												RoundedRectangle(cornerRadius: 20)
-													.fill(white)
-													.frame(width: 650, height: 500)
-													.overlay(
-														VStack (alignment: .leading){
-															Text("AAPL Stock")
-																.font(.system(size: 35, weight: .semibold))
-															Text("Data for the last 3 months (90 days) of 2024")
-																.font(.system(size: 20))
-																.padding(.bottom, 30)
-															
-															graph_stock()
-															
-														}
-													)
-												
-												RoundedRectangle(cornerRadius: 20)
-													.fill(white)
-													.frame(width: 360, height: 500)
-													.overlay(
-														VStack (alignment: .leading){
-															HStack {
-																Text("Stock \nPerformance \nToday")
-																	.font(.system(size: 30, weight: .semibold))
-																	.padding(.leading, 20)
-																
-																Divider()
-																	.frame(width: 1, height: 90)
-																	.overlay(divider)
-																
-																RoundedRectangle(cornerRadius: 20)
-																	.fill(white2)
-																	.frame(width: 120, height: 60)
-																	.overlay(content: {
-																		Text("\(stockPerf().str)%")
-																			.font(.system(size: 30, weight: .semibold))
-																	})
-																
-															}
-															.padding([.top, .bottom], 20)
-															
-															Text("Recent News")
-																.font(.system(size: 35, weight: .semibold))
-																.padding(.leading, 15)
-															
-															NewsView()
-															
-														}
-													)
-											}
+											 ExpandedStocksView()
 										}
 									}
 										.opacity(tog1 ? 0 : 1)
@@ -969,8 +1100,6 @@ struct ContentView: View {
 										.font(.system(size: 35, weight: .semibold))
 										
 									graph_spendingSummary()
-									
-									/// ADD "HOVER FOR INFO" TO GRAPH
 										
 								}
 									.opacity(tog1 ? 0 : 1)
@@ -1032,60 +1161,7 @@ struct ContentView: View {
 								
 								VStack {
 									
-									HStack {
-										Text("Recent Bills")
-											.font(.system(size: 35, weight: .semibold))
-											.padding(.horizontal, 30)
-											.padding(.top, 30)
-										
-										Spacer()
-									}
-									
-									HStack() {
-										
-										VStack {
-											Text("Spent")
-												.foregroundColor(black)
-												.font(.system(size: 22, weight: .semibold))
-												.frame(width: 160)
-										}
-										
-										
-										Divider().frame(width: 1).overlay(divider)
-										
-										
-										VStack {
-											Text("Date")
-												.foregroundColor(black)
-												.font(.system(size: 22, weight: .semibold))
-												.frame(width: 160)
-										}
-										
-										
-										Divider().frame(width: 1).overlay(divider)
-										
-										
-										VStack {
-											Text("Place")
-												.foregroundColor(black)
-												.font(.system(size: 22, weight: .semibold))
-												.frame(width: 160)
-										}
-										
-										
-									}
-									.padding()
-									.padding(.bottom, 0)
-									.frame(width: 350, height: 60)
-									
-									ScrollView {
-										VStack {
-											
-											ForEach(bills.indices, id: \.self) { index in
-															AnimatedBillRow(index: index, bill: bills[index], appearIndices: $appearIndices)
-														}
-										}
-									}
+									billsList_
 								}
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
@@ -1128,9 +1204,13 @@ struct tabView: View {
 					portfolioPage()
 				}
 
-				Tab("Acount", systemImage: "person.crop.circle.fill") {
+				Tab("Account", systemImage: "person.crop.circle.fill") {
 					Account()
 				}
+				 
+				Tab("Add Bill", systemImage: "plus") {
+					 Add_bill()
+				 }
 				
 			}
 			.onAppear() {

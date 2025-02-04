@@ -7,41 +7,59 @@
 
 import Foundation
 
-/// bills data loader
-
-func saveToFile(_ bills: [bills_data]) {
-	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/data.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	if let encoded = try? JSONEncoder().encode(bills) {
-		try? encoded.write(to: fileURL)
-	}
-}
-
-func loadFromFile() -> [bills_data] {
-	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/data.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	if let data = try? Data(contentsOf: fileURL),
-	   let decoded = try? JSONDecoder().decode([bills_data].self, from: data) {
-		return decoded
-	}
-	return []
-}
-
 /// news loader
 
 func saveToFileNews(_ bills: [newsDataStructure]) {
-	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/news.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/news.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if let encoded = try? JSONEncoder().encode(news) {
 		try? encoded.write(to: fileURL)
 	}
 }
 
 func loadFromFileNews() -> [newsDataStructure] {
-	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Resources/news.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/news.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	do {
 		let data = try Data(contentsOf: fileURL)
 		let decoded = try JSONDecoder().decode([newsDataStructure].self, from: data)
 			return decoded
 	} catch {
-		print("ERROR \(error)")
+		print("ERROR2 \(error)")
+		return []
 	}
-	return []
 }
+
+/// Bills Data loader
+
+func saveToFileBills(_ bills: [RecentBillsData]) {
+	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/bills.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	print("\nfunction: \(bills)")
+	if let encoded = try? JSONEncoder().encode(bills) {
+		try? encoded.write(to: fileURL)
+	}
+}
+
+func loadFromFileBills() -> [RecentBillsData] {
+	let fileURL = URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/bills.json") /// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	do {
+		let data = try Data(contentsOf: fileURL)
+		let decoded = try JSONDecoder().decode([RecentBillsData].self, from: data)
+			return decoded
+	} catch {
+		print("ERROR3 \(error)")
+		return []
+	}
+}
+
+func addNewBill(spent: Double, date: String, place: String, category: String) {
+
+	let newBill = RecentBillsData(spent: spent, date: date, place: place, category: category)
+	
+	var currentBills = loadFromFileBills()
+	
+	currentBills.append(newBill)
+	
+	saveToFileBills(currentBills)
+	
+	var newBills = loadFromFileBills()
+}
+

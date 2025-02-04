@@ -16,6 +16,7 @@ struct IniView: View {
 	@AppStorage("Notifications") var Notifications: Bool = false
 	@AppStorage("Ai_tools") var Ai_tools: Bool = true
 	@AppStorage("SavingGoal") var SavingGoal : String = ""
+	@AppStorage("MonthlyBudget") var monthly_budget : String = "1500"
 	
 	var body: some View {
 			ScrollView {
@@ -54,14 +55,14 @@ struct IniView: View {
 					VStack {
 						RoundedRectangle(cornerRadius: 20)
 							.fill(white)
-							.frame(width: 500, height: 600)
+							.frame(width: 500, height: 670)
 							.overlay(
 								VStack {
 											Text("First, we need some info: ")
 												.font(.system(size: 35))
 												.fontWeight(.bold)
 												.foregroundColor(black)
-												.padding(.top, 20)
+												.padding(.top, 10)
 											
 											// toggles
 											
@@ -117,19 +118,38 @@ struct IniView: View {
 												.frame(width: 370, height: 120)
 												.overlay(content: {
 													VStack {
-														Text("Do You Have Any Spending/Svaing goals?")
+														Text("Do You Have Any Svaing goals?")
 															.padding(.horizontal, 20)
 														
 														RoundedRectangle(cornerRadius: 40)
 															.fill(white)
 															.frame(width: 320, height: 40)
 															.overlay(content: {
-																TextField("Speding/Saving Budget", text: $SavingGoal)
+																TextField("Saving Goal", text: $SavingGoal)
 																	.padding()
 															})
 													}
 														
 												})
+									
+											RoundedRectangle(cornerRadius: 30)
+												.fill(white2)
+												.frame(width: 370, height: 120)
+												.overlay(content: {
+													VStack {
+														Text("Do You Have Any Monthyl Budget?")
+															.padding(.horizontal, 20)
+												
+														RoundedRectangle(cornerRadius: 40)
+															.fill(white)
+															.frame(width: 320, height: 40)
+															.overlay(content: {
+																TextField("Monthly Budget", text: $monthly_budget)
+																	.padding()
+													})
+											}
+												
+										})
 								}
 							)
 							
@@ -143,7 +163,7 @@ struct IniView: View {
 									.foregroundStyle(black)
 										
 								)
-								.padding(.top, 30)
+								.padding(.top, 10)
 								.onTapGesture {
 									withAnimation {
 										first_open.toggle()
