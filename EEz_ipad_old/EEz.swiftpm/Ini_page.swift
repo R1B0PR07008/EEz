@@ -22,6 +22,7 @@ struct IniView: View {
 	var body: some View {
 			ScrollView {
 				VStack {
+					
 					VStack {
 							if let logo = UIImage(named: "Logo") {
 								Image(uiImage: logo)
@@ -167,19 +168,10 @@ struct IniView: View {
 								.onTapGesture {
 									
 									if first_open {
-										
-										data_()
-										
-										let data = UserDefaults.standard.string(forKey: "bills_csv")!
-										
-										print(data)
-										
 										let key = SymmetricKey(size: .bits256)
 										KeychainHelper.storeKey(key)
 										
-										print(UserDefaults.standard.string(forKey: "bills_csv") ?? "nil")
-										
-										UserDefaults.standard.set(CryptoHelper.encryptCSVToString(UserDefaults.standard.string(forKey: "bills_csv")!, key: KeychainHelper.retrieveKey()!), forKey: "bills_csv")
+										encryptOldData()
 									}
 									
 									withAnimation {

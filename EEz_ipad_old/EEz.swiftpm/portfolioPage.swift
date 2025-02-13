@@ -15,9 +15,9 @@ let Investment_list = [ /// Name, Category, Value ($), Performance, Beta risk, C
 	("IBM", "Stock", 9000.0, 20, 0.71, orange, "")
 ]
 
-nonisolated(unsafe) var stocks_aapl: [dat] = parseCSVToDatArray("aapl")
-nonisolated(unsafe) var stocks_acn: [dat] = parseCSVToDatArray("acn")
-nonisolated(unsafe) var stocks_ibm: [dat] = parseCSVToDatArray("ibm")
+nonisolated(unsafe) var stocks_aapl: [dat] = getCSVData(ticker: "aapl")
+nonisolated(unsafe) var stocks_acn: [dat] = getCSVData(ticker: "acn")
+nonisolated(unsafe) var stocks_ibm: [dat] = getCSVData(ticker: "ibm")
 
 nonisolated(unsafe) var tog4: Bool = false
 
@@ -169,20 +169,20 @@ struct investment_list_view: View {
 // MARK: -Stocks Perf Stuff
 //@available(iOS 17.0, *)
 //struct stocks_perf_view: View {
-//
+//	
 //	@State var tog4: Bool = false
-//
+//	
 //	var graph: some View {
 //		ScrollView (.horizontal) {
 //			LazyHStack {
 //				ForEach(stocks_list, id: \.self) { item in
-//
+//					
 //					let formated_perf = String(format: "%.1f", item.perf)
-//
+//					
 //					let formated_risk = String(format: "%.2f", item.risk)
-//
+//					
 //					let maxCloseP = item.data.max(by: { $0.Close < $1.Close })?.Close ?? 0
-//
+//					
 //					RoundedRectangle(cornerRadius: 20)
 //						.fill(white)
 //						.frame(width: tog4 ? 1100 : 500 , height: tog4 ? 660 : 130)
@@ -194,40 +194,40 @@ struct investment_list_view: View {
 //						.overlay(
 //							HStack {
 //								VStack (alignment: .leading) {
-//
+//									
 //									Text("\(item.ticker) (last 3 months of 2024)")
 //									Chart() {
 //										let topXvalues = Array(item.data.prefix(90))
-//
+//										
 //										ForEach(topXvalues, id: \.self) {item in
-//
-//
+//											
+//											
 //											let condition: Bool = item.isLarger == "0"
-//
+//											
 //											LineMark(
 //												x: .value("Date", item.Date),
 //												y: .value("Close Price", item.Close)
 //											)
 //											.foregroundStyle(condition ? red : green)
 //											.interpolationMethod(.cardinal)
-//
+//											
 //										}
-//
+//										
 //									}.frame(width: 230, height: 70)
 //										.chartYScale(domain: [maxCloseP - 100, maxCloseP + 100]) /// automate the max value
 //										.padding(.bottom, 10)
 //										.chartXAxis(.hidden)
 //								}
 //								.frame(width: 230)
-//
+//								
 //								Divider().frame(width: 1, height: 90).background(Color.gray)
 //									.padding(.horizontal, 20)
-//
+//								
 //								VStack (alignment: .leading) {
 //									Text("Performance: \(formated_perf)%")
 //										.font(.system(size: 20, weight: .semibold))
 //										.padding(.bottom, 10)
-//
+//									
 //									Text("Beta Risk: \(formated_risk)")
 //										.font(.system(size: 20, weight: .semibold))
 //								}
@@ -254,7 +254,7 @@ struct portfolioPage: View {
 	
 	@State private var tog4: Bool = false
 	
-	var body: some View {
+    var body: some View {
 		ZStack {
 			ScrollView {
 				VStack (spacing: 15) {
@@ -388,7 +388,7 @@ struct portfolioPage: View {
 				}
 			}
 		}
-	}
+    }
 	
 	var stocks_perf_view: some View {
 		ScrollView (.horizontal) {

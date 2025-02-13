@@ -1,11 +1,12 @@
 import SwiftUI
 import Charts
+import CSV
 import Foundation
 import Security
 import CryptoKit
 
 
-/// Maybe Change colors to match tabbar.
+/// Maybe Change colors to match tabbar. 
 
 let green = Color(UIColor(named: "Green")!)
 let green2 = Color(UIColor(named: "Green2")!)
@@ -22,7 +23,7 @@ let divider = Color(UIColor(named: "Divider")!)
 /// CSV Data for Stocks
 
 struct dat : Identifiable, Decodable, Hashable {
-	let id: UUID = UUID()
+	let id: UUID?
 	let Date: String
 	let Open: Double
 	let High: Double
@@ -38,8 +39,6 @@ struct dat : Identifiable, Decodable, Hashable {
 nonisolated(unsafe) var stream : InputStream!
 
 /// Data For bills (monthly) list
-
-let bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
 
 /// data structure for bills (monthly)
 
@@ -67,10 +66,12 @@ struct source : Identifiable, Codable, Hashable {
 
 struct newsDataStructure : Identifiable, Codable, Hashable {
 	let id: UUID = UUID()
-	let source: String
+	let source: source
 	let author: String?
 	let title: String
 	let description: String
+	let url: String
+	let urlToImage: String?
 	let publishedAt: String
 	let content: String
 }
@@ -87,6 +88,15 @@ struct RecentBillsData : Identifiable, Codable, Hashable {
 
 /// Imported vars
 
+var newsData: [newsDataStructure] {
+	get { loadFromFileNews() }
+	set { saveToFileNews(newValue) }
+}
+
+var bills : [RecentBillsData] {
+	get {loadFromFileBills()}
+	set {saveToFileBills(newValue)}
+}
 
 /// formating functions
 
@@ -106,6 +116,24 @@ func formatWithCommas(number: Double) -> String {
 
 func replaceUnderscoresWithSpaces(in string: String) -> String {
 	return string.replacingOccurrences(of: "_", with: " ")
+}
+
+/// function for monthly spending
+
+func getMonthlySpending() -> [String: Double] {
+	var spendingByMonth: [String: Double] = [:]
+	
+	bills = loadFromFileBills()
+	
+	for bill in bills {
+		// Extract the year and month from the date (e.g., "2024-12")
+		let dateComponents = bill.date.prefix(7) // Get the first 7 characters "YYYY-MM"
+		
+		// Add the "spent" value to the corresponding month
+		spendingByMonth[String(dateComponents), default: 0] += bill.spent
+	}
+	
+	return spendingByMonth
 }
 
 func budget() -> Double {
@@ -139,6 +167,8 @@ nonisolated(unsafe) var Credit_Score = 600
 /// data for recent bills
  
 let news: [newsDataStructure] = []
+
+let bills_: [RecentBillsData] = []
 
 /// func to create swift data values of bills list
 
@@ -239,22 +269,6 @@ struct graph_Pie: View {
 
 // MARK: -Spent this month thingies
 
-func getMonthlySpending() -> [String: Double] {
-	var spendingByMonth: [String: Double] = [:]
-	
-	let bills = CryptoHelper.decryptCSVFromString( UserDefaults.standard.string(forKey: "bills_csv")!, key: KeychainHelper.retrieveKey()!)
-	
-	for bill in bills ?? [] as! [RecentBillsData] {
-		// Extract the year and month from the date (e.g., "2024-12")
-		let dateComponents = bill.date.prefix(7) // Get the first 7 characters "YYYY-MM"
-		
-		// Add the "spent" value to the corresponding month
-		spendingByMonth[String(dateComponents), default: 0] += bill.spent
-	}
-	
-	return spendingByMonth
-}
-
 // Function to convert date string to Date
 func parseDate(_ dateString: String) -> Date? {
 	let formatter = DateFormatter()
@@ -283,7 +297,7 @@ func sumBillsByDate(_ bills: [RecentBillsData]) -> [(date: String, totalSpent: D
 
 struct Graph_line1: View {
 	
-	@State private var bills__ = sumBillsByDate(CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!)!)
+	@State private var bills__ = sumBillsByDate(loadFromFileBills())
 	
 	var body: some View {
 		Chart {
@@ -294,7 +308,6 @@ struct Graph_line1: View {
 					y: .value("Spent", value)
 				)
 				.interpolationMethod(.cardinal)
-				.foregroundStyle(green)
 				
 				 AreaMark(
 					x: .value("Date", date),
@@ -306,7 +319,7 @@ struct Graph_line1: View {
 			}
 		}
 		.onAppear{
-			bills__ = sumBillsByDate(CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!)!)
+			bills__ = sumBillsByDate(loadFromFileBills())
 			
 			print(bills__)
 			
@@ -315,10 +328,7 @@ struct Graph_line1: View {
 }
 
 func getBillsByCategory(category: String) -> [RecentBillsData] {
-	let allBills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv")!, key: KeychainHelper.retrieveKey()!)!
-	
-	print("\n all bills: \n\(allBills)")
-	
+	let allBills = loadFromFileBills() // Load all stored bills
 	return allBills.filter { $0.category == category }
 }
 
@@ -602,10 +612,30 @@ struct AnimatedBillRow: View {
 
 // MARK: -Stocks stuff
 
+func getCSVData(ticker : String) -> Array<dat> {
+	var records = [dat] ()
+	
+
+		stream = InputStream(url: URL(fileURLWithPath: "/Users/riboldi_jr/Documents/GitHub/EEz/EEz.swiftpm/Documents/\(ticker).csv")) /// Fix this
+		do {
+			let reader = try CSVReader(stream: stream, hasHeaderRow: true)
+			let decoder = CSVRowDecoder()
+			
+			while reader.next() != nil {
+				let row = try decoder.decode(dat.self, from: reader)
+				records.append(row)
+			}
+		}
+		catch {
+			print("Error reading CSV file: \(error)")
+		}
+		
+		return records
+}
 
 struct graph_stock: View {
 	
-	@State var stocks: [dat] = parseCSVToDatArray("aapl")
+	@State var stocks: [dat] = getCSVData(ticker: "aapl")
 	
 	var body: some View {
 		
@@ -647,8 +677,7 @@ struct graph_stock: View {
 }
 
 func stockPerf() -> (str: String, double: Double) {
-	
-	let top1 = Array(parseCSVToDatArray("aapl"))
+	let top1 = Array(getCSVData(ticker: "aapl").prefix(2))
 	
 	let stockPerf = top1[1].Diff
 	
@@ -671,14 +700,15 @@ struct stockPerfView: View {
 }
 
 struct NewsView: View {
-	
 	var body: some View {
 		
-		let newsData : [newsDataStructure] = Array(loadNewsFromCSVString())
+		let maxLoadedNews = 10
+		
+		let articles = newsData[0...maxLoadedNews]
 		
 		ScrollView {
 			VStack () {
-				ForEach(newsData, id: \.self) { news in
+				ForEach(articles, id: \.self) { news in
 					
 					RoundedRectangle(cornerRadius: 20)
 						.fill(white2)
@@ -686,12 +716,9 @@ struct NewsView: View {
 						.padding(.horizontal, 15)
 						.overlay(
 							VStack (alignment: .leading) {
-								
-								let title = news.title
-								
-								Text("\(title)")
+								Text("\(news.title)")
 									.font(.system(size: 20, weight: .semibold))
-								Text("Source: \(news.source)")
+								Text("Source: \(news.source.name)")
 									.font(.system(size: 20))
 									
 								
@@ -701,6 +728,22 @@ struct NewsView: View {
 						)
 					
 				}
+				
+//				RoundedRectangle(cornerRadius: 20)
+//					.fill(white2)
+//					.frame(width: 150, height: 60)
+//					.overlay(
+//						Text("Load More")
+//							.font(.system(size: 25, weight: .semibold))
+//					)
+//					.padding(.top, 20)
+//					.padding(.bottom, 20)
+//					.onTapGesture {
+//						withAnimation {
+//							maxLoadedNews = maxLoadedNews + 10
+//						}
+//					}
+				
 			}
 		}
 	}
@@ -870,7 +913,7 @@ struct ContentView: View {
 	
 	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
 	
-	@State var stocks: [dat] = parseCSVToDatArray("aapl")
+	@State var stocks: [dat] = getCSVData(ticker: "aapl")
 	
 	@State private var tog1 : Bool = false // spent this month square
 	@State private var tog2 : Bool = false // saving goal square
@@ -941,7 +984,7 @@ struct ContentView: View {
 		}
 	}
 	
-	var body: some View {
+    var body: some View {
 			ScrollView {
 				HStack (spacing: 15) {
 					
@@ -1207,12 +1250,10 @@ struct ContentView: View {
 						
 					}
 				}
-			}
-			.scrollDisabled(tog1)
+			}.scrollDisabled(tog1)
 			.scrollDisabled(tog2)
 			.scrollDisabled(tog3)
 			.onTapGesture(perform: {
-				
 				withAnimation{
 					if tog1 {
 						tog1.toggle()
@@ -1226,7 +1267,6 @@ struct ContentView: View {
 				}
 			})
 			.onAppear{
-				
 				if spent != spentG {
 					var dif = spentG - spent
 					
@@ -1235,7 +1275,7 @@ struct ContentView: View {
 					formattedSpent = formatWithCommas(number: spent)
 				}
 			}
-	}
+    }
 }
 
 struct tabView: View {

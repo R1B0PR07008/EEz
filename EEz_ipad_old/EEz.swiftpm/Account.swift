@@ -20,7 +20,7 @@ struct Account: View {
 	
 	@AppStorage("first_open") var first_open : Bool = true
 	
-	var body: some View {
+    var body: some View {
 		VStack {
 			HStack (spacing: 15) {
 				VStack (alignment: .leading, spacing: 15) {
@@ -217,9 +217,9 @@ struct Account: View {
 			
 			Spacer()
 		}
-	}
+    }
 }
 
 #Preview {
-	Account()
+    Account()
 }

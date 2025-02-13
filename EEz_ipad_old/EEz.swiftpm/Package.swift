@@ -31,8 +31,7 @@ let package = Package(
                 .landscapeRight,
                 .landscapeLeft,
                 .portraitUpsideDown(.when(deviceFamilies: [.pad]))
-            ],
-            appCategory: .finance
+            ]
         )
     ],
     dependencies: [

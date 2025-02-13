@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+let len = bills.count
+
 /// Enconding and Decoding arrays as csv files:
 
 func encodeArrayToCSV(_ array: [String]) -> String {
@@ -61,7 +63,7 @@ struct Add_bill: View {
 		return defaultCategories + customCategories
 	}
 	
-	var body: some View {
+    var body: some View {
 		VStack {
 			RoundedRectangle(cornerRadius: 20)
 				.fill(white)
@@ -221,12 +223,7 @@ struct Add_bill: View {
 								
 								categoryStr = replaceUnderscoresWithSpaces(in: selectedCategory)
 								
-								spent_ = "9.99"
-								dateStr = "2025-03-07"
-								place = "Disney-"
-								categoryStr = "Subscriptions"
-								
-								CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
+								addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
 								
 								spentG += Double(spent_)!
 								
@@ -245,7 +242,7 @@ struct Add_bill: View {
 			)
 					
 		}
-	}
+    }
 	
 	private func addCategory(_ category: String) {
 		   var updatedCategories = customCategories
@@ -259,5 +256,5 @@ struct Add_bill: View {
 }
 
 #Preview {
-	Add_bill()
+    Add_bill()
 }
