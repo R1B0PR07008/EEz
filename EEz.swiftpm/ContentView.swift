@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import Charts
 import Foundation
 import Security
@@ -161,6 +162,25 @@ let monthly_data = [
 	("Dec", 1545.0, 1500.0),
 		
 ]
+
+// MARK: -Adjust to screen size
+
+@MainActor func AdjustToScreenSize() -> Bool {
+	let screensize = UIScreen.main.bounds
+	
+	var size : Bool
+	
+	if screensize.width <= 1080 {
+		size = true
+		
+	}
+	else {
+		size = false
+	}
+	
+	return size
+	
+}
 
 // MARK: -Pie Graph View
 
@@ -450,106 +470,106 @@ struct billsList: View {
 	 }
 }
 
-struct expandedSpentView: View {
-	
-	@State private var budget_monthly = budget_monthlyG
-	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
-	@State private var spent = 0.0
-	@State private var investment = sumInvestmentValues(investments: Investment_list)
-	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
-	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
-	
-	 var body: some View {
-		  VStack (alignment: .leading, spacing: 15) {
-			  
-			  HStack(spacing: 15) {
-				  VStack(alignment: .leading, spacing: 15) {
-					  
-					  Text("Your Monthly Spending")
-						  .font(.system(size: 45, weight: .semibold))
-						  .frame(width: 470)
-					  Text("Daily Data:")
-						  .font(.system(size: 20, weight: .semibold))
-					  
-					  Graph_line1()
-						  .frame(width: 500, height: 200)
-					  
-					  RoundedRectangle(cornerRadius: 20)
-						  .fill(white2)
-						  .frame(width: 500, height: 200)
-						  .overlay(
-							  HStack (spacing: 15) {
-								  VStack {
-									  Text("This Month \nYou've Spent:")
-										  .font(.system(size: 25, weight: .semibold))
-									  
-									  RoundedRectangle(cornerRadius: 20)
-										  .fill(white)
-										  .frame(width: 150, height: 60)
-										  .overlay(
-											  Text("$\(formattedSpent)")
-												  .font(.system(size: 25, weight: .semibold))
-										  )
-									  
-								  }
-								  
-								  Divider().frame(width: 1, height: 130).background(Color.gray)
-									  .padding(.horizontal, 20)
-								  
-								  VStack {
-									  Text("You are:")
-											  .font(.system(size: 25, weight: .semibold))
-										  
-										  RoundedRectangle(cornerRadius: 20)
-											  .fill(white)
-											  .frame(width: 150, height: 60)
-											  .overlay(
-												  Text("$\(formattedleft)")
-											  ).font(.system(size: 25, weight: .semibold))
-									  
-									  if Left > 0 {
-										  Text("Under budget").font(.system(size: 25, weight: .semibold))
-									  } else {
-										  Text("Over budget").font(.system(size: 25, weight: .semibold))
-									  }
-								  }
-								  
-							  }
-						  )
-				  }
-				  
-				  VStack(spacing: 15) {
-					  RoundedRectangle(cornerRadius: 20)
-						  .fill(white2)
-						  .frame(width: 500, height: 525)
-						  
-						  .overlay(
-							  VStack (alignment: .leading) {
-								  Text("Your Bills, Sorted:")
-									  .font(.system(size: 40, weight: .semibold))
-									  .padding(.top, 36)
-									  .padding(.bottom, 20)
-								  
-									billsList()
-								  
-							  }
-						  )
-						  
-				  }
-			  }
-			  
-		  }
-		  .onAppear{
-			  if spent != spentG {
-				  var dif = spentG - spent
-				  
-				  spent = spent + dif
-				  
-				  formattedSpent = formatWithCommas(number: spent)
-			  }
-		  }
-	 }
-}
+//struct expandedSpentView: View {
+//	
+//	@State private var budget_monthly = budget_monthlyG
+//	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
+//	@State private var spent = 0.0
+//	@State private var investment = sumInvestmentValues(investments: Investment_list)
+//	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
+//	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
+//	
+//	var body: some View {
+//		VStack (alignment: .leading, spacing: 15) {
+//			
+//			HStack(spacing: 15) {
+//				VStack(alignment: .leading, spacing: 15) {
+//					
+//					Text("Your Monthly Spending")
+//						.font(.system(size: 45, weight: .semibold))
+//						.frame(width: 470)
+//					Text("Daily Data:")
+//						.font(.system(size: 20, weight: .semibold))
+//					
+//					Graph_line1()
+//						.frame(width: 500, height: 200)
+//					
+//					RoundedRectangle(cornerRadius: 20)
+//						.fill(white2)
+//						.frame(width: 500, height: 200)
+//						.overlay(
+//							HStack (spacing: 15) {
+//								VStack {
+//									Text("This Month \nYou've Spent:")
+//										.font(.system(size: 25, weight: .semibold))
+//									
+//									RoundedRectangle(cornerRadius: 20)
+//										.fill(white)
+//										.frame(width: 150, height: 60)
+//										.overlay(
+//											Text("$\(formattedSpent)")
+//												.font(.system(size: 25, weight: .semibold))
+//										)
+//									
+//								}
+//								
+//								Divider().frame(width: 1, height: 130).background(Color.gray)
+//									.padding(.horizontal, 20)
+//								
+//								VStack {
+//									Text("You are:")
+//											.font(.system(size: 25, weight: .semibold))
+//										
+//										RoundedRectangle(cornerRadius: 20)
+//											.fill(white)
+//											.frame(width: 150, height: 60)
+//											.overlay(
+//												Text("$\(formattedleft)")
+//											).font(.system(size: 25, weight: .semibold))
+//									
+//									if Left > 0 {
+//										Text("Under budget").font(.system(size: 25, weight: .semibold))
+//									} else {
+//										Text("Over budget").font(.system(size: 25, weight: .semibold))
+//									}
+//								}
+//								
+//							}
+//						)
+//				}
+//				
+//				VStack(spacing: 15) {
+//					RoundedRectangle(cornerRadius: 20)
+//						.fill(white2)
+//						.frame(width: 500, height: 525)
+//						
+//						.overlay(
+//							VStack (alignment: .leading) {
+//								Text("Your Bills, Sorted:")
+//									.font(.system(size: 40, weight: .semibold))
+//									.padding(.top, 36)
+//									.padding(.bottom, 20)
+//								
+//								billsList()
+//								
+//							}
+//						)
+//						
+//				}
+//			}
+//			
+//		}
+//		.onAppear{
+//			if spent != spentG {
+//				var dif = spentG - spent
+//				
+//				spent = spent + dif
+//				
+//				formattedSpent = formatWithCommas(number: spent)
+//			}
+//		}
+//	}
+//}
 
 // MARK: -View for list animation
 
@@ -638,7 +658,7 @@ struct graph_stock: View {
 				
 				
 			}
-		}.frame(width: 600, height: 350)
+		}
 			.chartYScale(domain: [150,300]) /// automate the max value
 			.padding(.bottom, 10)
 			.chartXAxis(.hidden)
@@ -706,92 +726,94 @@ struct NewsView: View {
 	}
 }
 
-struct ExpandedStocksView: View {
-	 var body: some View {
-		  HStack(spacing: 15) {
-			  RoundedRectangle(cornerRadius: 20)
-				  .fill(white)
-				  .frame(width: 650, height: 500)
-				  .overlay(
-					  VStack (alignment: .leading){
-						  Text("AAPL Stock")
-							  .font(.system(size: 35, weight: .semibold))
-						  Text("Data for the last 3 months (90 days) of 2024")
-							  .font(.system(size: 20))
-							  .padding(.bottom, 30)
-						  
-						  graph_stock()
-						  
-					  }
-				  )
-			  
-			  RoundedRectangle(cornerRadius: 20)
-				  .fill(white)
-				  .frame(width: 360, height: 500)
-				  .overlay(
-					  VStack (alignment: .leading){
-						  HStack {
-							  Text("Stock \nPerformance \nToday")
-								  .font(.system(size: 30, weight: .semibold))
-								  .padding(.leading, 20)
-							  
-							  Divider()
-								  .frame(width: 1, height: 90)
-								  .overlay(divider)
-							  
-							  RoundedRectangle(cornerRadius: 20)
-								  .fill(white2)
-								  .frame(width: 120, height: 60)
-								  .overlay(content: {
-									  Text("\(stockPerf().str)%")
-										  .font(.system(size: 30, weight: .semibold))
-								  })
-							  
-						  }
-						  .padding([.top, .bottom], 20)
-						  
-						  HStack {
-							  Text("Beta (β) \nRisk")
-								  .font(.system(size: 30, weight: .semibold))
-								  .padding(.leading, -30)
-								  .frame(width: 200)
-							  
-							  Divider()
-								  .frame(width: 1, height: 90)
-								  .overlay(divider)
-							  
-							  RoundedRectangle(cornerRadius: 20)
-								  .fill(white2)
-								  .frame(width: 120, height: 60)
-								  .overlay(content: {
-									  Text("1.24")
-										  .font(.system(size: 30, weight: .semibold))
-								  })
-								  .padding(.trailing, 20)
-								  .padding(.leading, 10)
-						  }
-						  .padding(.bottom, 07)
-						  
-						  Text("Recent News")
-							  .font(.system(size: 35, weight: .semibold))
-							  .padding(.leading, 15)
-						  
-						  NewsView()
-						  
-					  }
-				  )
-		  }
-	 }
-}
+//struct ExpandedStocksView: View {
+//	 var body: some View {
+//		  HStack(spacing: 15) {
+//			  RoundedRectangle(cornerRadius: 20)
+//				  .fill(white)
+//				  .frame(width: 650, height: 500)
+//				  .overlay(
+//					  VStack (alignment: .leading){
+//						  Text("AAPL Stock")
+//							  .font(.system(size: 35, weight: .semibold))
+//						  Text("Data for the last 3 months (90 days) of 2024")
+//							  .font(.system(size: 20))
+//							  .padding(.bottom, 30)
+//						  
+//						  graph_stock()
+//						  
+//					  }
+//				  )
+//			  
+//			  RoundedRectangle(cornerRadius: 20)
+//				  .fill(white)
+//				  .frame(width: 360, height: 500)
+//				  .overlay(
+//					  VStack (alignment: .leading){
+//						  HStack {
+//							  Text("Stock \nPerformance \nToday")
+//								  .font(.system(size: 30, weight: .semibold))
+//								  .padding(.leading, 20)
+//							  
+//							  Divider()
+//								  .frame(width: 1, height: 90)
+//								  .overlay(divider)
+//							  
+//							  RoundedRectangle(cornerRadius: 20)
+//								  .fill(white2)
+//								  .frame(width: 120, height: 60)
+//								  .overlay(content: {
+//									  Text("\(stockPerf().str)%")
+//										  .font(.system(size: 30, weight: .semibold))
+//								  })
+//							  
+//						  }
+//						  .padding([.top, .bottom], 20)
+//						  
+//						  HStack {
+//							  Text("Beta (β) \nRisk")
+//								  .font(.system(size: 30, weight: .semibold))
+//								  .padding(.leading, -30)
+//								  .frame(width: 200)
+//							  
+//							  Divider()
+//								  .frame(width: 1, height: 90)
+//								  .overlay(divider)
+//							  
+//							  RoundedRectangle(cornerRadius: 20)
+//								  .fill(white2)
+//								  .frame(width: 120, height: 60)
+//								  .overlay(content: {
+//									  Text("1.24")
+//										  .font(.system(size: 30, weight: .semibold))
+//								  })
+//								  .padding(.trailing, 20)
+//								  .padding(.leading, 10)
+//						  }
+//						  .padding(.bottom, 07)
+//						  
+//						  Text("Recent News")
+//							  .font(.system(size: 35, weight: .semibold))
+//							  .padding(.leading, 15)
+//						  
+//						  NewsView()
+//						  
+//					  }
+//				  )
+//		  }
+//	 }
+//}
 
+// MARK: -Dashboard View
 
-// MARK: -Speding Summary stuff
-
-struct graph_spendingSummary: View {
+@available(iOS 17.0, *)
+struct ContentView: View {
+	
+	/// spending summary graph vars:
 	
 	@State private var animatedData: [(String, Double, Double)] = []
 	
-	@State private var first_open: Bool = false
+	@State private var first_open1: Bool = false
 	
 	private func animateData() {
 			for (index, dataPoint) in monthly_data.enumerated() {
@@ -805,7 +827,48 @@ struct graph_spendingSummary: View {
 	
 	@State private var line_width = 2
 	
-	var body : some View {
+	@State private var budget_monthly = budget_monthlyG
+	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
+	@State private var spent = 0.0
+	@State private var investment = sumInvestmentValues(investments: Investment_list)
+	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
+	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
+	
+	/// vars to adjust to screen
+	
+	@State private var decre1 : CGFloat = 0
+	@State private var decre2 : CGFloat = 0
+	@State private var decre3 : CGFloat = 0
+	@State private var decre4 : CGFloat = 0
+	@State private var decre5 : CGFloat = 0
+	@State private var decre6 : CGFloat = 0
+	@State private var fontdecre1 : CGFloat = 0
+	@State private var fontdecre2 : CGFloat = 0
+	@State private var posAdj1 : CGFloat = 0
+	@State private var posAdj2 : CGFloat = 0
+	@State private var posAdj3 : CGFloat = 0
+	
+	@State private var sizeBool : Bool = AdjustToScreenSize()
+	
+	/// Vars
+
+	@AppStorage("SavingGoal") var SavingGoal : String = ""
+	
+	@AppStorage("first_open") var first_open : Bool = true
+	
+	/// function to animate the graph
+	
+	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
+	
+	@State var stocks: [dat] = parseCSVToDatArray("aapl")
+	
+	@State private var tog1 : Bool = false // spent this month square
+	@State private var tog2 : Bool = false // saving goal square
+	@State private var tog3 : Bool = false // Stocks page
+	
+	@State private var appearIndices: Set<Int> = []
+	
+	var graph_spendingSummary : some View {
 		Chart {
 			ForEach(animatedData, id: \.0) { month, spent, budget in
 				Plot {
@@ -837,46 +900,15 @@ struct graph_spendingSummary: View {
 				}
 			}
 		}
-		.frame(width: 460, height: 300)
+		.frame(width: 460-decre2, height: 300)
 		.chartYScale(domain: [0,1800])
 		.onAppear {
-			if !first_open {
+			if !first_open1 {
 				animateData()
-				first_open = true
+				first_open1 = true
 			}
 		}
 	}
-}
-
-// MARK: -Dashboard View
-
-@available(iOS 17.0, *)
-struct ContentView: View {
-	
-	@State private var budget_monthly = budget_monthlyG
-	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
-	@State private var spent = 0.0
-	@State private var investment = sumInvestmentValues(investments: Investment_list)
-	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
-	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
-	
-	/// Vars
-
-	@AppStorage("SavingGoal") var SavingGoal : String = ""
-	
-	@AppStorage("first_open") var first_open : Bool = true
-	
-	/// function to animate the graph
-	
-	@State private var AnimationCurve : UnitCurve = .circularEaseInOut
-	
-	@State var stocks: [dat] = parseCSVToDatArray("aapl")
-	
-	@State private var tog1 : Bool = false // spent this month square
-	@State private var tog2 : Bool = false // saving goal square
-	@State private var tog3 : Bool = false // Stocks page
-	
-	@State private var appearIndices: Set<Int> = []
 	
 	var billsList_: some View {
 		
@@ -941,110 +973,283 @@ struct ContentView: View {
 		}
 	}
 	
-	var body: some View {
-			ScrollView {
-				HStack (spacing: 15) {
+	var monthlySpeding : some View {
+		RoundedRectangle(cornerRadius: 20)
+			.fill(white)
+			.opacity(tog2 ? 0 : 1)
+			.opacity(tog3 ? 0 : 1)
+			.zIndex(1)
+			.frame(width: tog1 ? 1100-decre1 : 270-decre2, height: tog1 ? 650 :  250)
+			.position(
+				x: tog1 ?  UIScreen.main.bounds.width / 2  : 168-posAdj2, /// 168
+				y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
+			)
+			.overlay(
+				VStack {
 					
-					VStack (spacing: 15) {
-						
-						HStack (spacing: 15) {
+					if !tog1 {
+						Text("Monthly \nSpending")
+							.font(.system(size: 35, weight: .semibold))
+							.padding(.top, 20)
 							
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white)
-								.opacity(tog2 ? 0 : 1)
-								.opacity(tog3 ? 0 : 1)
-								.zIndex(1)
-								.frame(width: tog1 ? 1100 : 270, height: tog1 ? 650 :  250)
-								.position(
-									x: tog1 ?  UIScreen.main.bounds.width / 2  : 168,
-									y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
-								)
-								.overlay(
-									VStack {
-										
-										if !tog1 {
-											Text("Monthly \nSpending")
-												.font(.system(size: 35, weight: .semibold))
-												.padding(.top, 20)
-												
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
-												.frame(width: 170, height: 80)
-												.overlay(
-													Text("$\(formattedSpent)")
-														.font(.system(size: 30, weight: .semibold))
-												)
-										} else {
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white2)
+							.frame(width: 170, height: 80)
+							.overlay(
+								Text("$\(formattedSpent)")
+									.font(.system(size: 30, weight: .semibold))
+							)
+					} else {
 
-											 expandedSpentView()
-										}
-									}
-										.opacity(tog2 ? 0 : 1)
-										.opacity(tog3 ? 0 : 1)
-										.position(
-											x: tog1 ? UIScreen.main.bounds.width / 2  : 168,
-											y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
-										)
-								)
-								.onTapGesture {
-									withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
-										tog1.toggle()
-									}
-								}
-								.animation(.easeInOut, value: tog1)
-							
-							
-							
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white)
-								.position(
-									x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
-									y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
-								)
-								.frame(width: tog2 ? 1100 : 230, height: tog2 ? 650 :  250)
-								.opacity(tog1 ? 0 : 1)
-								.opacity(tog3 ? 0 : 1)
-								.overlay(
-									VStack {
-										if !tog2 {
-											Text("Your Saving Goal")
-												.font(.system(size: 35, weight: .semibold))
-												.padding(.top, 20)
-											
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
-												.frame(width: 150, height: 80)
-												.overlay (
-													Text("$\(SavingGoal)")
-														.font(.system(size: 30, weight: .semibold))
-												)
-										}
-										
-									}
-										.opacity(tog1 ? 0 : 1)
-										.opacity(tog3 ? 0 : 1)
-										.position(
-											x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
-											y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
+						 expandedSpentView
+					}
+				}
+					.opacity(tog2 ? 0 : 1)
+					.opacity(tog3 ? 0 : 1)
+					.position(
+						x: tog1 ? UIScreen.main.bounds.width / 2  : 168-posAdj2, /// 168
+						y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
+					)
+			)
+			.onTapGesture {
+				withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
+					tog1.toggle()
+				}
+			}
+			.animation(.easeInOut, value: tog1)
+	}
+	
+	var savingGoal : some View {
+		RoundedRectangle(cornerRadius: 20)
+			.fill(white)
+			.position(
+				x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80-posAdj1, /// 80
+				y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
+			)
+			.frame(width: tog2 ? 1100-decre1 : 230-decre3, height: tog2 ? 650 :  250) /// 1100, 230
+			.opacity(tog1 ? 0 : 1)
+			.opacity(tog3 ? 0 : 1)
+			.overlay(
+				VStack {
+					if !tog2 {
+						Text("Your Saving Goal")
+							.font(.system(size: 35, weight: .semibold))
+							.padding(.top, 20)
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill(white2)
+							.frame(width: 150, height: 80)
+							.overlay (
+								Text("$\(SavingGoal)")
+									.font(.system(size: 30, weight: .semibold))
+							)
+					}
+					
+				}
+					.opacity(tog1 ? 0 : 1)
+					.opacity(tog3 ? 0 : 1)
+					.position(
+						x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80-posAdj1, /// 80
+						y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 122
+					)
+				
+			)
+			.onTapGesture {
+				withAnimation (.easeInOut(duration: 0.45)) {
+//										tog2.toggle()
+				}
+			}
+	}
+	
+	var ExpandedStocksView: some View {
+		 HStack(spacing: sizeBool ? 10 : 15) {
+			 RoundedRectangle(cornerRadius: 20)
+				 .fill(white)
+				 .frame(width: 650-decre6, height: 500)
+				 .overlay(
+					 VStack (alignment: .leading){
+						 Text("AAPL Stock")
+							 .font(.system(size: 35, weight: .semibold))
+						 Text("Data for the last 3 months (90 days) of 2024")
+							 .font(.system(size: 20))
+							 .padding(.bottom, 30)
+						 
+						 graph_stock()
+							 .frame(width:600-decre6, height: 350)
+						
+					 }
+				 )
+			 
+			 RoundedRectangle(cornerRadius: 20)
+				 .fill(white)
+				 .frame(width: 360, height: 500)
+				 .overlay(
+					 VStack (alignment: .leading){
+						 HStack {
+							 Text("Stock \nPerformance \nToday")
+								 .font(.system(size: 30, weight: .semibold))
+								 .padding(.leading, 20)
+							 
+							 Divider()
+								 .frame(width: 1, height: 90)
+								 .overlay(divider)
+							 
+							 RoundedRectangle(cornerRadius: 20)
+								 .fill(white2)
+								 .frame(width: 120, height: 60)
+								 .overlay(content: {
+									 Text("\(stockPerf().str)%")
+										 .font(.system(size: 30, weight: .semibold))
+								 })
+							 
+						 }
+						 .padding([.top, .bottom], 20)
+						 
+						 HStack {
+							 Text("Beta (β) \nRisk")
+								 .font(.system(size: 30, weight: .semibold))
+								 .padding(.leading, -30)
+								 .frame(width: 200)
+							 
+							 Divider()
+								 .frame(width: 1, height: 90)
+								 .overlay(divider)
+							 
+							 RoundedRectangle(cornerRadius: 20)
+								 .fill(white2)
+								 .frame(width: 120, height: 60)
+								 .overlay(content: {
+									 Text("1.24")
+										 .font(.system(size: 30, weight: .semibold))
+								 })
+								 .padding(.trailing, 20)
+								 .padding(.leading, 10)
+						 }
+						 .padding(.bottom, 07)
+						 
+						 Text("Recent News")
+							 .font(.system(size: 35, weight: .semibold))
+							 .padding(.leading, 15)
+						 
+						 NewsView()
+						 
+					 }
+				 )
+		 }
+		 .padding(.leading, sizeBool ? 50 : 0) /// mod
+	}
+	
+	var expandedSpentView: some View {
+		VStack (alignment: .leading, spacing: 15) {
+			
+			HStack(spacing: 15) {
+				VStack(alignment: .leading, spacing: 15) {
+					
+					Text("Your Monthly Spending")
+						.font(.system(size: 45-fontdecre2, weight: .semibold)) /// 45
+						.frame(width: 470-decre6) /// 470
+					Text("Daily Data:")
+						.font(.system(size: 20, weight: .semibold))
+					
+					Graph_line1()
+						.frame(width: 500-decre6, height: 200) /// 500
+					
+					RoundedRectangle(cornerRadius: 20)
+						.fill(white2)
+						.frame(width: 500-decre6, height: 200) /// 500
+						.overlay(
+							HStack (spacing: 15) {
+								VStack {
+									Text("This Month \nYou've Spent:")
+										.font(.system(size: 25, weight: .semibold))
+									
+									RoundedRectangle(cornerRadius: 20)
+										.fill(white)
+										.frame(width: 150, height: 60)
+										.overlay(
+											Text("$\(formattedSpent)")
+												.font(.system(size: 25, weight: .semibold))
 										)
 									
-								)
-								.onTapGesture {
-									withAnimation (.easeInOut(duration: 0.45)) {
-//										tog2.toggle()
+								}
+								
+								Divider().frame(width: 1, height: 130).background(Color.gray)
+									.padding(.horizontal, 20)
+								
+								VStack {
+									Text("You are:")
+											.font(.system(size: 25, weight: .semibold))
+										
+										RoundedRectangle(cornerRadius: 20)
+											.fill(white)
+											.frame(width: 150, height: 60)
+											.overlay(
+												Text("$\(formattedleft)")
+											).font(.system(size: 25, weight: .semibold))
+									
+									if Left > 0 {
+										Text("Under budget").font(.system(size: 25, weight: .semibold))
+									} else {
+										Text("Over budget").font(.system(size: 25, weight: .semibold))
 									}
 								}
+								
+							}
+						)
+				}
+				
+				VStack(spacing: 15) {
+					RoundedRectangle(cornerRadius: 20)
+						.fill(white2)
+						.frame(width: 500, height: 525)
+						
+						.overlay(
+							VStack (alignment: .leading) {
+								Text("Your Bills, Sorted:")
+									.font(.system(size: 40, weight: .semibold))
+									.padding(.top, 36)
+									.padding(.bottom, 20)
+								
+								billsList()
+								
+							}
+						)
+						
+				}
+			}
+			
+		}
+		.onAppear{
+			if spent != spentG {
+				var dif = spentG - spent
+				
+				spent = spent + dif
+				
+				formattedSpent = formatWithCommas(number: spent)
+			}
+		}
+	}
+	
+	var body: some View {
+			ScrollView {
+				HStack (spacing: sizeBool ? 10 : 15) {
+					
+					VStack (spacing: sizeBool ? 10 : 15) {
+						
+						HStack (spacing: sizeBool ? 10 : 15) {
+							
+							monthlySpeding
+							
+							savingGoal
 						}
 						
-						
-						
-						HStack (spacing: 15) {
+						HStack (spacing: sizeBool ? 10 : 15) {
 							RoundedRectangle(cornerRadius: 20)
 								.fill(white2)
 								.opacity(tog1 ? 0 : 1)
 								.opacity(tog2 ? 0 : 1)
 								.opacity(tog3 ? 0 : 1)
-								.frame(width: 230, height: 250)
+								.frame(width: 230-decre3, height: 250)
 								.overlay(
 									VStack {
 										Text("Your Credit Score")
@@ -1062,6 +1267,7 @@ struct ContentView: View {
 										.opacity(tog2 ? 0 : 1)
 										.opacity(tog3 ? 0 : 1)
 								)
+								.padding(.leading, -15)
 							
 							
 							
@@ -1070,23 +1276,25 @@ struct ContentView: View {
 								.opacity(tog1 ? 0 : 1)
 								.opacity(tog2 ? 0 : 1)
 								.position(
-									x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
+									x: tog3 ? UIScreen.main.bounds.width / 2-140 : 135-posAdj3,
 									y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
 								)
-								.frame(width: tog3 ? 1100 : 270, height: tog3 ? 650 :  250)
+								.frame(width: tog3 ? 1100-decre1 : 270-decre2, height: tog3 ? 650 :  250)
 								.overlay(
 									VStack (alignment: tog3 ? .leading : .center) {
 										Text("Stock Performance")
 											.padding(.top, 20)
 											.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
 											.padding(.bottom, 5)
+											.padding(.leading, sizeBool ? 50 : 0)
+											.padding(.trailing, sizeBool ? 0 : 40)
 										
 										/// Stocks Data Graph
 										
 										if !tog3 {
 											RoundedRectangle(cornerRadius: 20)
 												.fill(white)
-												.frame(width: 240, height: 120)
+												.frame(width: 240-decre2, height: 120)
 												.padding(.bottom, 10)
 												.overlay(
 													HStack (spacing: 10) {
@@ -1102,17 +1310,19 @@ struct ContentView: View {
 														.padding(.bottom, 10)
 													
 												)
+												.padding(.leading, sizeBool  ? -5 : 0)
 										} else {
 											
-											 ExpandedStocksView()
+											 ExpandedStocksView
 										}
 									}
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
 										.position(
-											x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
+											x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 125, ///
 											y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
 										)
+										.padding(.leading, sizeBool ? 0 : 10)
 								)
 							
 								.onTapGesture {
@@ -1127,24 +1337,25 @@ struct ContentView: View {
 							.opacity(tog1 ? 0 : 1)
 							.opacity(tog2 ? 0 : 1)
 							.opacity(tog3 ? 0 : 1)
-							.frame(width: 515, height: 400)
+							.frame(width: 510-decre4, height: 400)
 							.overlay(
 								VStack (alignment: .leading) {
 									Text("Spending Summary")
 										.font(.system(size: 35, weight: .semibold))
 										
-									graph_spendingSummary()
+									graph_spendingSummary
 										
 								}
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
 									.opacity(tog3 ? 0 : 1)
 							)
+							.padding(.leading, sizeBool ? -15 : 0)
 							
 					}
 					
 					
-					VStack (spacing: 15) {
+					VStack (spacing:  sizeBool ? 10 : 15) {
 						RoundedRectangle(cornerRadius: 20)
 							.fill(white2)
 							.opacity(tog1 ? 0 : 1)
@@ -1158,7 +1369,7 @@ struct ContentView: View {
 									VStack {
 										HStack {
 											Text("Your Data, Visualized")
-												.font(.system(size: 45, weight: .semibold))
+												.font(.system(size: 45-fontdecre1, weight: .semibold))
 												.padding(.top, 20)
 												.padding(.bottom,15)
 												.padding(.horizontal, 15)
@@ -1170,7 +1381,7 @@ struct ContentView: View {
 									.padding(.horizontal, 20)
 									
 									graph_Pie()
-										.frame(width: 240, height: 260)
+										.frame(width: 220-decre2, height: 260)
 										.padding(.horizontal, 20)
 								}
 									.opacity(tog1 ? 0 : 1)
@@ -1234,6 +1445,29 @@ struct ContentView: View {
 					
 					formattedSpent = formatWithCommas(number: spent)
 				}
+				
+				let screensize = UIScreen.main.bounds
+				
+				print("screen size: width: \(screensize.width), height: \(screensize.height)")
+				
+				if screensize.width == 1080 {
+					decre1 = 100
+					decre2 = 30
+					decre3 = 20
+					decre4 = 45
+					decre5 = 20
+					decre6 = 50
+					fontdecre1 = 8
+					fontdecre1 = 5
+					posAdj1 = 20
+					posAdj2 = 18
+					posAdj3 = 15
+				}else {
+					decre1 = 0
+					decre2 = 0
+					fontdecre1 = 0
+				}
+				
 			}
 	}
 }

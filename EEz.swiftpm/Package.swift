@@ -35,15 +35,9 @@ let package = Package(
             appCategory: .finance
         )
     ],
-    dependencies: [
-        .package(url: "https://github.com/yaslab/CSV.swift.git", "2.5.2"..<"3.0.0")
-    ],
     targets: [
         .executableTarget(
             name: "AppModule",
-            dependencies: [
-                .product(name: "CSV", package: "csv.swift")
-            ],
             path: "."
         )
     ]

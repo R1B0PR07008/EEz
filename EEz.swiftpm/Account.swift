@@ -193,16 +193,6 @@ struct Account: View {
 									})
 									.padding(.bottom, 10)
 								
-								Button(action: {
-									UserDefaults.standard.set(true , forKey: "first_open")
-									print(first_open)
-									
-//									encryptOldData()
-									
-								}) {
-									Text("reset")
-								}
-								
 								Spacer()
 								
 							}
@@ -211,8 +201,6 @@ struct Account: View {
 							Spacer()
 						}
 					)
-				
-				
 			}
 			
 			Spacer()
