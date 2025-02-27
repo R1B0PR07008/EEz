@@ -190,7 +190,6 @@ struct graph_Pie: View {
 			Chart {
 				ForEach(Budget, id: \.0) { category, value, color in
 					if #available(iOS 17.0, *) {
-						// Here, break down the logic into separate variables to avoid compiler overload
 						let targetValue = animatedAngles.first(where: { $0 == value }) ?? 0.0
 						SectorMark(
 							angle: .value("Value", targetValue),
@@ -202,7 +201,6 @@ struct graph_Pie: View {
 						.cornerRadius(30)
 						
 					} else {
-						// Fallback for earlier iOS versions
 					}
 				}
 			}
@@ -245,25 +243,22 @@ func getMonthlySpending() -> [String: Double] {
 	let bills = CryptoHelper.decryptCSVFromString( UserDefaults.standard.string(forKey: "bills_csv")!, key: KeychainHelper.retrieveKey()!)
 	
 	for bill in bills ?? [] as! [RecentBillsData] {
-		// Extract the year and month from the date (e.g., "2024-12")
-		let dateComponents = bill.date.prefix(7) // Get the first 7 characters "YYYY-MM"
 		
-		// Add the "spent" value to the corresponding month
+		let dateComponents = bill.date.prefix(7)
+		
 		spendingByMonth[String(dateComponents), default: 0] += bill.spent
 	}
 	
 	return spendingByMonth
 }
 
-// Function to convert date string to Date
 func parseDate(_ dateString: String) -> Date? {
 	let formatter = DateFormatter()
-	formatter.dateFormat = "yyyy-MM-dd" // Ensures correct parsing of "YYYY-MM-DD"
-	formatter.locale = Locale(identifier: "en_US_POSIX") // Ensures reliable parsing
+	formatter.dateFormat = "yyyy-MM-dd"
+	formatter.locale = Locale(identifier: "en_US_POSIX")
 	return formatter.date(from: dateString)
 }
 
-// Function to sort RecentBillsData by date and spent
 func sumBillsByDate(_ bills: [RecentBillsData]) -> [(date: String, totalSpent: Double)] {
 	var groupedBills: [String: Double] = [:]
 
@@ -271,7 +266,7 @@ func sumBillsByDate(_ bills: [RecentBillsData]) -> [(date: String, totalSpent: D
 		groupedBills[bill.date, default: 0] += bill.spent
 	}
 
-	// Sort the results by date
+	
 	return groupedBills.sorted {
 		guard let date1 = parseDate($0.key),
 			  let date2 = parseDate($1.key) else {
@@ -963,9 +958,20 @@ struct ContentView: View {
 									VStack {
 										
 										if !tog1 {
-											Text("Monthly \nSpending")
-												.font(.system(size: 35, weight: .semibold))
-												.padding(.top, 20)
+											HStack {
+												Text("Monthly \nSpending")
+													.font(.system(size: 35, weight: .semibold))
+													.padding(.top, 20)
+													.padding(.leading, 70)
+												
+												Spacer()
+												
+												Image(systemName: "cursorarrow.click")
+													.resizable()
+													.frame(width: 25, height: 25)
+													.padding(.trailing, 50)
+													.padding(.top, -60)
+											}
 												
 											RoundedRectangle(cornerRadius: 20)
 												.fill(white2)
@@ -1076,10 +1082,23 @@ struct ContentView: View {
 								.frame(width: tog3 ? 1100 : 270, height: tog3 ? 650 :  250)
 								.overlay(
 									VStack (alignment: tog3 ? .leading : .center) {
-										Text("Stock Performance")
-											.padding(.top, 20)
-											.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
-											.padding(.bottom, 5)
+										HStack {
+											Text("Stock Performance")
+												.padding(.top, 20)
+												.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
+												.padding(.bottom, 5)
+												.padding(.leading, 10)
+											
+											
+											Image(systemName: "cursorarrow.click")
+												.resizable()
+												.frame(width: 25, height: 25)
+												.padding(.trailing, 10)
+												.padding(.top, -40)
+												.opacity(tog1 ? 0 : 1)
+												.opacity(tog3 ? 0 : 1)
+												.opacity(tog2 ? 0 : 1)
+										}
 										
 										/// Stocks Data Graph
 										

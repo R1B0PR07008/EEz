@@ -221,14 +221,11 @@ struct Add_bill: View {
 								
 								categoryStr = replaceUnderscoresWithSpaces(in: selectedCategory)
 								
-								spent_ = "9.99"
-								dateStr = "2025-03-07"
-								place = "Disney-"
-								categoryStr = "Subscriptions"
-								
-								CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
-								
-								spentG += Double(spent_)!
+								if Double(spent_) ?? 0.0 > 0.0 {
+									CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
+									
+									spentG += Double(spent_)!
+								}
 								
 							}, label: {
 								RoundedRectangle(cornerRadius: 20)

@@ -2,11 +2,10 @@
 //  EEzTests.swift
 //  EEzTests
 //
-//  Created by Riboldi  on 27/02/25.
+//  Created by Riboldi  on 12/12/24.
 //
 
 import Testing
-@testable import EEz
 
 struct EEzTests {
 

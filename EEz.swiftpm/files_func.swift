@@ -317,35 +317,6 @@ struct CryptoHelper {
 		return parsedBills
 	}
 	
-	static func parseCSVToBill2(_ csvString: String) -> [RecentBillsData] {
-		let columns = csvString.components(separatedBy: ",")
-		
-		// Ensure we have at least one full row (id, spent, date, place, category)
-		guard columns.count > 5 else {
-			print("Invalid CSV data")
-			return []
-		}
-		
-		var parsedBills: [RecentBillsData] = []
-		
-		// Skip the first 5 elements (headers) and process in chunks of 5
-		for i in stride(from: 5, to: columns.count, by: 5) {
-			if i + 4 < columns.count { // Ensure we don't go out
-		
-				let spent = Double(columns[i + 5])!
-				let date = columns[i + 1]
-				let place = columns[i + 2]
-				let category = columns[i + 3]
-				
-				let bill = RecentBillsData(spent: spent, date: date, place: place, category: category)
-				parsedBills.append(bill)
-			}
-		}
-		
-		return parsedBills
-	}
-
-	
 	static func serializeBillsToCSV(_ bills: [RecentBillsData]) -> String {
 		var csvString = "id,spent,date,place,category" // Header row
 		
