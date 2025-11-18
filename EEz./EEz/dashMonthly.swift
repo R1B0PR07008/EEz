@@ -21,6 +21,8 @@ struct dashMonthly: View {
             ("mon 6", 13456),
             
         ]
+	
+	@State private var bills_ = bills
     
     var body: some View {
         VStack {
@@ -173,7 +175,7 @@ struct dashMonthly: View {
                         ScrollView {
                             VStack {
                                 
-                                ForEach(bills, id: \.self) {bills in
+								ForEach($bills_, id: \.self) {bills in
                                     RoundedRectangle(cornerRadius: 40)
                                         .fill(white2)
                                         .frame(width: 350, height: 40)
@@ -182,33 +184,26 @@ struct dashMonthly: View {
                                             
                                             HStack {
                                                 
-                                                if let spnt = bills["Spent"] {
-                                                    Text("\(spnt)")
-                                                        .foregroundColor(black)
-                                                        .frame(width: 106)
-                                                }
+												Text("\(bills.Spent!)")
+													.foregroundColor(black)
+													.frame(width: 106)
                                                 
-                                                
+												
+                                                Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
+                                                    
+												
+												Text("\(bills.Date!)")
+													.foregroundColor(black)
+													.frame(width: 106)
+											
+												
                                                 Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
                                                     
                                                 
+												Text("\(bills.Place!)")
+													.foregroundColor(black)
+													.frame(width: 106)
                                                 
-                                                if let spnt = bills["date"] {
-                                                    Text("\(spnt)")
-                                                        .foregroundColor(black)
-                                                        .frame(width: 106)
-                                                }
-                                                
-                                                
-                                                Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
-                                                    
-                                                
-                                                
-                                                if let spnt = bills["place"] {
-                                                    Text("\(spnt)")
-                                                        .foregroundColor(black)
-                                                        .frame(width: 106)
-                                                }
                                             }
                                         })
                                 }

@@ -22,11 +22,6 @@ func decodeCSVToArray(_ csvString: String) -> [String] {
 nonisolated(unsafe) var customCategories: [String] = []
 
 struct Add_bill: View {
-	
-//	enum Category: String, CaseIterable, Identifiable {
-//		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
-//		var id: Self { self }
-//	}
 
 	enum Category: String, CaseIterable, Identifiable {
 		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
@@ -112,9 +107,9 @@ struct Add_bill: View {
 //											.fill(white)
 //											.frame(width: 200, height: 40)
 //											.overlay(
-////												TextField("YYYY/MM/DD", text: $date)
-////													.padding(.leading, 10)
-////													.font(.system(size: 20))
+///												TextField("YYYY/MM/DD", text: $date)
+///													.padding(.leading, 10)
+///													.font(.system(size: 20))
 //											)
 										
 										VStack{
@@ -201,6 +196,7 @@ struct Add_bill: View {
 																	.buttonStyle(.borderedProminent)
 																	.cornerRadius(20)
 																	.frame(width: 55)
+																	.padding(.trailing, 15)
 																}
 																.padding()
 													

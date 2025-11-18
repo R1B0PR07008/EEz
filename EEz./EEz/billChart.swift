@@ -155,8 +155,8 @@ func graph_line(category: String) -> some View {
 func getTotalSpent(Categroy: String!) -> String {
 	let catg = Categroy
 	
-	let vills_data : [[String : String]] = bills.filter {$0["Category"] == catg}
-	let totalSpent = vills_data.compactMap { $0["Spent"] }.compactMap { Double($0) }.reduce(0, +)
+	let vills_data : [RecentBillsData] = bills.filter {$0.category == catg}
+	let totalSpent = vills_data.compactMap { $0.Spent }.compactMap { Double($0) }.reduce(0, +)
 	let formattedTotalSpent = String(format: "%.2f", totalSpent)
 	
 	return formattedTotalSpent

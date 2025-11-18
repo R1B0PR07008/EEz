@@ -32,27 +32,17 @@ var Left = budget_monthly-spent
 
 var i_rr2_1 = 0
 
-/// Bills data 
+/// data import thingies
 
-let bills: [[String: String]] = [
-	["id": "1", "Spent": "10", "date": "12-3-2024", "place": "McDonalds", "Category": "Fast Food"],
-	["id": "2", "Spent": "20", "date": "12-4-2024", "place": "McDonalds", "Category": "Fast Food"],
-	["id": "3", "Spent": "130", "date":  "12-5-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "4", "Spent": "150", "date":  "12-6-2024", "place":  "Walmart", "Category": "Super mMrket"],
-	["id": "5", "Spent": "170", "date":  "12-7-2024", "place":  "Decathlon", "Category": "Clothes"],
-	["id": "6", "Spent": "40", "date":  "12-9-2024", "place":  "Zara", "Category": "Clothes"],
-	["id": "7", "Spent": "15", "date": "12-8-2024", "place": "KFC", "Category": "Fast Food"],
-	["id": "8", "Spent": "150", "date":  "12-10-2024", "place":  "Costco", "Category": "Super Market"],
-	["id": "9", "Spent": "30", "date":  "12-11-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "10", "Spent": "40", "date":  "12-12-2024", "place":  "Gas", "Category": "Gas"],
-	["id": "11", "Spent": "60", "date":  "12-13-2024", "place":  "Zara", "Category": "Clothes"],
-	["id": "12", "Spent": "50", "date":  "12-14-2024", "place":  "Walmart", "Category": "Super Market"],
-	["id": "13", "Spent": "10", "date":  "12-14-2024", "place":  "Disney+", "Category": "Subscriptions"],
-	["id": "14", "Spent": "14", "date":  "12-14-2024", "place":  "HBO", "Category": "Subscriptions"],
-	["id": "15", "Spent": "10", "date":  "12-14-2024", "place":  "Paramount+", "Category": "Subscriptions"],
-	["id": "16", "Spent": "12", "date":  "12-14-2024", "place":  "Netflix", "Category": "Subscriptions"],
-	
-]
+var news: [newsDataStructure] {
+	get { loadFromFileNews() }
+	set { saveToFileNews(newValue) }
+}
+
+var bills : [RecentBillsData] {
+	get {loadFromFileBills()}
+	set {saveToFileBills(newValue)}
+}
 
 struct graph_Pie: View {
     

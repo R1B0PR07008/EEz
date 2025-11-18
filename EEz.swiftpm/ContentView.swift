@@ -39,7 +39,7 @@ nonisolated(unsafe) var stream : InputStream!
 
 /// Data For bills (monthly) list
 
-let bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
+//let bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
 
 /// data structure for bills (monthly)
 
@@ -317,24 +317,6 @@ func getBillsByCategory(category: String) -> [RecentBillsData] {
 	return allBills.filter { $0.category == category }
 }
 
-func getTotalSpent(Categroy: String!) -> String {
-	let catg = Categroy
-	
-	 let vills_data : [RecentBillsData] = bills.filter {$0.category == catg}
-	 let totalSpent = vills_data.compactMap { $0.spent }.compactMap { Double($0) }.reduce(0, +)
-	let formattedTotalSpent = String(format: "%.2f", totalSpent)
-	
-	return formattedTotalSpent
-}
-
-func get_categories() -> [String] {
-	var cats : [String]
-	
-	 cats = Array(Set(bills.compactMap { $0.category })).sorted()
-	
-	return cats
-}
-
 func graph_line(category: String) -> some View {
 	
 	let data = getBillsByCategory(category: category)
@@ -408,6 +390,27 @@ func graph_line(category: String) -> some View {
 }
 
 struct billsList: View {
+	
+	@State var bills : [RecentBillsData] = []
+	
+	func getTotalSpent(Categroy: String!) -> String {
+		let catg = Categroy
+		
+		let vills_data : [RecentBillsData] = bills.filter {$0.category == catg}
+		let totalSpent = vills_data.compactMap { $0.spent }.compactMap { Double($0) }.reduce(0, +)
+		let formattedTotalSpent = String(format: "%.2f", totalSpent)
+		
+		return formattedTotalSpent
+	}
+
+	func get_categories() -> [String] {
+		var cats : [String]
+		
+		cats = Array(Set(bills.compactMap { $0.category })).sorted()
+		
+		return cats
+	}
+	
 	 var body: some View {
 		  ScrollView {
 			  VStack {
@@ -442,6 +445,9 @@ struct billsList: View {
 				  }
 			  }
 		  }
+		  .onAppear {
+					  bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
+				  }
 	 }
 }
 
@@ -556,7 +562,7 @@ struct AnimatedBillRow: View {
 	var body: some View {
 		RoundedRectangle(cornerRadius: 40)
 			.fill(white2) // Use your custom color `white2`
-			.frame(width: 510, height: 57)
+			.frame(width: 510, height: 60)
 			.overlay(
 				billContent
 			)
@@ -873,6 +879,28 @@ struct ContentView: View {
 	
 	@State private var appearIndices: Set<Int> = []
 	
+	// billsList Vars/funcs
+	
+	@State var bills : [RecentBillsData] = []
+	
+	func getTotalSpent(Categroy: String!) -> String {
+		let catg = Categroy
+		
+		let vills_data : [RecentBillsData] = bills.filter {$0.category == catg}
+		let totalSpent = vills_data.compactMap { $0.spent }.compactMap { Double($0) }.reduce(0, +)
+		let formattedTotalSpent = String(format: "%.2f", totalSpent)
+		
+		return formattedTotalSpent
+	}
+
+	func get_categories() -> [String] {
+		var cats : [String]
+		
+		cats = Array(Set(bills.compactMap { $0.category })).sorted()
+		
+		return cats
+	}
+	
 	var billsList_: some View {
 		
 		VStack {
@@ -923,21 +951,30 @@ struct ContentView: View {
 			.frame(width: 350, height: 60)
 			
 			ScrollView {
-				VStack {
-					
-					ForEach(bills) { bill in
-						AnimatedBillRow(index: bills.firstIndex(where: { $0.id == bill.id }) ?? 0, bill: bill, appearIndices: $appearIndices)
+						VStack {
+							
+							ForEach(bills.sorted(by: { $0.date > $1.date })) { bill in
+								AnimatedBillRow(index: bills.sorted(by: { $0.date > $1.date }).firstIndex(where: { $0.id == bill.id }) ?? 0, bill: bill, appearIndices: $appearIndices)
+									.transition(.asymmetric(
+										insertion: .move(edge: .top).combined(with: .opacity),
+										removal: .opacity
+									))
+							}
+							
+						}
+						.animation(.spring(response: 0.6, dampingFraction: 0.8), value: bills.count)
 					}
-
-				}
-			}
+			.onAppear {
+						bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
+					}
 			
 			
 		}
 	}
 	
 	var body: some View {
-			ScrollView {
+		ScrollView {
+			ScrollViewReader { proxy in
 				HStack (spacing: 15) {
 					
 					VStack (spacing: 15) {
@@ -995,12 +1032,15 @@ struct ContentView: View {
 								.onTapGesture {
 									withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
 										tog1.toggle()
+										if tog1 {
+											proxy.scrollTo("top", anchor: .top)
+										}
 									}
 								}
 								.animation(.easeInOut, value: tog1)
+					
 							
-							
-							
+						
 							RoundedRectangle(cornerRadius: 20)
 								.fill(white)
 								.position(
@@ -1037,10 +1077,11 @@ struct ContentView: View {
 								)
 								.onTapGesture {
 									withAnimation (.easeInOut(duration: 0.45)) {
-//										tog2.toggle()
+		//										tog2.toggle()
 									}
 								}
 						}
+						.id("top")
 						
 						
 						
@@ -1137,6 +1178,9 @@ struct ContentView: View {
 								.onTapGesture {
 									withAnimation {
 										tog3.toggle()
+										if tog3 {
+											proxy.scrollTo("top", anchor: .top)
+										}
 									}
 								}
 						}
@@ -1227,6 +1271,7 @@ struct ContentView: View {
 					}
 				}
 			}
+		}
 			.scrollDisabled(tog1)
 			.scrollDisabled(tog2)
 			.scrollDisabled(tog3)

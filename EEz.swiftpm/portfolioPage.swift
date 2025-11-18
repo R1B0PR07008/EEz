@@ -122,7 +122,7 @@ struct investment_list_view: View {
 			
 				  RoundedRectangle(cornerRadius: 20)
 					  .fill(white)
-					  .frame(width: 460, height: 150)
+					  .frame(width: 460, height: 160)
 					  .overlay(
 						  HStack {
 							  VStack {
@@ -157,6 +157,10 @@ struct investment_list_view: View {
 					  .offset(y: showItems ? 0 : 20) // Start lower
 					  .animation(.easeOut(duration: 0.5).delay(Double(index) * 0.2), value: showItems) // Delay each item
 			  }
+		
+		Spacer()
+			.frame(height: 120)
+		
 		  .onAppear {
 			  showItems = true // Triggers the animation when the view appears
 		  }
@@ -165,6 +169,10 @@ struct investment_list_view: View {
 		  }
 	}
 }
+
+
+
+
 
 // MARK: -Stocks Perf Stuff
 //@available(iOS 17.0, *)
@@ -269,19 +277,55 @@ struct portfolioPage: View {
 							)
 							.opacity(tog4 ? 0 : 1)
 						
+//						RoundedRectangle(cornerRadius: 20)
+//							.fill(white2)
+//							.frame(width: 500, height: 500)
+//							.opacity(tog4 ? 0 : 1)
+//							.overlay(
+//								ScrollView {
+//									VStack {
+//										investment_list_view()
+//									}
+//								}
+//									.padding(.top, 20)
+//									.opacity(tog4 ? 0 : 1)
+//							)
+						
 						RoundedRectangle(cornerRadius: 20)
 							.fill(white2)
 							.frame(width: 500, height: 500)
 							.opacity(tog4 ? 0 : 1)
 							.overlay(
-								ScrollView {
+								ZStack {
+									ScrollView {
+										VStack {
+											investment_list_view()
+										}
+										.padding(.top, 20)
+										.opacity(tog4 ? 0 : 1)
+									}
+									
+									// Fade overlay at the bottom of the parent RoundedRectangle
 									VStack {
-										investment_list_view()
+										Spacer()
+										LinearGradient(
+											gradient: Gradient(stops: [
+												.init(color: .clear, location: 0),
+												.init(color: white2, location: 1)  // Matches the rectangle fill color
+											]),
+											startPoint: .top,
+											endPoint: .bottom
+										)
+										.frame(height: 130)
+										.allowsHitTesting(false)
 									}
 								}
-									.padding(.top, 20)
-									.opacity(tog4 ? 0 : 1)
+								.clipShape(RoundedRectangle(cornerRadius: 20))  // Clips the entire overlay to rounded corners
 							)
+						
+						///
+
+						
 					}
 					
 					HStack (spacing: 15) {
@@ -327,6 +371,7 @@ struct portfolioPage: View {
 										VStack {
 											Text("Best Performing Investment")
 												.font(.system(size: 25, weight: .semibold))
+												.padding(.leading, -20)
 											
 											RoundedRectangle(cornerRadius: 20)
 												.fill(white2)
@@ -348,7 +393,7 @@ struct portfolioPage: View {
 											
 										}
 											.opacity(tog4 ? 0 : 1)
-											.position(x: 130,y: 100)
+											.position(x: 140,y: 100)
 									)
 								
 								RoundedRectangle(cornerRadius: 20)
@@ -381,7 +426,7 @@ struct portfolioPage: View {
 											
 										}
 											.opacity(tog4 ? 0 : 1)
-											.position(x: 120,y: 100)
+											.position(x: 140,y: 100)
 									)
 							}
 					}

@@ -9,11 +9,65 @@ import SwiftUI
 
 /// sorted bills data
 
-let vills_data : [[String : String]] = bills.filter {$0["Category"] == cookie}
-let totalSpent = vills_data.compactMap { $0["Spent"] }.compactMap { Double($0) }.reduce(0, +)
-let formattedTotalSpent = String(format: "%.2f", totalSpent)
+let vills_data_ : [RecentBillsData] = bills.filter {$0.category == cookie}
+let totalSpent = vills_data_.compactMap { $0.Spent }.compactMap { Double($0) }.reduce(0, +)
 
 struct bills_inDepth: View {
+	
+	@State private var vills_data : [RecentBillsData] = bills.filter {$0.category == cookie}
+	@State private var formattedTotalSpent = String(format: "%.2f", totalSpent)
+	
+	var scrollviewthingy : some View {
+		ScrollView {
+			VStack {
+				ForEach(vills_data, id: \.self) {bills in
+					RoundedRectangle(cornerRadius: 40)
+						.fill(white2)
+						.frame(width: 350, height: 40)
+						.padding(.top, 0)
+						.overlay(content: {
+							
+							HStack {
+								
+								
+								Text("\(bills.Spent)")
+										.foregroundColor(black)
+										.frame(width: 106)
+								
+								
+								Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
+									
+								
+								
+								 
+									Text("\(bills.Date)")
+										.foregroundColor(black)
+										.frame(width: 106)
+								
+								
+								
+								Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
+									
+								
+								
+								
+									Text("\(bills.Place)")
+										.foregroundColor(black)
+										.frame(width: 106)
+								
+							}
+						})
+				}
+				
+				RoundedRectangle(cornerRadius: 40)
+					.fill(white2)
+					.frame(width: 350, height: 40)
+					.overlay(
+						Text("Looks like you ran out of bills")
+					)
+			}
+		}
+	}
 	
 	var body: some View {
 		VStack {
@@ -99,57 +153,7 @@ struct bills_inDepth: View {
 								
 							)
 						
-						ScrollView {
-							VStack {
-								ForEach(vills_data, id: \.self) {bills in
-									RoundedRectangle(cornerRadius: 40)
-										.fill(white2)
-										.frame(width: 350, height: 40)
-										.padding(.top, 0)
-										.overlay(content: {
-											
-											HStack {
-												
-												if let spnt = bills["Spent"] {
-													Text("\(spnt)")
-														.foregroundColor(black)
-														.frame(width: 106)
-												}
-												
-												
-												Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
-													
-												
-												
-												if let spnt = bills["date"] {
-													Text("\(spnt)")
-														.foregroundColor(black)
-														.frame(width: 106)
-												}
-												
-												
-												Divider().frame(width: 1, height: 25).overlay(Color(red: 176/255, green: 165/255, blue: 173/255))
-													
-												
-												
-												if let spnt = bills["place"] {
-													Text("\(spnt)")
-														.foregroundColor(black)
-														.frame(width: 106)
-												}
-											}
-										})
-								}
-								
-								RoundedRectangle(cornerRadius: 40)
-									.fill(white2)
-									.frame(width: 350, height: 40)
-									.overlay(
-										Text("Looks like you ran out of bills")
-									)
-							}
-						}
-						
+						scrollviewthingy
 						
 					}
 				)
