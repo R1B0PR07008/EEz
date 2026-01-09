@@ -86,7 +86,7 @@ struct graph_Pie_InP: View {
 				
 			
 			RoundedRectangle(cornerRadius: 20)
-				.fill(white2)
+				.tintedGlassShape(color: white2)
 				.frame(width: 200, height: 455)
 				.overlay(
 					VStack (alignment: .leading) {
@@ -120,42 +120,42 @@ struct investment_list_view: View {
 			
 				let formattedValue = formatWithCommas(number: value)
 			
-				  RoundedRectangle(cornerRadius: 20)
-					  .fill(white)
-					  .frame(width: 460, height: 160)
-					  .overlay(
-						  HStack {
-							  VStack {
-								  Text(name)
-									  .font(.system(size: 30, weight: .semibold))
-								  
-								  Text(category)
-									  .font(.system(size: 20, weight: .semibold))
-							  }
-							  .frame(width: 150)
-							  
-							  Divider().frame(width: 1, height: 100).background(Color.gray)
-								  .padding(.horizontal, 20)
-							  
-							  VStack {
-								  Text("Value: $\(formattedValue)")
-									  .font(.system(size: 30, weight: .semibold))
-								  
-								  if perf != -9999999 {
-									  Text("Performance: \(perf)")
-										  .font(.system(size: 20, weight: .semibold))
-								  } else {
-									  Text("Performance: N/A")
-										  .font(.system(size: 20, weight: .semibold))
-								  }
-							  }
-							  .frame(width: 210)
-						  }
-					  )
-					  .padding(.bottom, 2)
-					  .opacity(showItems ? 1 : 0) // Start invisible
-					  .offset(y: showItems ? 0 : 20) // Start lower
-					  .animation(.easeOut(duration: 0.5).delay(Double(index) * 0.2), value: showItems) // Delay each item
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.frame(width: 460, height: 160)
+					.overlay(
+						HStack {
+							VStack {
+								Text(name)
+									.font(.system(size: 30, weight: .semibold))
+								
+								Text(category)
+									.font(.system(size: 20, weight: .semibold))
+							}
+							.frame(width: 150)
+							
+							Divider().frame(width: 1, height: 100).background(Color.gray)
+								.padding(.horizontal, 20)
+							
+							VStack {
+								Text("Value: $\(formattedValue)")
+									.font(.system(size: 30, weight: .semibold))
+								
+								if perf != -9999999 {
+									Text("Performance: \(perf)")
+										.font(.system(size: 20, weight: .semibold))
+								} else {
+									Text("Performance: N/A")
+										.font(.system(size: 20, weight: .semibold))
+								}
+							}
+							.frame(width: 210)
+						}
+					)
+					.padding(.bottom, 2)
+					.opacity(showItems ? 1 : 0) // Start invisible
+					.offset(y: showItems ? 0 : 20) // Start lower
+					.animation(.easeOut(duration: 0.5).delay(Double(index) * 0.2), value: showItems) // Delay each item
 			  }
 		
 		Spacer()
@@ -262,13 +262,36 @@ struct portfolioPage: View {
 	
 	@State private var tog4: Bool = false
 	
+	/// for light-dark mode detector
+	
+	@Environment(\.colorScheme) var colorScheme
+	
 	var body: some View {
 		ZStack {
+			
+			LinearGradient(
+				colors: colorScheme == .dark ? [
+						green2.opacity(0.4),      // Use your existing colors!
+						Color.black,
+						green.opacity(0.3),
+						green2.opacity(0.2)
+					] : [
+						green.opacity(0.4),                    // Your app's green
+						green2.opacity(0.2),
+						Color.white,
+						green.opacity(0.5),
+						green2.opacity(0.5)
+					],
+							startPoint: .topLeading,
+							endPoint: .bottomTrailing
+						)
+						.edgesIgnoringSafeArea(.all)
+			
 			ScrollView {
 				VStack (spacing: 15) {
 					HStack (spacing: 15) {
 						RoundedRectangle(cornerRadius: 20)
-							.fill(white)
+							.tintedGlassShape(color: white)
 							.frame(width: 600, height: 500)
 							.overlay(
 								graph_Pie_InP()
@@ -292,7 +315,7 @@ struct portfolioPage: View {
 //							)
 						
 						RoundedRectangle(cornerRadius: 20)
-							.fill(white2)
+							.tintedGlassShape(color: white2)
 							.frame(width: 500, height: 500)
 							.opacity(tog4 ? 0 : 1)
 							.overlay(
@@ -311,7 +334,7 @@ struct portfolioPage: View {
 										LinearGradient(
 											gradient: Gradient(stops: [
 												.init(color: .clear, location: 0),
-												.init(color: white2, location: 1)  // Matches the rectangle fill color
+												.init(color: white2.opacity(0.5), location: 1)  // Matches the rectangle fill color
 											]),
 											startPoint: .top,
 											endPoint: .bottom
@@ -330,7 +353,7 @@ struct portfolioPage: View {
 					
 					HStack (spacing: 15) {
 							RoundedRectangle(cornerRadius: 20)
-								.fill(white2)
+							.tintedGlassShape(color: white2)
 								.frame(width: tog4 ? 1200 : 520, height: tog4 ? 900 : 200)
 //								.position(
 //									x: tog4 ?  UIScreen.main.bounds.width / 2 - 000  : 295,
@@ -362,7 +385,7 @@ struct portfolioPage: View {
 							
 							HStack (spacing: 15) {
 								RoundedRectangle(cornerRadius: 20)
-									.fill(white)
+									.tintedGlassShape(color: white)
 									.frame(width: 287.5, height: 200)
 //									.position(x: 115, y: 100)
 									.opacity(tog4 ? 0 : 1)
@@ -374,7 +397,7 @@ struct portfolioPage: View {
 												.padding(.leading, -20)
 											
 											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
+												.tintedGlassShape(color: white2)
 												.frame(width: 230, height: 80)
 												.overlay(
 													HStack {
@@ -397,7 +420,7 @@ struct portfolioPage: View {
 									)
 								
 								RoundedRectangle(cornerRadius: 20)
-									.fill(white)
+									.tintedGlassShape(color: white)
 									.frame(width: 279, height: 200)
 //									.position(x: 110,y: 100)
 									.opacity(tog4 ? 0 : 1)
@@ -407,7 +430,7 @@ struct portfolioPage: View {
 												.font(.system(size: 25, weight: .semibold))
 											
 											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
+												.tintedGlassShape(color: white2)
 												.frame(width: 220, height: 80)
 												.overlay(
 													HStack {
@@ -447,7 +470,7 @@ struct portfolioPage: View {
 					let maxCloseP = item.data.max(by: { $0.Close < $1.Close })?.Close ?? 0
 					
 					RoundedRectangle(cornerRadius: 20)
-						.fill(white)
+						.tintedGlassShape(color: white)
 						.frame(width: tog4 ? 1100 : 500 , height: tog4 ? 660 : 130)
 //						.position(
 //							x: tog4 ?  UIScreen.main.bounds.width / 2 - 100 : 250,

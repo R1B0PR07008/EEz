@@ -10,15 +10,10 @@ struct MyApp: App {
 	var body: some Scene {
 		WindowGroup {
 			if !first_open {
-				withAnimation {
-					tabView()
-				}
+				tabView()  // Make sure this goes directly to tabView
 			}
 			else if first_open {
-				
-				withAnimation {
-					IniView()
-				}
+				IniView()
 			}
 		}
 	}

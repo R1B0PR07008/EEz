@@ -418,7 +418,7 @@ struct billsList: View {
 
 					  
 					  RoundedRectangle(cornerRadius: 20)
-						  .fill(white)
+						  .tintedGlassShape(color: white)
 						  .frame(width: 470, height: 200)
 						  .overlay(
 							  HStack (spacing: 15) {
@@ -427,7 +427,7 @@ struct billsList: View {
 										  .font(.system(size: 30, weight: .bold, design: .default))
 									  
 									  RoundedRectangle(cornerRadius: 20)
-										  .fill(white2)
+										  .tintedGlassShape(color: white2)
 										  .frame(width: 130, height: 60)
 										  .overlay(
 											  Text("$\(getTotalSpent(Categroy: category))")
@@ -476,7 +476,7 @@ struct expandedSpentView: View {
 						  .frame(width: 500, height: 200)
 					  
 					  RoundedRectangle(cornerRadius: 20)
-						  .fill(white2)
+						  .tintedGlassShape(color: white2)
 						  .frame(width: 500, height: 200)
 						  .overlay(
 							  HStack (spacing: 15) {
@@ -485,7 +485,7 @@ struct expandedSpentView: View {
 										  .font(.system(size: 25, weight: .semibold))
 									  
 									  RoundedRectangle(cornerRadius: 20)
-										  .fill(white)
+										  .tintedGlassShape(color: white)
 										  .frame(width: 150, height: 60)
 										  .overlay(
 											  Text("$\(formattedSpent)")
@@ -502,7 +502,7 @@ struct expandedSpentView: View {
 											  .font(.system(size: 25, weight: .semibold))
 										  
 										  RoundedRectangle(cornerRadius: 20)
-											  .fill(white)
+											.tintedGlassShape(color: white)
 											  .frame(width: 150, height: 60)
 											  .overlay(
 												  Text("$\(formattedleft)")
@@ -521,7 +521,7 @@ struct expandedSpentView: View {
 				  
 				  VStack(spacing: 15) {
 					  RoundedRectangle(cornerRadius: 20)
-						  .fill(white2)
+						  .tintedGlassShape(color: white2)
 						  .frame(width: 500, height: 525)
 						  
 						  .overlay(
@@ -561,7 +561,7 @@ struct AnimatedBillRow: View {
 
 	var body: some View {
 		RoundedRectangle(cornerRadius: 40)
-			.fill(white2) // Use your custom color `white2`
+			.tintedGlassShape(color: white2)
 			.frame(width: 510, height: 60)
 			.overlay(
 				billContent
@@ -608,6 +608,8 @@ struct graph_stock: View {
 	
 	@State var stocks: [dat] = parseCSVToDatArray("aapl")
 	
+	@Environment(\.colorScheme) var colorScheme  // Add this line
+	
 	var body: some View {
 		
 		let topXvalues = Array(stocks.prefix(90))
@@ -624,25 +626,37 @@ struct graph_stock: View {
 				)
 				.interpolationMethod(.cardinal)
 				.foregroundStyle(condition ? red : green)
-				.annotation(position: .topTrailing,content: {
-					RoundedRectangle(cornerRadius: 20)
-						.fill(white2)
-						.frame(width: 110, height: 55)
-						.overlay(
-							Text("AAPL")
-								.font(.system(size: 25, weight: .semibold))
-						)
-						.padding(.bottom, 10)
-						.padding(.leading, 95)
-				})
-				
-				
 				
 			}
 		}.frame(width: 600, height: 350)
 			.chartYScale(domain: [150,300]) /// automate the max value
 			.padding(.bottom, 10)
 			.chartXAxis(.hidden)
+			.overlay(alignment: .topTrailing) {  // Use overlay instead of annotation
+				Text("AAPL")
+					.font(.system(size: 22, weight: .semibold))
+					.foregroundColor(.primary)
+					.padding(.horizontal, 16)
+					.padding(.vertical, 8)
+					.background(
+						RoundedRectangle(cornerRadius: 15)
+							.fill(.thinMaterial)
+							.overlay(
+								RoundedRectangle(cornerRadius: 15)
+									.fill(
+										colorScheme == .dark
+											? Color.black.opacity(0.2)
+											: Color.white.opacity(0.3)
+									)
+							)
+							.overlay(
+								RoundedRectangle(cornerRadius: 15)
+									.stroke(Color.white.opacity(0.3), lineWidth: 1)
+							)
+							.shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 2)
+					)
+					.padding(12)  // Padding from chart edge
+			}
 		
 	}
 }
@@ -682,7 +696,7 @@ struct NewsView: View {
 				ForEach(newsData, id: \.self) { news in
 					
 					RoundedRectangle(cornerRadius: 20)
-						.fill(white2)
+						.tintedGlassShape(color: white2)
 						.frame(minWidth: 330, idealWidth: 330, maxWidth: 330, minHeight: 120, idealHeight: 160, maxHeight: 200)
 						.padding(.horizontal, 15)
 						.overlay(
@@ -711,7 +725,7 @@ struct ExpandedStocksView: View {
 	 var body: some View {
 		  HStack(spacing: 15) {
 			  RoundedRectangle(cornerRadius: 20)
-				  .fill(white)
+				  .tintedGlassShape(color: white)
 				  .frame(width: 650, height: 500)
 				  .overlay(
 					  VStack (alignment: .leading){
@@ -727,7 +741,7 @@ struct ExpandedStocksView: View {
 				  )
 			  
 			  RoundedRectangle(cornerRadius: 20)
-				  .fill(white)
+				  .tintedGlassShape(color: white)
 				  .frame(width: 360, height: 500)
 				  .overlay(
 					  VStack (alignment: .leading){
@@ -741,7 +755,7 @@ struct ExpandedStocksView: View {
 								  .overlay(divider)
 							  
 							  RoundedRectangle(cornerRadius: 20)
-								  .fill(white2)
+								  .tintedGlassShape(color: white2)
 								  .frame(width: 120, height: 60)
 								  .overlay(content: {
 									  Text("\(stockPerf().str)%")
@@ -762,7 +776,7 @@ struct ExpandedStocksView: View {
 								  .overlay(divider)
 							  
 							  RoundedRectangle(cornerRadius: 20)
-								  .fill(white2)
+								  .tintedGlassShape(color: white2)
 								  .frame(width: 120, height: 60)
 								  .overlay(content: {
 									  Text("1.24")
@@ -793,6 +807,8 @@ struct graph_spendingSummary: View {
 	@State private var animatedData: [(String, Double, Double)] = []
 	
 	@State private var first_open: Bool = false
+	
+	@Environment(\.colorScheme) var colorScheme
 	
 	private func animateData() {
 			for (index, dataPoint) in monthly_data.enumerated() {
@@ -825,13 +841,28 @@ struct graph_spendingSummary: View {
 					)
 					.lineStyle(StrokeStyle(lineWidth: CGFloat(line_width)))
 					.foregroundStyle(red)
-					.annotation(position: .top, alignment: .leading,content: {
-						RoundedRectangle(cornerRadius: 10)
-							.fill(white2)
-							.frame(width: 150, height: 30)
-							.overlay(content: {
-								Text("Budget: $1500")
-							})
+					.annotation(position: .top, alignment: .leading, content: {
+						Text("Budget: $1500")
+							.font(.system(size: 14, weight: .medium))
+							.foregroundColor(.primary)
+							.padding(.horizontal, 12)
+							.padding(.vertical, 6)
+							.background(
+								RoundedRectangle(cornerRadius: 10)
+									.fill(.regularMaterial)
+									.overlay(
+										RoundedRectangle(cornerRadius: 10)
+											.fill(
+												colorScheme == .dark
+													? Color.black.opacity(0.3)  // Dark overlay in dark mode
+												: Color.white.opacity(0.95)   // White overlay in light mode
+											)
+									)
+									.overlay(
+										RoundedRectangle(cornerRadius: 10)
+											.stroke(Color.white.opacity(0.02), lineWidth: 1)
+									)
+							)
 							.padding(.bottom, 10)
 					})
 					
@@ -849,6 +880,58 @@ struct graph_spendingSummary: View {
 	}
 }
 
+// MARK: -Extension for glass effect
+
+extension Shape {
+	func tintedGlassShape(color: Color = .green) -> some View {
+		TintedGlassShapeView(shape: self, color: color)
+	}
+}
+
+struct TintedGlassShapeView<S: Shape>: View {
+	let shape: S
+	let color: Color
+	@Environment(\.colorScheme) var colorScheme  // Detects dark mode
+	
+	var body: some View {
+		shape
+			.fill(.ultraThinMaterial)
+			.overlay(
+				shape.fill(
+					LinearGradient(
+						colors: colorScheme == .dark ? [
+							// Dark mode - more subtle tint
+							color.opacity(0.20),
+							color.opacity(0.10)
+						] : [
+							// Light mode - original tint
+							color.opacity(0.25),
+							color.opacity(0.15)
+						],
+						startPoint: .topLeading,
+						endPoint: .bottomTrailing
+					)
+				)
+			)
+			.shadow(
+				color: colorScheme == .dark
+					? Color.white.opacity(0.05)  // Subtle light shadow in dark mode
+					: Color.black.opacity(0.1),   // Dark shadow in light mode
+				radius: 8,
+				x: 0,
+				y: 4
+			)
+			.overlay(
+				shape.stroke(
+					colorScheme == .dark
+						? Color.white.opacity(0.15)  // Dimmer border in dark mode
+						: Color.white.opacity(0.3),  // Brighter border in light mode
+					lineWidth: 1.5
+				)
+			)
+	}
+}
+
 // MARK: -Dashboard View
 
 @available(iOS 17.0, *)
@@ -860,6 +943,10 @@ struct ContentView: View {
 	@State private var investment = sumInvestmentValues(investments: Investment_list)
 	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
 	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
+	
+	/// for light-dark mode detector
+	
+	@Environment(\.colorScheme) var colorScheme
 	
 	/// Vars
 
@@ -973,364 +1060,419 @@ struct ContentView: View {
 	}
 	
 	var body: some View {
-		ScrollView {
-			ScrollViewReader { proxy in
-				HStack (spacing: 15) {
-					
-					VStack (spacing: 15) {
+		ZStack {
+			
+			LinearGradient(
+				colors: colorScheme == .dark ? [
+						green2.opacity(0.4),      // Use your existing colors!
+						Color.black,
+						green.opacity(0.3),
+						green2.opacity(0.2)
+					] : [
+						green.opacity(0.4),                    // Your app's green
+						green2.opacity(0.2),
+						Color.white,
+						green.opacity(0.5),
+						green2.opacity(0.5)
+					],
+							startPoint: .topLeading,
+							endPoint: .bottomTrailing
+						)
+						.edgesIgnoringSafeArea(.all)
+			
+			ScrollView {
+				ScrollViewReader { proxy in
+					HStack (spacing: 15) {
 						
-						HStack (spacing: 15) {
+						VStack (spacing: 15) {
 							
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white)
-								.opacity(tog2 ? 0 : 1)
-								.opacity(tog3 ? 0 : 1)
-								.zIndex(1)
-								.frame(width: tog1 ? 1100 : 270, height: tog1 ? 650 :  250)
-								.position(
-									x: tog1 ?  UIScreen.main.bounds.width / 2  : 168,
-									y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
-								)
-								.overlay(
-									VStack {
-										
-										if !tog1 {
-											HStack {
-												Text("Monthly \nSpending")
+							HStack (spacing: 15) {
+								
+								RoundedRectangle(cornerRadius: 20)
+									.tintedGlassShape(color: white)
+									.opacity(tog2 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
+									.zIndex(1)
+									.frame(
+										width: tog3 ? 0 : tog1 ? 1100 : 270,
+										height: tog3 ? 0 : tog1 ? 650 : 250
+									)
+									.overlay(
+										VStack {
+											
+												if !tog1 {
+													VStack {
+														HStack {
+															Text("Monthly \nSpending")
+																.font(.system(size: 35, weight: .semibold))
+																.padding(.top, 20)
+																	.padding(.leading, 20)
+															
+															Spacer()
+															
+															Image(systemName: "cursorarrow.click")
+																.resizable()
+																.frame(width: 25, height: 25)
+																.padding(.trailing, 15)
+																.padding(.top, -40)
+														}
+														
+														Spacer()
+															
+														RoundedRectangle(cornerRadius: 20)
+															.tintedGlassShape(color: white2)
+															.frame(width: 170, height: 80)
+															.overlay(
+																Text("$\(formattedSpent)")
+																	.font(.system(size: 30, weight: .semibold))
+															)
+															.padding(.bottom, 20)
+													}
+												} else {
+													
+													 expandedSpentView()
+														
+												}
+										}
+											
+											.opacity(tog2 ? 0 : 1)
+											.opacity(tog3 ? 0 : 1)
+									)
+									.onTapGesture {
+										withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
+											tog1.toggle()
+											if tog1 {
+												proxy.scrollTo("top", anchor: .top)
+											}
+										}
+									}
+									.padding(.leading, tog1 ? 25 : 0)
+									.animation(.easeInOut, value: tog1)
+						
+								
+							
+								RoundedRectangle(cornerRadius: 20)
+									.tintedGlassShape(color: white)
+									.frame(width: (tog1 || tog3) ? 0 : 230, height: (tog1 || tog3) ? 0 : 250)
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
+									.overlay(
+										VStack {
+											if !tog2 {
+												Text("Your Saving Goal")
 													.font(.system(size: 35, weight: .semibold))
 													.padding(.top, 20)
-													.padding(.leading, 70)
 												
-												Spacer()
+												RoundedRectangle(cornerRadius: 20)
+													.tintedGlassShape(color: white2)
+													.frame(width: 150, height: 80)
+													.overlay (
+														Text("$\(SavingGoal)")
+															.font(.system(size: 30, weight: .semibold))
+													)
+											}
+											
+										}
+											.opacity(tog1 ? 0 : 1)
+											.opacity(tog3 ? 0 : 1)
+										
+									)
+									.onTapGesture {
+										withAnimation (.easeInOut(duration: 0.45)) {
+			//										tog2.toggle()
+										}
+									}
+							}
+							.id("top")
+							
+							HStack (spacing: 15) {
+								RoundedRectangle(cornerRadius: 20)
+									.tintedGlassShape(color: white2)
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog2 ? 0 : 1)
+									.opacity(tog3 ? 0 : 1)
+									.frame(width: 230, height: 250)
+									.frame(width: (tog1 || tog3) ? 0 : 230, height: (tog1 || tog3) ? 0 : 250)
+									.overlay(
+										VStack {
+											Text("Your Credit Score")
+												.font(.system(size: 35, weight: .semibold))
+											
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white)
+												.frame(width: 150, height: 80)
+												.overlay(
+													Text("600")
+														.font(.system(size: 30, weight: .semibold))
+												)
+										}
+											.opacity(tog1 ? 0 : 1)
+											.opacity(tog2 ? 0 : 1)
+											.opacity(tog3 ? 0 : 1)
+									)
+								
+								
+								
+								RoundedRectangle(cornerRadius: 20)
+									.tintedGlassShape(color: white2)
+									.opacity(tog1 ? 0 : 1)
+									.opacity(tog2 ? 0 : 1)
+									.frame(
+										width: (tog1 || tog2) ? 0 : tog3 ? 1100 : 270,
+										height: (tog1 || tog2) ? 0 : tog3 ? 650 : 250
+									)
+									.overlay(
+										VStack (alignment: tog3 ? .leading : .center) {
+											HStack {
+												Text("Stock Performance")
+													.padding(.top, 20)
+													.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
+													.padding(.bottom, 5)
+													.padding(.leading, 10)
+												
 												
 												Image(systemName: "cursorarrow.click")
 													.resizable()
 													.frame(width: 25, height: 25)
-													.padding(.trailing, 50)
-													.padding(.top, -60)
+													.padding(.trailing, 10)
+													.padding(.top, -40)
+													.opacity(tog1 ? 0 : 1)
+													.opacity(tog3 ? 0 : 1)
+													.opacity(tog2 ? 0 : 1)
+											}
+											
+											/// Stocks Data Graph
+											
+											if !tog3 {
+												RoundedRectangle(cornerRadius: 20)
+													.tintedGlassShape(color: white)
+													.frame(width: 240, height: 120)
+													.frame(width: (tog1 || tog3) ? 0 : 240, height: (tog1 || tog3) ? 0 : 120)
+													.padding(.bottom, 10)
+													.overlay(
+														HStack (spacing: 10) {
+																Text("AAPL")
+																	.font(.system(size: 23, weight: .semibold))
+																
+															Divider()
+																.frame(width: 1, height: 90)
+																.overlay(divider)
+
+															stockPerfView()
+														}
+															.padding(.bottom, 10)
+														
+													)
+											} else {
+												
+												 ExpandedStocksView()
+											}
+										}
+											.opacity(tog1 ? 0 : 1)
+											.opacity(tog2 ? 0 : 1)
+									)
+								
+									.onTapGesture {
+										withAnimation {
+											tog3.toggle()
+											if tog3 {
+												proxy.scrollTo("top", anchor: .top)
+											}
+										}
+									}
+							}
+							
+							RoundedRectangle(cornerRadius: 20)
+								.tintedGlassShape(color: white)
+								.opacity(tog1 ? 0 : 1)
+								.opacity(tog2 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
+								.frame(width: 515, height: 400)
+								.frame(width: (tog1 || tog3) ? 0 : 515, height: (tog1 || tog3) ? 0 : 400)
+								.overlay(
+									VStack (alignment: .leading) {
+										Text("Spending Summary")
+											.font(.system(size: 35, weight: .semibold))
+											
+										graph_spendingSummary()
+											
+									}
+										.opacity(tog1 ? 0 : 1)
+										.opacity(tog2 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
+								)
+								
+						}
+						
+						
+						VStack (spacing: 15) {
+							RoundedRectangle(cornerRadius: 20)
+								.tintedGlassShape(color: white2)
+								.opacity(tog1 ? 0 : 1)
+								.opacity(tog2 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
+								.frame(width: 550, height: 300)
+								.frame(width: (tog1 || tog3) ? 0 : 550, height: (tog1 || tog3) ? 0 : 300)
+								.overlay(
+									HStack {
+										
+										VStack {
+											HStack {
+												Text("Your Data, Visualized")
+													.font(.system(size: 45, weight: .semibold))
+//													.padding(.top, 20)
+													.padding(.bottom,15)
+													.padding(.horizontal, 15)
+													.frame(width: 240)
+												
+												
 											}
 												
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
-												.frame(width: 170, height: 80)
-												.overlay(
-													Text("$\(formattedSpent)")
-														.font(.system(size: 30, weight: .semibold))
-												)
-										} else {
-
-											 expandedSpentView()
 										}
-									}
-										.opacity(tog2 ? 0 : 1)
-										.opacity(tog3 ? 0 : 1)
-										.position(
-											x: tog1 ? UIScreen.main.bounds.width / 2  : 168,
-											y: tog1 ? UIScreen.main.bounds.height / 2 - 50 : 125
-										)
-								)
-								.onTapGesture {
-									withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
-										tog1.toggle()
-										if tog1 {
-											proxy.scrollTo("top", anchor: .top)
-										}
-									}
-								}
-								.animation(.easeInOut, value: tog1)
-					
-							
-						
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white)
-								.position(
-									x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
-									y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
-								)
-								.frame(width: tog2 ? 1100 : 230, height: tog2 ? 650 :  250)
-								.opacity(tog1 ? 0 : 1)
-								.opacity(tog3 ? 0 : 1)
-								.overlay(
-									VStack {
-										if !tog2 {
-											Text("Your Saving Goal")
-												.font(.system(size: 35, weight: .semibold))
-												.padding(.top, 20)
-											
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white2)
-												.frame(width: 150, height: 80)
-												.overlay (
-													Text("$\(SavingGoal)")
-														.font(.system(size: 30, weight: .semibold))
-												)
-										}
-										
-									}
-										.opacity(tog1 ? 0 : 1)
-										.opacity(tog3 ? 0 : 1)
-										.position(
-											x: tog2 ? UIScreen.main.bounds.width / 2 - 15: 80,
-											y: tog2 ? UIScreen.main.bounds.height / 2 - 50 : 125
-										)
-									
-								)
-								.onTapGesture {
-									withAnimation (.easeInOut(duration: 0.45)) {
-		//										tog2.toggle()
-									}
-								}
-						}
-						.id("top")
-						
-						
-						
-						HStack (spacing: 15) {
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white2)
-								.opacity(tog1 ? 0 : 1)
-								.opacity(tog2 ? 0 : 1)
-								.opacity(tog3 ? 0 : 1)
-								.frame(width: 230, height: 250)
-								.overlay(
-									VStack {
-										Text("Your Credit Score")
-											.font(.system(size: 35, weight: .semibold))
-										
-										RoundedRectangle(cornerRadius: 20)
-											.fill(white)
-											.frame(width: 150, height: 80)
-											.overlay(
-												Text("600")
-													.font(.system(size: 30, weight: .semibold))
-											)
-									}
-										.opacity(tog1 ? 0 : 1)
-										.opacity(tog2 ? 0 : 1)
-										.opacity(tog3 ? 0 : 1)
-								)
-							
-							
-							
-							RoundedRectangle(cornerRadius: 20)
-								.fill(white2)
-								.opacity(tog1 ? 0 : 1)
-								.opacity(tog2 ? 0 : 1)
-								.position(
-									x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
-									y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
-								)
-								.frame(width: tog3 ? 1100 : 270, height: tog3 ? 650 :  250)
-								.overlay(
-									VStack (alignment: tog3 ? .leading : .center) {
-										HStack {
-											Text("Stock Performance")
-												.padding(.top, 20)
-												.font(.system(size: tog3 ? 50 : 35, weight: .semibold))
-												.padding(.bottom, 5)
-												.padding(.leading, 10)
-											
-											
-											Image(systemName: "cursorarrow.click")
-												.resizable()
-												.frame(width: 25, height: 25)
-												.padding(.trailing, 10)
-												.padding(.top, -40)
-												.opacity(tog1 ? 0 : 1)
-												.opacity(tog3 ? 0 : 1)
-												.opacity(tog2 ? 0 : 1)
-										}
-										
-										/// Stocks Data Graph
-										
-										if !tog3 {
-											RoundedRectangle(cornerRadius: 20)
-												.fill(white)
-												.frame(width: 240, height: 120)
-												.padding(.bottom, 10)
-												.overlay(
-													HStack (spacing: 10) {
-															Text("AAPL")
-																.font(.system(size: 23, weight: .semibold))
-															
-														Divider()
-															.frame(width: 1, height: 90)
-															.overlay(divider)
-
-														stockPerfView()
-													}
-														.padding(.bottom, 10)
-													
-												)
-										} else {
-											
-											 ExpandedStocksView()
-										}
-									}
-										.opacity(tog1 ? 0 : 1)
-										.opacity(tog2 ? 0 : 1)
-										.position(
-											x: tog3 ? UIScreen.main.bounds.width / 2 - 160: 135,
-											y: tog3 ? UIScreen.main.bounds.height / 2 - 320 : 125
-										)
-								)
-							
-								.onTapGesture {
-									withAnimation {
-										tog3.toggle()
-										if tog3 {
-											proxy.scrollTo("top", anchor: .top)
-										}
-									}
-								}
-						}
-						
-						RoundedRectangle(cornerRadius: 20)
-							.fill(white)
-							.opacity(tog1 ? 0 : 1)
-							.opacity(tog2 ? 0 : 1)
-							.opacity(tog3 ? 0 : 1)
-							.frame(width: 515, height: 400)
-							.overlay(
-								VStack (alignment: .leading) {
-									Text("Spending Summary")
-										.font(.system(size: 35, weight: .semibold))
-										
-									graph_spendingSummary()
-										
-								}
-									.opacity(tog1 ? 0 : 1)
-									.opacity(tog2 ? 0 : 1)
-									.opacity(tog3 ? 0 : 1)
-							)
-							
-					}
-					
-					
-					VStack (spacing: 15) {
-						RoundedRectangle(cornerRadius: 20)
-							.fill(white2)
-							.opacity(tog1 ? 0 : 1)
-							.opacity(tog2 ? 0 : 1)
-							.opacity(tog3 ? 0 : 1)
-							.frame(width: 550, height: 300)
-							.position(x: 240, y: 150)
-							.overlay(
-								HStack {
-									
-									VStack {
-										HStack {
-											Text("Your Data, Visualized")
-												.font(.system(size: 45, weight: .semibold))
-												.padding(.top, 20)
-												.padding(.bottom,15)
-												.padding(.horizontal, 15)
-											
-											Spacer()
-										}
-											
-									}
-									.padding(.horizontal, 20)
-									
-									graph_Pie()
-										.frame(width: 240, height: 260)
 										.padding(.horizontal, 20)
-								}
-									.opacity(tog1 ? 0 : 1)
-									.opacity(tog2 ? 0 : 1)
-									.opacity(tog3 ? 0 : 1)
-									.position(x: 240, y: 150)
-								
-								
-								
-							)
-						
-						/// Recent Bills (uncategorized)
-						
-						RoundedRectangle(cornerRadius: 20)
-							.fill(white)
-							.opacity(tog1 ? 0 : 1)
-							.opacity(tog2 ? 0 : 1)
-							.opacity(tog3 ? 0 : 1)
-							.frame(width: 550, height: 615)
-							.position(x: 240, y: 150)
-							.overlay(
-								
-								VStack {
+										
+										graph_Pie()
+											.frame(width: 240, height: 260)
+											.padding(.horizontal, 20)
+									}
+										.opacity(tog1 ? 0 : 1)
+										.opacity(tog2 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
+										
 									
-									billsList_
-								}
-									.opacity(tog1 ? 0 : 1)
-									.opacity(tog2 ? 0 : 1)
-									.opacity(tog3 ? 0 : 1)
-									.position(x: 240, y: 70)
-									.frame(height: 615)
-									.padding(.top, 300)
-							)
+									
+									
+								)
+							
+							/// Recent Bills (uncategorized)
+							
+							RoundedRectangle(cornerRadius: 20)
+								.tintedGlassShape(color: white)
+								.opacity(tog1 ? 0 : 1)
+								.opacity(tog2 ? 0 : 1)
+								.opacity(tog3 ? 0 : 1)
+								.frame(width: 550, height: 615)
+								.frame(width: (tog1 || tog3) ? 0 : 550, height: (tog1 || tog3) ? 0 : 615)
+								.overlay(
+									
+									VStack {
+										
+										billsList_
+									}
+										.opacity(tog1 ? 0 : 1)
+										.opacity(tog2 ? 0 : 1)
+										.opacity(tog3 ? 0 : 1)
+										
+										.frame(height: 615)
+										
+								)
+							
+						}
+					}
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
+				}
+			}
+				.scrollContentBackground(.hidden) // THIS IS THE KEY LINE!
+				.background(Color.clear)
+				.scrollDisabled(tog1)
+				.scrollDisabled(tog2)
+				.scrollDisabled(tog3)
+				.onTapGesture(perform: {
+					
+					withAnimation{
+						if tog1 {
+							tog1.toggle()
+						}
+						else if tog2 {
+							tog2.toggle()
+						}
+						else if tog3 {
+							tog3.toggle()
+						}
+					}
+				})
+				.onAppear{
+					
+					if spent != spentG {
+						var dif = spentG - spent
 						
+						spent = spent + dif
+						
+						formattedSpent = formatWithCommas(number: spent)
 					}
 				}
-			}
 		}
-			.scrollDisabled(tog1)
-			.scrollDisabled(tog2)
-			.scrollDisabled(tog3)
-			.onTapGesture(perform: {
-				
-				withAnimation{
-					if tog1 {
-						tog1.toggle()
-					}
-					else if tog2 {
-						tog2.toggle()
-					}
-					else if tog3 {
-						tog3.toggle()
-					}
-				}
-			})
-			.onAppear{
-				
-				if spent != spentG {
-					var dif = spentG - spent
-					
-					spent = spent + dif
-					
-					formattedSpent = formatWithCommas(number: spent)
-				}
-			}
 	}
 }
 
 struct tabView: View {
+	@State private var showAddBill = false
+	@Environment(\.colorScheme) var colorScheme
+
 	var body: some View {
-		if #available(iOS 18.0, *) {
-			TabView {
-				Tab("Dashboard", systemImage: "house.fill") {
-					ContentView()
-				}
+		HStack {
+			if #available(iOS 18.0, *) {
+				ZStack {
+					TabView {
+						Tab("Dashboard", systemImage: "house.fill") {
+							ContentView()
+						}
 
-				Tab("Portfolio", systemImage: "briefcase") {
-					portfolioPage()
-				}
+						Tab("Portfolio", systemImage: "briefcase") {
+							portfolioPage()
+						}
 
-				Tab("Account", systemImage: "person.crop.circle.fill") {
-					Account()
+						Tab("Account", systemImage: "person.crop.circle.fill") {
+							Account()
+						}
+					}
+
+					// Floating Add Bill button
+					VStack {
+						HStack {
+							Spacer()
+							Button {
+								withAnimation {
+									showAddBill = true
+								}
+							} label: {
+								Image(systemName: "plus")
+									.font(.system(size: 20, weight: .bold))
+									.foregroundStyle(colorScheme == .dark ? .white : .black)  // Adaptive color
+									.padding(10)
+									.background {
+										if colorScheme == .dark {
+											Circle().tintedGlassShape(color: white)
+										} else {
+											Circle()
+												.fill(.white.opacity(0.6))
+												.shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+										}
+									}
+							}
+							.padding(.trailing, 370)
+							.padding(.top, 2.5)
+						}
+						
+						Spacer()
+						
+					}
+					
+					// Add Bill overlay - appears on top
+					if showAddBill {
+						Color.black.opacity(0.4)
+							.ignoresSafeArea()
+							.onTapGesture {
+								withAnimation {
+									showAddBill = false
+								}
+							}
+						
+						Add_bill()
+							.transition(.scale.combined(with: .opacity))
+					}
 				}
-				 
-				Tab("Add Bill", systemImage: "plus") {
-					 Add_bill()
-				 }
-				
 			}
-			.onAppear() {
-				UITabBar.appearance().barTintColor = UIColor(white)
-				UITabBar.appearance().backgroundColor = UIColor(white)
-				UITabBar.appearance().unselectedItemTintColor = UIColor(black2)
-				UITabBar.appearance().barTintColor = UIColor(white)
-				}
-		} else {
-			// Fallback on earlier versions
 		}
 	}
 }

@@ -56,10 +56,14 @@ struct Add_bill: View {
 		return defaultCategories + customCategories
 	}
 	
+	/// for light-dark mode detector
+	
+	@Environment(\.colorScheme) var colorScheme
+	
 	var body: some View {
-		VStack {
+		
 			RoundedRectangle(cornerRadius: 20)
-				.fill(white)
+				.tintedGlassShape(color: white)
 				.frame(width: 550, height: 650)
 				.overlay(
 					VStack {
@@ -69,7 +73,7 @@ struct Add_bill: View {
 								.font(.system(size: 40, weight: .semibold))
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -80,7 +84,7 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 40)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 200, height: 40)
 											.overlay(
 												TextField("$...", text: $spent_)
@@ -93,7 +97,7 @@ struct Add_bill: View {
 							
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -125,7 +129,7 @@ struct Add_bill: View {
 								.padding(.bottom, 20)
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -136,7 +140,7 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 40)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 200, height: 40)
 											.overlay(
 												TextField("Store Name", text: $place)
@@ -148,7 +152,7 @@ struct Add_bill: View {
 								.padding(.bottom, 20)
 							
 							RoundedRectangle(cornerRadius: 20)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 120)
 								.overlay(
 									VStack (alignment: .leading) {
@@ -159,7 +163,7 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 20)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 420, height: 50)
 											.overlay(
 												
@@ -179,7 +183,7 @@ struct Add_bill: View {
 													
 													HStack {
 														RoundedRectangle(cornerRadius: 20)
-															.fill(white2)
+															.tintedGlassShape(color: white2)
 															.frame(width: 150, height: 40)
 															.overlay(
 																TextField("New category", text: $newCategory)
@@ -193,7 +197,14 @@ struct Add_bill: View {
 																								newCategory = "" // Clear input field
 																							}
 																	}
-																	.buttonStyle(.borderedProminent)
+																	.frame(width: 55, height: 40)
+																	.background {
+																		TintedGlassShapeView(
+																			shape: RoundedRectangle(cornerRadius: 20),
+																			color: white2
+																		)
+																	}
+																	.foregroundStyle(black)
 																	.cornerRadius(20)
 																	.frame(width: 55)
 																	.padding(.trailing, 15)
@@ -225,7 +236,7 @@ struct Add_bill: View {
 								
 							}, label: {
 								RoundedRectangle(cornerRadius: 20)
-									.fill(white2)
+									.tintedGlassShape(color: white2)
 									.frame(width: 250, height: 70)
 									.overlay(
 										Text("Enter Bill Data")
@@ -237,7 +248,8 @@ struct Add_bill: View {
 					}
 			)
 					
-		}
+		
+		
 	}
 	
 	private func addCategory(_ category: String) {
