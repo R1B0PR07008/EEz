@@ -349,7 +349,7 @@ struct CryptoHelper {
 		
 		let newDataCsv = serializeBillsToCSV(modifieableData)
 		
-//		print("\n New data csv: \n\(newDataCsv)")
+		print("\n New data csv: \n\(newDataCsv)")
 		
 		let encryptedNewData = encryptCSVToString(newDataCsv, key: key)!
 		

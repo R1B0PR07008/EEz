@@ -22,16 +22,8 @@ func decodeCSVToArray(_ csvString: String) -> [String] {
 nonisolated(unsafe) var customCategories: [String] = []
 
 struct Add_bill: View {
-
-	enum Category: String, CaseIterable, Identifiable {
-		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
-
-		var id: Self { self }
-		
-		static var allCases: [Category] {
-			return [.Clothes, .Fast_Food, .Super_Market, .Subscriptions, .Gas, .Coffee] // Add new cases here
-		}
-	}
+	
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0
 	
 	@State private var selectedCategory: String = Category.Gas.rawValue
 	@State private var newCategory: String = ""
@@ -42,6 +34,16 @@ struct Add_bill: View {
 	@State private var place : String = ""
 	@State private var category : Category = .Subscriptions
 	@State private var categoryStr : String = ""
+	
+	enum Category: String, CaseIterable, Identifiable {
+		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
+
+		var id: Self { self }
+		
+		static var allCases: [Category] {
+			return [.Clothes, .Fast_Food, .Super_Market, .Subscriptions, .Gas, .Coffee]
+		}
+	}
 	
 	private var customCategories: [String] {
 		if let data = UserDefaults.standard.string(forKey: "customCategories"),
@@ -56,12 +58,8 @@ struct Add_bill: View {
 		return defaultCategories + customCategories
 	}
 	
-	/// for light-dark mode detector
-	
-	@Environment(\.colorScheme) var colorScheme
-	
 	var body: some View {
-		
+		VStack {
 			RoundedRectangle(cornerRadius: 20)
 				.tintedGlassShape(color: white)
 				.frame(width: 550, height: 650)
@@ -106,15 +104,6 @@ struct Add_bill: View {
 											.font(.system(size: 20, weight: .semibold))
 											.padding(.leading, 20)
 											.frame(width: 170)
-										
-//										RoundedRectangle(cornerRadius: 40)
-//											.fill(white)
-//											.frame(width: 200, height: 40)
-//											.overlay(
-///												TextField("YYYY/MM/DD", text: $date)
-///													.padding(.leading, 10)
-///													.font(.system(size: 20))
-//											)
 										
 										VStack{
 											DatePicker(
@@ -166,18 +155,15 @@ struct Add_bill: View {
 											.tintedGlassShape(color: white)
 											.frame(width: 420, height: 50)
 											.overlay(
-												
-												
-												
 												HStack {
 													Picker("Select category", selection: $selectedCategory) {
 														ForEach(allCategories, id: \.self) { category in
 															Text(replaceUnderscoresWithSpaces(in: category)).tag(category)
-																		}
+														}
 													}
-														.accentColor(black)
-														.padding(.leading, 10)
-														.frame(width: 200)
+													.accentColor(black)
+													.padding(.leading, 10)
+													.frame(width: 200)
 													
 													Spacer()
 													
@@ -190,36 +176,30 @@ struct Add_bill: View {
 																	.padding(.leading, 20)
 															)
 														
-
-																	Button("Add") {
-																		if !newCategory.isEmpty && !customCategories.contains(newCategory) {
-																								addCategory(newCategory)
-																								newCategory = "" // Clear input field
-																							}
-																	}
-																	.frame(width: 55, height: 40)
-																	.background {
-																		TintedGlassShapeView(
-																			shape: RoundedRectangle(cornerRadius: 20),
-																			color: white2
-																		)
-																	}
-																	.foregroundStyle(black)
-																	.cornerRadius(20)
-																	.frame(width: 55)
-																	.padding(.trailing, 15)
-																}
-																.padding()
-													
+														Button("Add") {
+															if !newCategory.isEmpty && !customCategories.contains(newCategory) {
+																addCategory(newCategory)
+																newCategory = ""
+															}
+														}
+														.frame(width: 55, height: 40)
+														.background {
+															TintedGlassShapeView(
+																shape: RoundedRectangle(cornerRadius: 20),
+																color: white2
+															)
+														}
+														.foregroundStyle(black)
+														.cornerRadius(20)
+														.frame(width: 55)
 													}
-												)
-												
-													
-											
+													.padding()
+												}
+											)
 									}
 								)
 								.padding(.bottom, 50)
-					}
+						}
 						
 						VStack {
 							Button(action: {
@@ -228,11 +208,12 @@ struct Add_bill: View {
 								
 								categoryStr = replaceUnderscoresWithSpaces(in: selectedCategory)
 								
-								if Double(spent_) ?? 0.0 > 0.0 {
-									CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
-									
-									spentG += Double(spent_)!
-								}
+								CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
+								
+								spentG += Double(spent_)!
+								
+								// Trigger refresh
+								billsRefreshTrigger += 1
 								
 							}, label: {
 								RoundedRectangle(cornerRadius: 20)
@@ -246,23 +227,21 @@ struct Add_bill: View {
 							})
 						}
 					}
-			)
-					
-		
-		
+				)
+		}
 	}
 	
 	private func addCategory(_ category: String) {
-		   var updatedCategories = customCategories
-		   updatedCategories.append(category)
+		var updatedCategories = customCategories
+		updatedCategories.append(category)
 
-		   if let encoded = try? JSONEncoder().encode(updatedCategories),
-			  let jsonString = String(data: encoded, encoding: .utf8) {
-			   UserDefaults.standard.set(jsonString, forKey: "customCategories")
-		   }
-	   }
+		if let encoded = try? JSONEncoder().encode(updatedCategories),
+		   let jsonString = String(data: encoded, encoding: .utf8) {
+			UserDefaults.standard.set(jsonString, forKey: "customCategories")
+		}
+	}
 }
 
-#Preview {
+#Preview(traits: .landscapeLeft) {
 	Add_bill()
 }

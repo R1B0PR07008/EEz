@@ -170,93 +170,6 @@ struct investment_list_view: View {
 	}
 }
 
-
-
-
-
-// MARK: -Stocks Perf Stuff
-//@available(iOS 17.0, *)
-//struct stocks_perf_view: View {
-//
-//	@State var tog4: Bool = false
-//
-//	var graph: some View {
-//		ScrollView (.horizontal) {
-//			LazyHStack {
-//				ForEach(stocks_list, id: \.self) { item in
-//
-//					let formated_perf = String(format: "%.1f", item.perf)
-//
-//					let formated_risk = String(format: "%.2f", item.risk)
-//
-//					let maxCloseP = item.data.max(by: { $0.Close < $1.Close })?.Close ?? 0
-//
-//					RoundedRectangle(cornerRadius: 20)
-//						.fill(white)
-//						.frame(width: tog4 ? 1100 : 500 , height: tog4 ? 660 : 130)
-//						.position(
-//							x: tog4 ?  UIScreen.main.bounds.width / 2  : 250,
-//							y: tog4 ? UIScreen.main.bounds.height / 2 - 50 : 75
-//						)
-//						.zIndex(1)
-//						.overlay(
-//							HStack {
-//								VStack (alignment: .leading) {
-//
-//									Text("\(item.ticker) (last 3 months of 2024)")
-//									Chart() {
-//										let topXvalues = Array(item.data.prefix(90))
-//
-//										ForEach(topXvalues, id: \.self) {item in
-//
-//
-//											let condition: Bool = item.isLarger == "0"
-//
-//											LineMark(
-//												x: .value("Date", item.Date),
-//												y: .value("Close Price", item.Close)
-//											)
-//											.foregroundStyle(condition ? red : green)
-//											.interpolationMethod(.cardinal)
-//
-//										}
-//
-//									}.frame(width: 230, height: 70)
-//										.chartYScale(domain: [maxCloseP - 100, maxCloseP + 100]) /// automate the max value
-//										.padding(.bottom, 10)
-//										.chartXAxis(.hidden)
-//								}
-//								.frame(width: 230)
-//
-//								Divider().frame(width: 1, height: 90).background(Color.gray)
-//									.padding(.horizontal, 20)
-//
-//								VStack (alignment: .leading) {
-//									Text("Performance: \(formated_perf)%")
-//										.font(.system(size: 20, weight: .semibold))
-//										.padding(.bottom, 10)
-//
-//									Text("Beta Risk: \(formated_risk)")
-//										.font(.system(size: 20, weight: .semibold))
-//								}
-//							}
-//						)
-//						.onTapGesture {
-//							withAnimation {
-//								tog4.toggle()
-//								print(tog4)
-//							}
-//							print("QWERTYUIOPAGHJKL:ZXCVBNM")
-//						}
-//				}
-//			}
-//			.scrollTargetLayout()
-//		}
-//		.scrollTargetBehavior(.viewAligned)
-//		.safeAreaPadding(.horizontal, 25)
-//	}
-//}
-
 @available(iOS 17.0, *)
 struct portfolioPage: View {
 	
@@ -265,6 +178,20 @@ struct portfolioPage: View {
 	/// for light-dark mode detector
 	
 	@Environment(\.colorScheme) var colorScheme
+	
+	/// for app tour
+	
+	@AppStorage("st8") var st8 : Bool = false
+	@AppStorage("st9") var st9 : Bool = false
+	@AppStorage("st10") var st10 : Bool = false
+	@AppStorage("st11") var st11 : Bool = false
+	@AppStorage("st12") var st12 : Bool = false
+	@AppStorage("st13") var st13 : Bool = false
+	
+	@AppStorage("appTour") var appTour : Bool = true
+	
+	@AppStorage("selectedTab") private var selectedTab: Int = 0
+	
 	
 	var body: some View {
 		ZStack {
@@ -299,20 +226,6 @@ struct portfolioPage: View {
 									.opacity(tog4 ? 0 : 1)
 							)
 							.opacity(tog4 ? 0 : 1)
-						
-//						RoundedRectangle(cornerRadius: 20)
-//							.fill(white2)
-//							.frame(width: 500, height: 500)
-//							.opacity(tog4 ? 0 : 1)
-//							.overlay(
-//								ScrollView {
-//									VStack {
-//										investment_list_view()
-//									}
-//								}
-//									.padding(.top, 20)
-//									.opacity(tog4 ? 0 : 1)
-//							)
 						
 						RoundedRectangle(cornerRadius: 20)
 							.tintedGlassShape(color: white2)
@@ -455,6 +368,15 @@ struct portfolioPage: View {
 					}
 				}
 			}
+			
+			if appTour == true {
+				app_Tour2.opacity(1)
+			}
+			else if appTour == false {
+				withAnimation {
+					app_Tour2.opacity(0)
+				}
+			}
 		}
 	}
 	
@@ -538,9 +460,289 @@ struct portfolioPage: View {
 		.safeAreaPadding(.horizontal, 25)
 	}
 	
+	var app_Tour2: some View {
+		ZStack {
+			ScrollView {
+				VStack (spacing: 15) {
+					HStack (spacing: 15) {
+						RoundedRectangle(cornerRadius: 20)
+							.fill(st9 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+							.frame(width: 600, height: 500)
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill(st10 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+							.frame(width: 500, height: 500)
+					}
+					
+					HStack (spacing: 15) {
+						RoundedRectangle(cornerRadius: 20)
+							.fill(st11 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+							.frame(width: 520, height: 200)
+						
+						
+						
+						HStack (spacing: 15) {
+							RoundedRectangle(cornerRadius: 20)
+								.fill(st12 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 287.5, height: 200)
+							
+							RoundedRectangle(cornerRadius: 20)
+								.fill(st12 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 279, height: 200)
+								.opacity(tog4 ? 0 : 1)
+						}
+					}
+				}
+			}
+			
+			/// st9 explanation
+			VStack {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.opacity(st9 ? 1 : 0)
+					.frame(width: 350, height: 270)
+					.overlay(
+						VStack {
+							Text("This pie graph allows you to see the distribution of your investments. This is important because if you invest all your money into one thing, you leave your self vulnerable to something happening to that thing and you loosing everything. Moral of the story, diversify your assets.")
+							
+							HStack {
+								
+								Button(action: {
+									withAnimation{
+										st8 = true
+										st9 = false
+										selectedTab = 0
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 110, height: 40)
+										.overlay(
+											HStack {
+												Image(systemName: "arrow.backward")
+												Text("Previous")
+											}
+										)
+								})
+								.padding(10)
+								
+								Spacer()
+								
+								Button(action: {
+									withAnimation{
+										st9 = false
+										st10 = true
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 100, height: 40)
+										.overlay(
+											HStack {
+												
+												Text("Next")
+												Image(systemName: "arrow.forward")
+											}
+										)
+								})
+								.padding(10)
+							}
+							
+						}
+							.padding(10)
+							.opacity(st9 ? 1 : 0)
+					)
+					.padding(.bottom, 450)
+					.padding(.leading, 500)
+			}
+			
+			/// st10 explanation
+			VStack {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.opacity(st10 ? 1 : 0)
+					.frame(width: 350, height: 170)
+					.overlay(
+						VStack {
+							Text("In this list you can see the different assets you own along with thier type, current value, and performance.")
+							
+							HStack {
+								
+								Button(action: {
+									withAnimation{
+										st9 = true
+										st10 = false
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 110, height: 40)
+										.overlay(
+											HStack {
+												Image(systemName: "arrow.backward")
+												Text("Previous")
+											}
+										)
+								})
+								.padding(10)
+								
+								Spacer()
+								
+								Button(action: {
+									withAnimation{
+										st10 = false
+										st11 = true
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 100, height: 40)
+										.overlay(
+											HStack {
+												
+												Text("Next")
+												Image(systemName: "arrow.forward")
+											}
+										)
+								})
+								.padding(10)
+							}
+							
+						}
+							.padding(10)
+							.opacity(st10 ? 1 : 0)
+					)
+					.padding(.bottom, 450)
+					.padding(.leading, -280)
+			}
+			
+			/// st11 explanation
+			VStack {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.opacity(st11 ? 1 : 0)
+					.frame(width: 350, height: 170)
+					.overlay(
+						VStack {
+							Text("In this list you can see the different assets you own along with thier type, current value, and performance.")
+							
+							HStack {
+								
+								Button(action: {
+									withAnimation{
+										st10 = true
+										st11 = false
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 110, height: 40)
+										.overlay(
+											HStack {
+												Image(systemName: "arrow.backward")
+												Text("Previous")
+											}
+										)
+								})
+								.padding(10)
+								
+								Spacer()
+								
+								Button(action: {
+									withAnimation{
+										st11 = false
+										st12 = true
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 100, height: 40)
+										.overlay(
+											HStack {
+												
+												Text("Next")
+												Image(systemName: "arrow.forward")
+											}
+										)
+								})
+								.padding(10)
+							}
+							
+						}
+							.padding(10)
+							.opacity(st11 ? 1 : 0)
+					)
+					.padding(.bottom, -100)
+					.padding(.leading, -400)
+			}
+			
+			/// st12 explanation
+			VStack {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.opacity(st12 ? 1 : 0)
+					.frame(width: 350, height: 200)
+					.overlay(
+						VStack {
+							Text("Here you can see your best and worst performing investments at a glance. Both of these update automatically as your assets' performance changes.")
+							
+							HStack {
+								
+								Button(action: {
+									withAnimation{
+										st11 = true
+										st12 = false
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 110, height: 40)
+										.overlay(
+											HStack {
+												Image(systemName: "arrow.backward")
+												Text("Previous")
+											}
+										)
+								})
+								.padding(10)
+								
+								Spacer()
+								
+								Button(action: {
+									withAnimation{
+										st13 = true
+										st12 = false
+										selectedTab = 2
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 100, height: 40)
+										.overlay(
+											HStack {
+												
+												Text("Next")
+												Image(systemName: "arrow.forward")
+											}
+										)
+								})
+								.padding(10)
+							}
+							
+						}
+							.padding(10)
+							.opacity(st12 ? 1 : 0)
+					)
+					.padding(.bottom, -100)
+					.padding(.leading, 500)
+			}
+			
+		}
+	}
+	
 }
 
 @available(iOS 17.0, *)
-#Preview {
+#Preview(traits: .landscapeLeft) {
 	portfolioPage()
 }

@@ -20,6 +20,28 @@ struct Account: View {
 	
 	@AppStorage("first_open") var first_open : Bool = true
 	
+	/// App tour vars
+	
+	@AppStorage("appTour") var appTour : Bool = true
+	
+	@AppStorage("st1") var st1 : Bool = true
+	@AppStorage("st2") var st2 : Bool = false
+	@AppStorage("st3") var st3 : Bool = false
+	@AppStorage("st4") var st4 : Bool = false
+	@AppStorage("st5") var st5 : Bool = false
+	@AppStorage("st6") var st6 : Bool = false
+	@AppStorage("st7") var st7 : Bool = false
+	@AppStorage("st8") var st8 : Bool = false
+	@AppStorage("st9") var st9 : Bool = false
+	@AppStorage("st10") var st10 : Bool = false
+	@AppStorage("st11") var st11 : Bool = false
+	@AppStorage("st12") var st12 : Bool = false
+	@AppStorage("st13") var st13 : Bool = false
+	@AppStorage("st14") var st14 : Bool = false
+	
+	
+	@AppStorage("selectedTab") private var selectedTab: Int = 0
+	
 	/// for light-dark mode detector
 	
 	@Environment(\.colorScheme) var colorScheme
@@ -75,7 +97,7 @@ struct Account: View {
 						
 						RoundedRectangle(cornerRadius: 20)
 							.tintedGlassShape(color: white2)
-							.frame(width: 500, height: 450)
+							.frame(width: 500, height: 500)
 							.overlay(
 								VStack (alignment: .leading) {
 									Text("Cards")
@@ -118,7 +140,7 @@ struct Account: View {
 					
 					RoundedRectangle(cornerRadius: 20)
 						.tintedGlassShape(color: white)
-						.frame(width: 500, height: 665)
+						.frame(width: 500, height: 715)
 						.overlay(
 							HStack {
 								VStack (alignment: .leading) {
@@ -217,6 +239,82 @@ struct Account: View {
 										})
 										.padding(.bottom, 10)
 									
+										HStack {
+											Button(
+												action: {
+													withAnimation{
+														first_open = true
+														
+														withAnimation{
+															appTour = true
+															selectedTab = 0
+														}
+														
+														st1 = true
+														st2 = false
+														st3 = false
+														st4 = false
+														st5 = false
+														st6 = false
+														st7 = false
+														st8 = false
+														st9 = false
+														st10 = false
+														st11 = false
+														st12 = false
+														st13 = false
+														st14 = false
+													}
+												},
+												label: {
+													RoundedRectangle(cornerRadius: 20)
+														.tintedGlassShape(color: white2)
+														.frame(width: 220, height: 40)
+														.overlay {
+															Text("Reset Introduction Page")
+																.foregroundStyle(black)
+														}
+												}
+											)
+											
+											Button(
+												action: {
+													withAnimation{
+														appTour = true
+														selectedTab = 0
+													}
+													
+													st1 = true
+													st2 = false
+													st3 = false
+													st4 = false
+													st5 = false
+													st6 = false
+													st7 = false
+													st8 = false
+													st9 = false
+													st10 = false
+													st11 = false
+													st12 = false
+													st13 = false
+													st14 = false
+													
+													
+													
+												},
+												label: {
+													RoundedRectangle(cornerRadius: 20)
+														.tintedGlassShape(color: white2)
+														.frame(width: 220, height: 40)
+														.overlay {
+															Text("Reset App Tour")
+																.foregroundStyle(black)
+														}
+												}
+											)
+											
+										}
+									
 									Spacer()
 									
 								}
@@ -231,10 +329,109 @@ struct Account: View {
 				
 				Spacer()
 			}
+			
+			if appTour == true {
+				app_yout3.opacity(1)
+			}
+			else if appTour == false {
+				withAnimation {
+					app_yout3.opacity(0)
+				}
+			}
 		}
 	}
+	
+	var app_yout3: some View {
+		
+		ZStack {
+			VStack {
+				HStack (spacing: 15) {
+					VStack (alignment: .leading, spacing: 15) {
+						RoundedRectangle(cornerRadius: 20)
+							.fill((colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+							.frame(width: 500, height: 200)
+						
+						RoundedRectangle(cornerRadius: 20)
+							.fill((colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+							.frame(width: 500, height: 500)
+						
+						
+					}
+					
+					RoundedRectangle(cornerRadius: 20)
+						.fill((colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+						.frame(width: 500, height: 715)
+					
+				}
+				
+				Spacer()
+			}
+			
+			
+			/// st13 explanation
+			VStack {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white)
+					.opacity(st13 ? 1 : 0)
+					.frame(width: 350, height: 200)
+					.overlay(
+						VStack {
+							Text("Last but not least, here you can see and edit your settings for the app. You can also reset the app tour and see the app intro again if you want.")
+							
+							HStack {
+								
+								Button(action: {
+									withAnimation{
+										st12 = true
+										st13 = false
+										selectedTab = 1
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 110, height: 40)
+										.overlay(
+											HStack {
+												Image(systemName: "arrow.backward")
+												Text("Previous")
+											}
+										)
+								})
+								.padding(10)
+								
+								Spacer()
+								
+								Button(action: {
+									withAnimation{
+										st14 = true
+										st12 = false
+										selectedTab = 0
+									}
+								}, label: {
+									RoundedRectangle(cornerRadius: 20)
+										.tintedGlassShape(color: white2)
+										.frame(width: 100, height: 40)
+										.overlay(
+											HStack {
+												
+												Text("Finish")
+												Image(systemName: "arrow.forward")
+											}
+										)
+								})
+								.padding(10)
+							}
+							
+						}
+							.padding(10)
+							.opacity(st13 ? 1 : 0)
+					)
+			}
+		}
+	}
+	
 }
 
-#Preview {
+#Preview(traits: .landscapeLeft) {
 	Account()
 }

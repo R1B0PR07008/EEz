@@ -453,6 +453,8 @@ struct billsList: View {
 
 struct expandedSpentView: View {
 	
+	let bills: [RecentBillsData]  // Add this parameter
+	
 	@State private var budget_monthly = budget_monthlyG
 	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
 	@State private var spent = 0.0
@@ -531,7 +533,7 @@ struct expandedSpentView: View {
 									  .padding(.top, 36)
 									  .padding(.bottom, 20)
 								  
-									billsList()
+								  billsList(bills: bills)  // Pass bills here
 								  
 							  }
 						  )
@@ -905,8 +907,8 @@ struct TintedGlassShapeView<S: Shape>: View {
 							color.opacity(0.10)
 						] : [
 							// Light mode - original tint
-							color.opacity(0.25),
-							color.opacity(0.15)
+							color.opacity(0.10),
+							color.opacity(0.05)
 						],
 						startPoint: .topLeading,
 						endPoint: .bottomTrailing
@@ -932,6 +934,354 @@ struct TintedGlassShapeView<S: Shape>: View {
 	}
 }
 
+// MARK: -Expanded Credit score
+
+//struct CreditScoreEducationView: View {
+//	
+//	@Environment(\.colorScheme) var colorScheme
+//	
+//	var body: some View {
+//		ScrollView {
+//			VStack(alignment: .leading, spacing: 20) {
+//				
+//				// Header
+//				HStack {
+//					Text("Understanding Credit Scores")
+//						.font(.system(size: 50, weight: .bold))
+//						.padding(.leading, 30)
+//					
+//					Spacer()
+//				}
+//				.padding(.top, 30)
+//				.padding(.bottom, 10)
+//				
+//				HStack(spacing: 20) {
+//					
+//					// Left Column
+//					VStack(spacing: 20) {
+//						
+//						// What is a Credit Score?
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white)
+//							.frame(width: 520, height: 280)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "questionmark.circle.fill")
+//											.font(.system(size: 30))
+//											.foregroundColor(green)
+//										
+//										Text("What is a Credit Score?")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 5)
+//									
+//									Text("A credit score is a three-digit number (300-850) that represents your creditworthiness - how likely you are to repay borrowed money.")
+//										.font(.system(size: 18))
+//										.foregroundColor(black)
+//									
+//									Text("Think of it as your financial report card. Lenders, landlords, and even some employers use it to evaluate your financial responsibility.")
+//										.font(.system(size: 18))
+//										.foregroundColor(black)
+//								}
+//								.padding(30)
+//							)
+//						
+//						// Credit Score Ranges
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white2)
+//							.frame(width: 520, height: 380)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "chart.bar.fill")
+//											.font(.system(size: 30))
+//											.foregroundColor(green)
+//										
+//										Text("Credit Score Ranges")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 10)
+//									
+//									CreditScoreRangeRow(range: "800-850", label: "Exceptional", color: green)
+//									CreditScoreRangeRow(range: "740-799", label: "Very Good", color: green.opacity(0.7))
+//									CreditScoreRangeRow(range: "670-739", label: "Good", color: orange.opacity(0.7))
+//									CreditScoreRangeRow(range: "580-669", label: "Fair", color: orange)
+//									CreditScoreRangeRow(range: "300-579", label: "Poor", color: red)
+//								}
+//								.padding(30)
+//							)
+//						
+//						// How It's Calculated
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white)
+//							.frame(width: 520, height: 450)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "percent")
+//											.font(.system(size: 30))
+//											.foregroundColor(green)
+//										
+//										Text("How It's Calculated")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 10)
+//									
+//									Text("Your FICO score is based on 5 key factors:")
+//										.font(.system(size: 18, weight: .semibold))
+//										.foregroundColor(black)
+//									
+//									CreditFactorRow(percentage: "35%", title: "Payment History", description: "Do you pay bills on time?")
+//									
+//									CreditFactorRow(percentage: "30%", title: "Credit Utilization", description: "How much credit are you using?")
+//									
+//									CreditFactorRow(percentage: "15%", title: "Length of History", description: "How long have you had credit?")
+//									
+//									CreditFactorRow(percentage: "10%", title: "Credit Mix", description: "Types of credit accounts you have")
+//									
+//									CreditFactorRow(percentage: "10%", title: "New Credit", description: "Recent credit inquiries")
+//								}
+//								.padding(30)
+//							)
+//					}
+//					
+//					// Right Column
+//					VStack(spacing: 20) {
+//						
+//						// How to Build Credit
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white2)
+//							.frame(width: 520, height: 550)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "arrow.up.circle.fill")
+//											.font(.system(size: 30))
+//											.foregroundColor(green)
+//										
+//										Text("How to Build Credit")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 10)
+//									
+//									BuildCreditTip(
+//										number: "1",
+//										title: "Get a Credit Card",
+//										description: "Start with a secured card or student card. Use it responsibly."
+//									)
+//									
+//									BuildCreditTip(
+//										number: "2",
+//										title: "Pay On Time, Always",
+//										description: "Set up automatic payments. Even one late payment hurts."
+//									)
+//									
+//									BuildCreditTip(
+//										number: "3",
+//										title: "Keep Balances Low",
+//										description: "Use less than 30% of your credit limit. Lower is better."
+//									)
+//									
+//									BuildCreditTip(
+//										number: "4",
+//										title: "Don't Close Old Cards",
+//										description: "Length of history matters. Keep old accounts open."
+//									)
+//									
+//									BuildCreditTip(
+//										number: "5",
+//										title: "Limit New Applications",
+//										description: "Too many inquiries in a short time can hurt your score."
+//									)
+//								}
+//								.padding(30)
+//							)
+//						
+//						// Why It Matters
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white)
+//							.frame(width: 520, height: 360)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "star.fill")
+//											.font(.system(size: 30))
+//											.foregroundColor(green)
+//										
+//										Text("Why It Matters")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 10)
+//									
+//									WhyItMattersRow(
+//										icon: "house.fill",
+//										title: "Rent an Apartment",
+//										description: "Landlords check credit scores"
+//									)
+//									
+//									WhyItMattersRow(
+//										icon: "car.fill",
+//										title: "Buy a Car",
+//										description: "Better rates with good credit"
+//									)
+//									
+//									WhyItMattersRow(
+//										icon: "creditcard.fill",
+//										title: "Get Better Cards",
+//										description: "Access premium rewards cards"
+//									)
+//									
+//									WhyItMattersRow(
+//										icon: "banknote.fill",
+//										title: "Lower Interest Rates",
+//										description: "Save thousands on loans"
+//									)
+//								}
+//								.padding(30)
+//							)
+//						
+//						// Common Myths
+//						RoundedRectangle(cornerRadius: 20)
+//							.tintedGlassShape(color: white2)
+//							.frame(width: 520, height: 200)
+//							.overlay(
+//								VStack(alignment: .leading, spacing: 15) {
+//									HStack {
+//										Image(systemName: "exclamationmark.triangle.fill")
+//											.font(.system(size: 30))
+//											.foregroundColor(orange)
+//										
+//										Text("Common Myths")
+//											.font(.system(size: 30, weight: .bold))
+//									}
+//									.padding(.bottom, 5)
+//									
+//									Text("❌ Checking your own score hurts it")
+//										.font(.system(size: 18, weight: .semibold))
+//										.foregroundColor(black)
+//									
+//									Text("✅ Only hard inquiries (from lenders) affect your score. Checking your own score is a 'soft inquiry' and doesn't hurt.")
+//										.font(.system(size: 16))
+//										.foregroundColor(black.opacity(0.8))
+//								}
+//								.padding(30)
+//							)
+//					}
+//				}
+//				.padding(.horizontal, 20)
+//			}
+//		}
+//	}
+//}
+
+// MARK: - Helper Components
+
+//struct CreditScoreRangeRow: View {
+//	let range: String
+//	let label: String
+//	let color: Color
+//	
+//	var body: some View {
+//		HStack {
+//			RoundedRectangle(cornerRadius: 10)
+//				.fill(color)
+//				.frame(width: 100, height: 40)
+//				.overlay(
+//					Text(range)
+//						.font(.system(size: 16, weight: .bold))
+//						.foregroundColor(.white)
+//				)
+//			
+//			Text(label)
+//				.font(.system(size: 20, weight: .semibold))
+//				.foregroundColor(black)
+//			
+//			Spacer()
+//		}
+//	}
+//}
+//
+//struct CreditFactorRow: View {
+//	let percentage: String
+//	let title: String
+//	let description: String
+//	
+//	var body: some View {
+//		HStack(alignment: .top, spacing: 15) {
+//			Text(percentage)
+//				.font(.system(size: 24, weight: .bold))
+//				.foregroundColor(green)
+//				.frame(width: 60, alignment: .leading)
+//			
+//			VStack(alignment: .leading, spacing: 3) {
+//				Text(title)
+//					.font(.system(size: 18, weight: .semibold))
+//					.foregroundColor(black)
+//				
+//				Text(description)
+//					.font(.system(size: 16))
+//					.foregroundColor(black.opacity(0.7))
+//			}
+//		}
+//	}
+//}
+//
+//struct BuildCreditTip: View {
+//	let number: String
+//	let title: String
+//	let description: String
+//	
+//	var body: some View {
+//		HStack(alignment: .top, spacing: 15) {
+//			ZStack {
+//				Circle()
+//					.fill(green)
+//					.frame(width: 35, height: 35)
+//				
+//				Text(number)
+//					.font(.system(size: 18, weight: .bold))
+//					.foregroundColor(.white)
+//			}
+//			
+//			VStack(alignment: .leading, spacing: 3) {
+//				Text(title)
+//					.font(.system(size: 18, weight: .semibold))
+//					.foregroundColor(black)
+//				
+//				Text(description)
+//					.font(.system(size: 16))
+//					.foregroundColor(black.opacity(0.7))
+//			}
+//		}
+//	}
+//}
+//
+//struct WhyItMattersRow: View {
+//	let icon: String
+//	let title: String
+//	let description: String
+//	
+//	var body: some View {
+//		HStack(alignment: .top, spacing: 15) {
+//			Image(systemName: icon)
+//				.font(.system(size: 24))
+//				.foregroundColor(green)
+//				.frame(width: 30)
+//			
+//			VStack(alignment: .leading, spacing: 3) {
+//				Text(title)
+//					.font(.system(size: 18, weight: .semibold))
+//					.foregroundColor(black)
+//				
+//				Text(description)
+//					.font(.system(size: 16))
+//					.foregroundColor(black.opacity(0.7))
+//			}
+//		}
+//	}
+//}
+
 // MARK: -Dashboard View
 
 @available(iOS 17.0, *)
@@ -949,10 +1299,12 @@ struct ContentView: View {
 	@Environment(\.colorScheme) var colorScheme
 	
 	/// Vars
-
+	
 	@AppStorage("SavingGoal") var SavingGoal : String = ""
 	
 	@AppStorage("first_open") var first_open : Bool = true
+	
+	@AppStorage("appTour") var appTour : Bool = true
 	
 	/// function to animate the graph
 	
@@ -969,6 +1321,7 @@ struct ContentView: View {
 	// billsList Vars/funcs
 	
 	@State var bills : [RecentBillsData] = []
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0
 	
 	func getTotalSpent(Categroy: String!) -> String {
 		let catg = Categroy
@@ -979,13 +1332,30 @@ struct ContentView: View {
 		
 		return formattedTotalSpent
 	}
-
+	
 	func get_categories() -> [String] {
 		var cats : [String]
 		
 		cats = Array(Set(bills.compactMap { $0.category })).sorted()
 		
 		return cats
+	}
+	
+	private func loadBills() {
+		bills = CryptoHelper.decryptCSVFromString(
+			UserDefaults.standard.string(forKey: "bills_csv") ?? "",
+			key: KeychainHelper.retrieveKey()!
+		) ?? []
+		
+		// Recalculate spending values
+		spentG = getMonthlySpending()["2025-03"] ?? 0
+		LeftG = budget_monthlyG - spentG
+		
+		// Update formatted strings
+		spent = spentG
+		formattedSpent = formatWithCommas(number: spentG)
+		formattedleft = formatWithCommas(number: LeftG)
+		Left = LeftG
 	}
 	
 	var billsList_: some View {
@@ -1038,22 +1408,22 @@ struct ContentView: View {
 			.frame(width: 350, height: 60)
 			
 			ScrollView {
-						VStack {
-							
-							ForEach(bills.sorted(by: { $0.date > $1.date })) { bill in
-								AnimatedBillRow(index: bills.sorted(by: { $0.date > $1.date }).firstIndex(where: { $0.id == bill.id }) ?? 0, bill: bill, appearIndices: $appearIndices)
-									.transition(.asymmetric(
-										insertion: .move(edge: .top).combined(with: .opacity),
-										removal: .opacity
-									))
-							}
-							
-						}
-						.animation(.spring(response: 0.6, dampingFraction: 0.8), value: bills.count)
+				VStack {
+					
+					ForEach(bills.sorted(by: { $0.date > $1.date })) { bill in
+						AnimatedBillRow(index: bills.sorted(by: { $0.date > $1.date }).firstIndex(where: { $0.id == bill.id }) ?? 0, bill: bill, appearIndices: $appearIndices)
+							.transition(.asymmetric(
+								insertion: .move(edge: .top).combined(with: .opacity),
+								removal: .opacity
+							))
 					}
+					
+				}
+				.animation(.spring(response: 0.6, dampingFraction: 0.8), value: bills.count)
+			}
 			.onAppear {
-						bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
-					}
+				bills = CryptoHelper.decryptCSVFromString(UserDefaults.standard.string(forKey: "bills_csv") ?? "", key: KeychainHelper.retrieveKey()!) ?? []
+			}
 			
 			
 		}
@@ -1064,21 +1434,21 @@ struct ContentView: View {
 			
 			LinearGradient(
 				colors: colorScheme == .dark ? [
-						green2.opacity(0.4),      // Use your existing colors!
-						Color.black,
-						green.opacity(0.3),
-						green2.opacity(0.2)
-					] : [
-						green.opacity(0.4),                    // Your app's green
-						green2.opacity(0.2),
-						Color.white,
-						green.opacity(0.5),
-						green2.opacity(0.5)
-					],
-							startPoint: .topLeading,
-							endPoint: .bottomTrailing
-						)
-						.edgesIgnoringSafeArea(.all)
+					green2.opacity(0.4),      // Use your existing colors!
+					Color.black,
+					green.opacity(0.3),
+					green2.opacity(0.2)
+				] : [
+					green.opacity(0.4),                    // Your app's green
+					green2.opacity(0.2),
+					Color.white,
+					green.opacity(0.5),
+					green2.opacity(0.5)
+				],
+				startPoint: .topLeading,
+				endPoint: .bottomTrailing
+			)
+			.edgesIgnoringSafeArea(.all)
 			
 			ScrollView {
 				ScrollViewReader { proxy in
@@ -1100,41 +1470,41 @@ struct ContentView: View {
 									.overlay(
 										VStack {
 											
-												if !tog1 {
-													VStack {
-														HStack {
-															Text("Monthly \nSpending")
-																.font(.system(size: 35, weight: .semibold))
-																.padding(.top, 20)
-																	.padding(.leading, 20)
-															
-															Spacer()
-															
-															Image(systemName: "cursorarrow.click")
-																.resizable()
-																.frame(width: 25, height: 25)
-																.padding(.trailing, 15)
-																.padding(.top, -40)
-														}
+											if !tog1 {
+												VStack {
+													HStack {
+														Text("Monthly \nSpending")
+															.font(.system(size: 35, weight: .semibold))
+															.padding(.top, 20)
+															.padding(.leading, 20)
 														
 														Spacer()
-															
-														RoundedRectangle(cornerRadius: 20)
-															.tintedGlassShape(color: white2)
-															.frame(width: 170, height: 80)
-															.overlay(
-																Text("$\(formattedSpent)")
-																	.font(.system(size: 30, weight: .semibold))
-															)
-															.padding(.bottom, 20)
-													}
-												} else {
-													
-													 expandedSpentView()
 														
+														Image(systemName: "cursorarrow.click")
+															.resizable()
+															.frame(width: 25, height: 25)
+															.padding(.trailing, 15)
+															.padding(.top, -40)
+													}
+													
+													Spacer()
+													
+													RoundedRectangle(cornerRadius: 20)
+														.tintedGlassShape(color: white2)
+														.frame(width: 170, height: 80)
+														.overlay(
+															Text("$\(formattedSpent)")
+																.font(.system(size: 30, weight: .semibold))
+														)
+														.padding(.bottom, 20)
 												}
+											} else {
+												
+												expandedSpentView(bills: bills)
+												
+											}
 										}
-											
+										
 											.opacity(tog2 ? 0 : 1)
 											.opacity(tog3 ? 0 : 1)
 									)
@@ -1148,9 +1518,9 @@ struct ContentView: View {
 									}
 									.padding(.leading, tog1 ? 25 : 0)
 									.animation(.easeInOut, value: tog1)
-						
 								
-							
+								
+								
 								RoundedRectangle(cornerRadius: 20)
 									.tintedGlassShape(color: white)
 									.frame(width: (tog1 || tog3) ? 0 : 230, height: (tog1 || tog3) ? 0 : 250)
@@ -1179,7 +1549,7 @@ struct ContentView: View {
 									)
 									.onTapGesture {
 										withAnimation (.easeInOut(duration: 0.45)) {
-			//										tog2.toggle()
+											//										tog2.toggle()
 										}
 									}
 							}
@@ -1251,13 +1621,13 @@ struct ContentView: View {
 													.padding(.bottom, 10)
 													.overlay(
 														HStack (spacing: 10) {
-																Text("AAPL")
-																	.font(.system(size: 23, weight: .semibold))
-																
+															Text("AAPL")
+																.font(.system(size: 23, weight: .semibold))
+															
 															Divider()
 																.frame(width: 1, height: 90)
 																.overlay(divider)
-
+															
 															stockPerfView()
 														}
 															.padding(.bottom, 10)
@@ -1265,13 +1635,12 @@ struct ContentView: View {
 													)
 											} else {
 												
-												 ExpandedStocksView()
+												ExpandedStocksView()
 											}
 										}
 											.opacity(tog1 ? 0 : 1)
 											.opacity(tog2 ? 0 : 1)
 									)
-								
 									.onTapGesture {
 										withAnimation {
 											tog3.toggle()
@@ -1293,15 +1662,15 @@ struct ContentView: View {
 									VStack (alignment: .leading) {
 										Text("Spending Summary")
 											.font(.system(size: 35, weight: .semibold))
-											
+										
 										graph_spendingSummary()
-											
+										
 									}
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
 										.opacity(tog3 ? 0 : 1)
 								)
-								
+							
 						}
 						
 						
@@ -1320,14 +1689,14 @@ struct ContentView: View {
 											HStack {
 												Text("Your Data, Visualized")
 													.font(.system(size: 45, weight: .semibold))
-//													.padding(.top, 20)
+												//													.padding(.top, 20)
 													.padding(.bottom,15)
 													.padding(.horizontal, 15)
 													.frame(width: 240)
 												
 												
 											}
-												
+											
 										}
 										.padding(.horizontal, 20)
 										
@@ -1338,7 +1707,7 @@ struct ContentView: View {
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
 										.opacity(tog3 ? 0 : 1)
-										
+									
 									
 									
 									
@@ -1362,77 +1731,654 @@ struct ContentView: View {
 										.opacity(tog1 ? 0 : 1)
 										.opacity(tog2 ? 0 : 1)
 										.opacity(tog3 ? 0 : 1)
-										
+									
 										.frame(height: 615)
-										
+									
 								)
 							
 						}
+						.id("bottom")
 					}
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						.onChange(of: st5) { _, newValue in
+							guard newValue else { return }
+							withAnimation {
+								proxy.scrollTo("bottom", anchor: .bottom)
+							}
+						}
+						.onChange(of: st4) { _, newValue in
+							guard newValue else { return }
+							withAnimation {
+								proxy.scrollTo("top", anchor: .top)
+							}
+						}
+						.onChange(of: st7) { _, newValue in
+							withAnimation {
+								if newValue == true {
+									proxy.scrollTo("top", anchor: .top)
+								} else if st8 != true {
+									proxy.scrollTo("bottom", anchor: .bottom)
+								}
+							}
+						}
+					
 				}
 			}
-				.scrollContentBackground(.hidden) // THIS IS THE KEY LINE!
-				.background(Color.clear)
-				.scrollDisabled(tog1)
-				.scrollDisabled(tog2)
-				.scrollDisabled(tog3)
-				.onTapGesture(perform: {
-					
-					withAnimation{
-						if tog1 {
-							tog1.toggle()
-						}
-						else if tog2 {
-							tog2.toggle()
-						}
-						else if tog3 {
-							tog3.toggle()
-						}
+			.scrollContentBackground(.hidden) // THIS IS THE KEY LINE!
+			.background(Color.clear)
+			.scrollDisabled(tog1)
+			.scrollDisabled(tog2)
+			.scrollDisabled(tog3)
+			.onTapGesture(perform: {
+				
+				withAnimation{
+					if tog1 {
+						tog1.toggle()
 					}
-				})
-				.onAppear{
-					
-					if spent != spentG {
-						var dif = spentG - spent
-						
-						spent = spent + dif
-						
-						formattedSpent = formatWithCommas(number: spent)
+					else if tog2 {
+						tog2.toggle()
+					}
+					else if tog3 {
+						tog3.toggle()
 					}
 				}
+			})
+			.onAppear {
+				// Load bills initially
+				loadBills()
+				
+				if spent != spentG {
+					var dif = spentG - spent
+					
+					spent = spent + dif
+					
+					formattedSpent = formatWithCommas(number: spent)
+				}
+			}
+			.onChange(of: billsRefreshTrigger) { _, _ in
+				// Reload bills whenever trigger changes
+				loadBills()
+			}
+			
+			if appTour == true {
+				app_tour.opacity(1)
+			}
+			else if appTour == false {
+				withAnimation {
+					app_tour.opacity(0)
+				}
+			}
+			
 		}
+	}
+	
+	/// App tour code
+	
+	@State private var sharedPosition = ScrollPosition()
+	
+	@AppStorage("selectedTab") private var selectedTab: Int = 0
+	
+	/// Code for app tour
+	
+	@AppStorage("st1") var st1 : Bool = true
+	@AppStorage("st2") var st2 : Bool = false
+	@AppStorage("st3") var st3 : Bool = false
+	@AppStorage("st4") var st4 : Bool = false
+	@AppStorage("st5") var st5 : Bool = false
+	@AppStorage("st6") var st6 : Bool = false
+	@AppStorage("st7") var st7 : Bool = false
+	@AppStorage("st8") var st8 : Bool = false
+	
+	var app_tour: some View {
+		ScrollView {
+			ScrollViewReader { proxy in
+				ZStack {
+					
+					HStack (spacing: 15) {
+						
+						VStack (spacing: 15) {
+							
+							HStack (spacing: 15) {
+								
+								RoundedRectangle(cornerRadius: 20)
+									.fill(st1 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+									.zIndex(1)
+									.frame(
+										width: 270,
+										height: 250
+									)
+								
+								
+								RoundedRectangle(cornerRadius: 20)
+									.fill(st2 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+									.frame(width: 230, height: 250)
+								
+							}
+							.id("top")
+							
+							HStack (spacing: 15) {
+								RoundedRectangle(cornerRadius: 20)
+									.fill(st3 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+									.frame(width: 230, height: 250)
+								
+								
+								
+								
+								RoundedRectangle(cornerRadius: 20)
+									.fill(st4 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+									.frame(
+										width: 270,
+										height: 250
+									)
+								
+							}
+							
+							RoundedRectangle(cornerRadius: 20)
+								.fill(st5 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 515, height: 400)
+							
+							
+						}
+						
+						
+						VStack (spacing: 15) {
+							RoundedRectangle(cornerRadius: 20)
+								.fill(st7 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 550, height: 300)
+							
+							
+							/// Recent Bills (uncategorized)
+							
+							RoundedRectangle(cornerRadius: 20)
+								.fill(st6 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 550, height: 615)
+							
+							
+						}
+						.id("bottom")
+					}
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					
+					/// st1 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st1 ? 1 : 0)
+							.frame(width: 350, height: 250)
+							.overlay(
+								VStack {
+									Text("By clicking on this page, you can view all you expences for the month sorted by category. There are also graphs that show you, in a graphic—easier to understand—way, how much you spend in each category and in each day of the month.")
+									
+									HStack{
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st1 = false
+												st2 = true
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st1 ? 1 : 0)
+							)
+							.padding(.bottom, 670)
+							.padding(.trailing, 150)
+						
+						
+						
+					}
+					
+					/// st2 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st2 ? 1 : 0)
+							.frame(width: 350, height: 160)
+							.overlay(
+								VStack {
+									Text("Part of managing your money responsably, is learning how to save. Here you can set a saving goal.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st1 = true
+												st2 = false
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st2 = false
+												st3 = true
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st2 ? 1 : 0)
+							)
+							.padding(.bottom, 700)
+							.padding(.trailing, -350)
+						
+						
+						
+					}
+					
+					/// st3 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st3 ? 1 : 0)
+							.frame(width: 350, height: 160)
+							.overlay(
+								VStack {
+									Text("Here you can view your credit score. You can also get an explanation of how it works by clicking it.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st2 = true
+												st3 = false
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st3 = false
+												st4 = true
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st3 ? 1 : 0)
+							)
+							.padding(.bottom, 150)
+							.padding(.trailing, 200)
+						
+						
+						
+					}
+					
+					/// st4 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st4 ? 1 : 0)
+							.frame(width: 350, height: 200)
+							.overlay(
+								VStack {
+									Text("By clicking this, you can view your stock investments. It shows you a line graph for the stock price of t your stock over time, shows you risk factors, and recent news that may affect your stocks's price.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st3 = true
+												st4 = false
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st4 = false
+												st5 = true
+												proxy.scrollTo("bottom", anchor: .bottom)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st4 ? 1 : 0)
+							)
+							.padding(.bottom, 150)
+							.padding(.trailing, -350)
+						
+						
+						
+					}
+					
+					/// st5 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st5 ? 1 : 0)
+							.frame(width: 350, height: 260)
+							.overlay(
+								VStack {
+									Text("This graph allows you to see you monthly expences in a graphic, and thus easier to understand, way. This helps people seeif they are spending too much instead of just seeing a number. The red line alows you to see where your budget is set and whether you met it or not and by how much.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st4 = true
+												st5 = false
+												proxy.scrollTo("top", anchor: .top)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st5 = false
+												st6 = true
+												proxy.scrollTo("bottom", anchor: .bottom)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st5 ? 1 : 0)
+							)
+							.padding(.bottom, -350)
+							.padding(.trailing, -350)
+						
+						
+						
+					}
+					
+					/// st6 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st6 ? 1 : 0)
+							.frame(width: 350, height: 230)
+							.overlay(
+								VStack {
+									Text("Here you can see all your bills for the month in a list, sorted from newest to oldest. Can also see when, where,a and how much you spent. This is automatically synced up with the spending summary and monthly spending pages.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st5 = true
+												st6 = false
+												proxy.scrollTo("bottom", anchor: .bottom)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st6 = false
+												st7 = true
+												proxy.scrollTo("top", anchor: .top)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st6 ? 1 : 0)
+							)
+							.padding(.bottom, -350)
+							.padding(.trailing, 400)
+						
+						
+						
+					}
+					
+					/// st7 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st7 ? 1 : 0)
+							.frame(width: 350, height: 190)
+							.overlay(
+								VStack {
+									Text("This pie graph shows you in a visual way how much of your monthly budget you've spent and how much you have left.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st6 = true
+												st7 = false
+												proxy.scrollTo("bottom", anchor: .bottom)
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st7 = false
+												st8 = true
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st7 ? 1 : 0)
+							)
+							.padding(.bottom, 670)
+							.padding(.trailing, 400)
+						
+						
+						
+					}
+					
+				}
+			}
+		}
+		.scrollDisabled(true)
 	}
 }
 
 struct tabView: View {
 	@State private var showAddBill = false
 	@Environment(\.colorScheme) var colorScheme
-
+	@AppStorage("selectedTab") private var selectedTab: Int = 0
+	@AppStorage("appTour") var appTour : Bool = true
+	
+	@AppStorage("st1") var st1 : Bool = true
+	@AppStorage("st2") var st2 : Bool = false
+	@AppStorage("st3") var st3 : Bool = false
+	@AppStorage("st4") var st4 : Bool = false
+	@AppStorage("st5") var st5 : Bool = false
+	@AppStorage("st6") var st6 : Bool = false
+	@AppStorage("st7") var st7 : Bool = false
+	@AppStorage("st8") var st8 : Bool = false
+	@AppStorage("st9") var st9 : Bool = false
+	@AppStorage("st10") var st10 : Bool = false
+	@AppStorage("st11") var st11 : Bool = false
+	@AppStorage("st12") var st12 : Bool = false
+	@AppStorage("st13") var st13 : Bool = false
+	@AppStorage("st14") var st14 : Bool = false
+	
 	var body: some View {
 		HStack {
 			if #available(iOS 18.0, *) {
 				ZStack {
-					TabView {
-						Tab("Dashboard", systemImage: "house.fill") {
-							ContentView()
-						}
-
-						Tab("Portfolio", systemImage: "briefcase") {
-							portfolioPage()
-						}
-
-						Tab("Account", systemImage: "person.crop.circle.fill") {
-							Account()
-						}
+					TabView (selection: $selectedTab) {
+						ContentView()
+							.tabItem { Label("Dashboard", systemImage: "house.fill") }
+							.tag(0)
+						
+						portfolioPage()
+							.tabItem { Label("Portfolio", systemImage: "briefcase") }
+							.tag(1)
+						
+						Account()
+							.tabItem { Label("Account", systemImage: "person.crop.circle.fill") }
+							.tag(2)
 					}
-
+					
 					// Floating Add Bill button
 					VStack {
 						HStack {
 							Spacer()
 							Button {
-								withAnimation {
+								withAnimation(.easeInOut(duration: 0.3)) {
 									showAddBill = true
 								}
 							} label: {
@@ -1463,7 +2409,7 @@ struct tabView: View {
 						Color.black.opacity(0.4)
 							.ignoresSafeArea()
 							.onTapGesture {
-								withAnimation {
+								withAnimation(.easeInOut(duration: 0.3)) {
 									showAddBill = false
 								}
 							}
@@ -1471,8 +2417,195 @@ struct tabView: View {
 						Add_bill()
 							.transition(.scale.combined(with: .opacity))
 					}
+					
+					/// app tour
+					
+					VStack {
+						HStack {
+							Circle()
+								.fill(st8 ? Color.clear : (colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7)))
+								.frame(width: 40, height: 40)
+								.padding(.bottom, 725)
+								.padding(.leading, 398)
+						}
+						
+					}
+					.opacity(appTour  ? 1 : 0)
+					
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.fill(colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7))
+							.frame(width: 350, height: 50)
+							.padding(.bottom, 720)
+					}
+					.opacity(appTour  ? 1 : 0)
+					
+					/// st8 explanation
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st8 ? 1 : 0)
+							.frame(width: 350, height: 190)
+							.overlay(
+								VStack {
+									Text("By clicking here you can add any bill by simply giving it 4 bits of information: Price, Date, Place, Category.")
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st7 = true
+												st8 = false
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st8 = false
+												selectedTab = 1
+												st9 = true
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 100, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Next")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st8 ? 1 : 0)
+							)
+							.padding(.bottom, 470)
+							.padding(.leading, 400)
+						
+						
+						
+						
+					}
+					.opacity(appTour  ? (st8 ? 1 : 0) : 0)
+					
+					/// st14 welcome
+					VStack {
+						RoundedRectangle(cornerRadius: 20)
+							.tintedGlassShape(color: white)
+							.opacity(st14 ? 1 : 0)
+							.frame(width: 550, height: 650)
+							.overlay(
+								VStack {
+									
+									if let logo = UIImage(named: "Logo") {
+										Image(uiImage: logo)
+											.resizable() // Allow resizing
+											.frame(width: 230, height: 230) // Set size
+											.clipShape(RoundedRectangle(cornerRadius: 16)) // Optional: Add styling
+											.padding(.top, 150)
+									}
+									
+									Text("Welcome to EEz!")
+										.font(.system(size: 40, weight: .bold))
+										
+									Spacer()
+									
+									HStack {
+										
+										Button(action: {
+											withAnimation{
+												st13 = true
+												st14 = false
+												selectedTab = 2
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 110, height: 40)
+												.overlay(
+													HStack {
+														Image(systemName: "arrow.backward")
+														Text("Previous")
+													}
+												)
+										})
+										.padding(10)
+										
+										Spacer()
+										
+										Button(action: {
+											withAnimation{
+												st14 = false
+												appTour =  false
+											}
+										}, label: {
+											RoundedRectangle(cornerRadius: 20)
+												.tintedGlassShape(color: white2)
+												.frame(width: 250, height: 40)
+												.overlay(
+													HStack {
+														
+														Text("Finish, for real this time.")
+														Image(systemName: "arrow.forward")
+													}
+												)
+										})
+										.padding(10)
+									}
+									
+								}
+									.padding(10)
+									.opacity(st14 ? 1 : 0)
+							)
+						
+						
+						
+						
+					}
+					.opacity(appTour  ? 1 : 0)
+					
 				}
 			}
+		}
+		.onAppear{
+			selectedTab = 0
+			
+			appTour = true
+			
+			st1 = true
+			st2 = false
+			st3 = false
+			st4 = false
+			st5 = false
+			st6 = false
+			st7 = false
+			st8 = false
+			st9 = false
+			st10 = false
+			st11 = false
+			st12 = false
+			st13 = false
+			st14 = false
+			
+			print(st1, st2, st3, st4, st5, st6, st7, st8, st9, st10, st11, st12, st13, st14, "App Tour: ", appTour)
 		}
 	}
 }
