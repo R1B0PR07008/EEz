@@ -56,11 +56,11 @@ struct Account: View {
 						green.opacity(0.3),
 						green2.opacity(0.2)
 					] : [
-						green.opacity(0.4),                    // Your app's green
+						green.opacity(0.6),
 						green2.opacity(0.2),
 						Color.white,
 						green.opacity(0.5),
-						green2.opacity(0.5)
+						green2.opacity(0.6)
 					],
 							startPoint: .topLeading,
 							endPoint: .bottomTrailing

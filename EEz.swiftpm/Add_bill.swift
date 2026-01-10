@@ -204,13 +204,14 @@ struct Add_bill: View {
 						VStack {
 							Button(action: {
 								
-								dateStr = String(String(date.ISO8601Format()).prefix(10))
+								let dateFormatter = DateFormatter()
+									dateFormatter.dateFormat = "yyyy-MM-dd"
+									dateFormatter.timeZone = TimeZone.current  // Use local timezone
+									dateStr = dateFormatter.string(from: date)
 								
 								categoryStr = replaceUnderscoresWithSpaces(in: selectedCategory)
 								
 								CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
-								
-								spentG += Double(spent_)!
 								
 								// Trigger refresh
 								billsRefreshTrigger += 1

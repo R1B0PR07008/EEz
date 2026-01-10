@@ -116,11 +116,6 @@ func replaceUnderscoresWithSpaces(in string: String) -> String {
 	return string.replacingOccurrences(of: "_", with: " ")
 }
 
-func budget() -> Double {
-	@AppStorage("MonthlyBudget") var monthly_budget : String = "1500"
-	
-	return monthly_budget.isEmpty ? 1500 : Double(monthly_budget) ?? 1500
-}
 
 func sumInvestmentValues(investments: [(String, String, Double, Int, Double, Color, String)]) -> Double {
 	var totalValue: Double = 0.0
@@ -134,13 +129,22 @@ func sumInvestmentValues(investments: [(String, String, Double, Int, Double, Col
 
 /// vars
 
-nonisolated(unsafe) var budget_monthlyG : Double = budget()
-nonisolated(unsafe) var spentG = getMonthlySpending()["2025-03"] ?? 0
-nonisolated(unsafe) var investmentG : Double = sumInvestmentValues(investments: Investment_list)
-nonisolated(unsafe) var LeftG : Double = budget_monthlyG-spentG
+func getCurrentBudget() -> Double {
+	let monthly_budget = UserDefaults.standard.string(forKey: "MonthlyBudget") ?? "1500"
+	return monthly_budget.isEmpty ? 1500 : Double(monthly_budget) ?? 1500
+}
 
-let formattedSpentG = formatWithCommas(number: spentG)
-let formattedleftG = formatWithCommas(number: LeftG)
+func getCurrentSpent() -> Double {
+	return getMonthlySpending()["2025-03"] ?? 0
+}
+
+func getCurrentInvestment() -> Double {
+	return sumInvestmentValues(investments: Investment_list)
+}
+
+func getCurrentLeft() -> Double {
+	return getCurrentBudget() - getCurrentSpent()
+}
 
 nonisolated(unsafe) var Credit_Score = 600
 
@@ -176,15 +180,19 @@ let monthly_data = [
 
 struct graph_Pie: View {
 	
-	@State private var investment = investmentG
-	@State private var spent = spentG
-	@State private var Left = LeftG
+	@State private var investment = getCurrentInvestment()
+	@State private var spent = getCurrentSpent()
+	@State private var Left = getCurrentLeft()
 
 	// Pie chart data
 	
 	@State private var animatedAngles: [Double] = []
 	@AppStorage("first_open") var first_open: Bool = true
 	@AppStorage("Budget") var budget: String = ""
+	
+	// Add these two lines:
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0
+	@AppStorage("MonthlyBudget") private var monthlyBudget: String = "1500"
 
 	var body: some View {
 		
@@ -238,6 +246,26 @@ struct graph_Pie: View {
 							.foregroundColor(black)
 					}
 				}
+			}
+		}
+		// Add these onChange handlers:
+		.onChange(of: billsRefreshTrigger) { _, _ in
+			// Recalculate when bills change
+			spent = getCurrentSpent()
+			Left = getCurrentLeft()
+			
+			// Re-animate the pie chart
+			withAnimation(.easeIn(duration: 0.8)) {
+				animatedAngles = [Left, spent]
+			}
+		}
+		.onChange(of: monthlyBudget) { _, _ in
+			// Recalculate when budget changes
+			Left = getCurrentLeft()
+			
+			// Re-animate the pie chart
+			withAnimation(.easeIn(duration: 0.8)) {
+				animatedAngles = [Left, spent]
 			}
 		}
 	}
@@ -461,14 +489,16 @@ struct billsList: View {
 
 struct expandedSpentView: View {
 	
-	let bills: [RecentBillsData]  // Add this parameter
+	@Binding var bills: [RecentBillsData]  // Change to @Binding so it updates from parent
 	
-	@State private var budget_monthly = budget_monthlyG
-	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
+	@State private var budget_monthly = getCurrentBudget()
+	@State private var Left = getCurrentBudget() - getCurrentSpent()
 	@State private var spent = 0.0
-	@State private var investment = sumInvestmentValues(investments: Investment_list)
-	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
-	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
+	@State private var investment = getCurrentInvestment()
+	@State private var formattedSpent = formatWithCommas(number: getCurrentSpent())
+	@State private var formattedleft = formatWithCommas(number: getCurrentBudget() - getCurrentSpent())
+	
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0  // Add this
 	
 	 var body: some View {
 		  VStack (alignment: .leading, spacing: 15) {
@@ -550,14 +580,17 @@ struct expandedSpentView: View {
 			  }
 			  
 		  }
-		  .onAppear{
-			  if spent != spentG {
-				  var dif = spentG - spent
-				  
-				  spent = spent + dif
-				  
-				  formattedSpent = formatWithCommas(number: spent)
-			  }
+		  .onChange(of: billsRefreshTrigger) { _, _ in
+			  // Recalculate values when bills refresh
+			  let currentSpent = getCurrentSpent()
+			  let currentBudget = getCurrentBudget()
+			  let currentLeft = getCurrentLeft()
+			  
+			  spent = currentSpent
+			  budget_monthly = currentBudget
+			  Left = currentLeft
+			  formattedSpent = formatWithCommas(number: currentSpent)
+			  formattedleft = formatWithCommas(number: currentLeft)
 		  }
 	 }
 }
@@ -1015,7 +1048,7 @@ struct CreditFactorRowCompact: View {
 		HStack(spacing: 10) {
 			Text(percentage)
 				.font(.system(size: 18, weight: .bold))
-				.foregroundColor(green)
+				.foregroundColor(accent)
 				.frame(width: 45, alignment: .leading)
 			
 			Text(title)
@@ -1054,8 +1087,8 @@ struct ExpandedCreditScore: View {
 									.padding(.bottom, 10)
 								
 								VStack(spacing: 6) {
-									CreditScoreRangeRowCompact(range: "800-850", label: "Exceptional", color: green)
-									CreditScoreRangeRowCompact(range: "740-799", label: "Very Good", color: green.opacity(0.7))
+									CreditScoreRangeRowCompact(range: "800-850", label: "Exceptional", color: accent)
+									CreditScoreRangeRowCompact(range: "740-799", label: "Very Good", color: accent.opacity(0.7))
 									CreditScoreRangeRowCompact(range: "670-739", label: "Good", color: orange.opacity(0.7))
 									CreditScoreRangeRowCompact(range: "580-669", label: "Fair", color: orange)
 									CreditScoreRangeRowCompact(range: "300-579", label: "Poor", color: red)
@@ -1194,12 +1227,12 @@ struct build_list: View {
 @available(iOS 17.0, *)
 struct ContentView: View {
 	
-	@State private var budget_monthly = budget_monthlyG
-	@State private var Left = budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0)
-	@State private var spent = 0.0
-	@State private var investment = sumInvestmentValues(investments: Investment_list)
-	@State private var formattedSpent = formatWithCommas(number: getMonthlySpending()["2025-03"] ?? 0)
-	@State private var formattedleft = formatWithCommas(number: budget_monthlyG-(getMonthlySpending()["2025-03"] ?? 0))
+	@State private var budget_monthly = getCurrentBudget()
+	@State private var Left = getCurrentBudget() - getCurrentSpent()
+	@State private var spent = getCurrentSpent()
+	@State private var investment = getCurrentInvestment()
+	@State private var formattedSpent = formatWithCommas(number: getCurrentSpent())
+	@State private var formattedleft = formatWithCommas(number: getCurrentBudget() - getCurrentSpent())
 	
 	/// for light-dark mode detector
 	
@@ -1254,15 +1287,17 @@ struct ContentView: View {
 			key: KeychainHelper.retrieveKey()!
 		) ?? []
 		
-		// Recalculate spending values
-		spentG = getMonthlySpending()["2025-03"] ?? 0
-		LeftG = budget_monthlyG - spentG
+		// Recalculate spending values using the new functions
+		let currentSpent = getCurrentSpent()
+		let currentBudget = getCurrentBudget()
+		let currentLeft = getCurrentLeft()
 		
-		// Update formatted strings
-		spent = spentG
-		formattedSpent = formatWithCommas(number: spentG)
-		formattedleft = formatWithCommas(number: LeftG)
-		Left = LeftG
+		// Update state variables
+		spent = currentSpent
+		budget_monthly = currentBudget
+		Left = currentLeft
+		formattedSpent = formatWithCommas(number: currentSpent)
+		formattedleft = formatWithCommas(number: currentLeft)
 	}
 	
 	var billsList_: some View {
@@ -1341,16 +1376,16 @@ struct ContentView: View {
 			
 			LinearGradient(
 				colors: colorScheme == .dark ? [
-					green2.opacity(0.4),      // Use your existing colors!
+					green2.opacity(0.4),
 					Color.black,
 					green.opacity(0.3),
 					green2.opacity(0.2)
 				] : [
-					green.opacity(0.4),                    // Your app's green
+					green.opacity(0.6),
 					green2.opacity(0.2),
 					Color.white,
 					green.opacity(0.5),
-					green2.opacity(0.5)
+					green2.opacity(0.6)
 				],
 				startPoint: .topLeading,
 				endPoint: .bottomTrailing
@@ -1407,7 +1442,7 @@ struct ContentView: View {
 												}
 											} else {
 												
-												expandedSpentView(bills: bills)
+												expandedSpentView(bills: $bills)
 												
 											}
 										}
@@ -1718,19 +1753,6 @@ struct ContentView: View {
 					}
 				}
 			})
-			.onAppear {
-				// Load bills initially
-				loadBills()
-				
-				if spent != spentG {
-					var dif = spentG - spent
-					
-					spent = spent + dif
-					
-					formattedSpent = formatWithCommas(number: spent)
-				}
-				  
-			}
 			.onChange(of: billsRefreshTrigger) { _, _ in
 				// Reload bills whenever trigger changes
 				loadBills()
