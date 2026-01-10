@@ -219,6 +219,10 @@ struct IniView: View {
 											
 											UserDefaults.standard.set(CryptoHelper.encryptCSVToString(UserDefaults.standard.string(forKey: "bills_csv")!, key: KeychainHelper.retrieveKey()!), forKey: "bills_csv")
 											
+											creditHelper.encryptCreditScoreCSVInPlace()
+											
+											UserDefaults.standard.synchronize()
+											
 											appTour = true
 										}
 										

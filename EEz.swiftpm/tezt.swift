@@ -251,50 +251,50 @@ struct CreditScoreEducationView: View {
 
 // MARK: - Compact Helper Components
 
-struct CreditScoreRangeRowCompact: View {
-	let range: String
-	let label: String
-	let color: Color
-	
-	var body: some View {
-		HStack {
-			RoundedRectangle(cornerRadius: 8)
-				.fill(color)
-				.frame(width: 75, height: 28)
-				.overlay(
-					Text(range)
-						.font(.system(size: 13, weight: .bold))
-						.foregroundColor(.white)
-				)
-			
-			Text(label)
-				.font(.system(size: 15, weight: .semibold))
-				.foregroundColor(black)
-			
-			Spacer()
-		}
-	}
-}
+//struct CreditScoreRangeRowCompact: View {
+//	let range: String
+//	let label: String
+//	let color: Color
+//	
+//	var body: some View {
+//		HStack {
+//			RoundedRectangle(cornerRadius: 8)
+//				.fill(color)
+//				.frame(width: 75, height: 28)
+//				.overlay(
+//					Text(range)
+//						.font(.system(size: 13, weight: .bold))
+//						.foregroundColor(.white)
+//				)
+//			
+//			Text(label)
+//				.font(.system(size: 15, weight: .semibold))
+//				.foregroundColor(black)
+//			
+//			Spacer()
+//		}
+//	}
+//}
 
-struct CreditFactorRowCompact: View {
-	let percentage: String
-	let title: String
-	
-	var body: some View {
-		HStack(spacing: 10) {
-			Text(percentage)
-				.font(.system(size: 18, weight: .bold))
-				.foregroundColor(green)
-				.frame(width: 45, alignment: .leading)
-			
-			Text(title)
-				.font(.system(size: 15, weight: .semibold))
-				.foregroundColor(black)
-			
-			Spacer()
-		}
-	}
-}
+//struct CreditFactorRowCompact: View {
+//	let percentage: String
+//	let title: String
+//	
+//	var body: some View {
+//		HStack(spacing: 10) {
+//			Text(percentage)
+//				.font(.system(size: 18, weight: .bold))
+//				.foregroundColor(green)
+//				.frame(width: 45, alignment: .leading)
+//			
+//			Text(title)
+//				.font(.system(size: 15, weight: .semibold))
+//				.foregroundColor(black)
+//			
+//			Spacer()
+//		}
+//	}
+//}
 
 struct BuildCreditTipCompact: View {
 	let number: String

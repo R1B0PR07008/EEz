@@ -33,6 +33,15 @@ struct dat : Identifiable, Decodable, Hashable {
 	let isLarger: String
 }
 
+/// CSV data for Credit Score history
+
+struct CreditScoreHistory: Identifiable {
+	let id = UUID()
+	let month: String
+	let score: Int
+	let change: Int // Change from previous month
+}
+
 /// var for func
 
 nonisolated(unsafe) var stream : InputStream!
@@ -55,7 +64,6 @@ struct Data_ : Identifiable, Codable {
 	let value: Double
 	let budget: Double
 }
-
 
 /// data structure for news
 
@@ -936,351 +944,250 @@ struct TintedGlassShapeView<S: Shape>: View {
 
 // MARK: -Expanded Credit score
 
-//struct CreditScoreEducationView: View {
-//	
-//	@Environment(\.colorScheme) var colorScheme
-//	
-//	var body: some View {
-//		ScrollView {
-//			VStack(alignment: .leading, spacing: 20) {
-//				
-//				// Header
-//				HStack {
-//					Text("Understanding Credit Scores")
-//						.font(.system(size: 50, weight: .bold))
-//						.padding(.leading, 30)
-//					
-//					Spacer()
-//				}
-//				.padding(.top, 30)
-//				.padding(.bottom, 10)
-//				
-//				HStack(spacing: 20) {
-//					
-//					// Left Column
-//					VStack(spacing: 20) {
-//						
-//						// What is a Credit Score?
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white)
-//							.frame(width: 520, height: 280)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "questionmark.circle.fill")
-//											.font(.system(size: 30))
-//											.foregroundColor(green)
-//										
-//										Text("What is a Credit Score?")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 5)
-//									
-//									Text("A credit score is a three-digit number (300-850) that represents your creditworthiness - how likely you are to repay borrowed money.")
-//										.font(.system(size: 18))
-//										.foregroundColor(black)
-//									
-//									Text("Think of it as your financial report card. Lenders, landlords, and even some employers use it to evaluate your financial responsibility.")
-//										.font(.system(size: 18))
-//										.foregroundColor(black)
-//								}
-//								.padding(30)
-//							)
-//						
-//						// Credit Score Ranges
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white2)
-//							.frame(width: 520, height: 380)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "chart.bar.fill")
-//											.font(.system(size: 30))
-//											.foregroundColor(green)
-//										
-//										Text("Credit Score Ranges")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 10)
-//									
-//									CreditScoreRangeRow(range: "800-850", label: "Exceptional", color: green)
-//									CreditScoreRangeRow(range: "740-799", label: "Very Good", color: green.opacity(0.7))
-//									CreditScoreRangeRow(range: "670-739", label: "Good", color: orange.opacity(0.7))
-//									CreditScoreRangeRow(range: "580-669", label: "Fair", color: orange)
-//									CreditScoreRangeRow(range: "300-579", label: "Poor", color: red)
-//								}
-//								.padding(30)
-//							)
-//						
-//						// How It's Calculated
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white)
-//							.frame(width: 520, height: 450)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "percent")
-//											.font(.system(size: 30))
-//											.foregroundColor(green)
-//										
-//										Text("How It's Calculated")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 10)
-//									
-//									Text("Your FICO score is based on 5 key factors:")
-//										.font(.system(size: 18, weight: .semibold))
-//										.foregroundColor(black)
-//									
-//									CreditFactorRow(percentage: "35%", title: "Payment History", description: "Do you pay bills on time?")
-//									
-//									CreditFactorRow(percentage: "30%", title: "Credit Utilization", description: "How much credit are you using?")
-//									
-//									CreditFactorRow(percentage: "15%", title: "Length of History", description: "How long have you had credit?")
-//									
-//									CreditFactorRow(percentage: "10%", title: "Credit Mix", description: "Types of credit accounts you have")
-//									
-//									CreditFactorRow(percentage: "10%", title: "New Credit", description: "Recent credit inquiries")
-//								}
-//								.padding(30)
-//							)
-//					}
-//					
-//					// Right Column
-//					VStack(spacing: 20) {
-//						
-//						// How to Build Credit
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white2)
-//							.frame(width: 520, height: 550)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "arrow.up.circle.fill")
-//											.font(.system(size: 30))
-//											.foregroundColor(green)
-//										
-//										Text("How to Build Credit")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 10)
-//									
-//									BuildCreditTip(
-//										number: "1",
-//										title: "Get a Credit Card",
-//										description: "Start with a secured card or student card. Use it responsibly."
-//									)
-//									
-//									BuildCreditTip(
-//										number: "2",
-//										title: "Pay On Time, Always",
-//										description: "Set up automatic payments. Even one late payment hurts."
-//									)
-//									
-//									BuildCreditTip(
-//										number: "3",
-//										title: "Keep Balances Low",
-//										description: "Use less than 30% of your credit limit. Lower is better."
-//									)
-//									
-//									BuildCreditTip(
-//										number: "4",
-//										title: "Don't Close Old Cards",
-//										description: "Length of history matters. Keep old accounts open."
-//									)
-//									
-//									BuildCreditTip(
-//										number: "5",
-//										title: "Limit New Applications",
-//										description: "Too many inquiries in a short time can hurt your score."
-//									)
-//								}
-//								.padding(30)
-//							)
-//						
-//						// Why It Matters
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white)
-//							.frame(width: 520, height: 360)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "star.fill")
-//											.font(.system(size: 30))
-//											.foregroundColor(green)
-//										
-//										Text("Why It Matters")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 10)
-//									
-//									WhyItMattersRow(
-//										icon: "house.fill",
-//										title: "Rent an Apartment",
-//										description: "Landlords check credit scores"
-//									)
-//									
-//									WhyItMattersRow(
-//										icon: "car.fill",
-//										title: "Buy a Car",
-//										description: "Better rates with good credit"
-//									)
-//									
-//									WhyItMattersRow(
-//										icon: "creditcard.fill",
-//										title: "Get Better Cards",
-//										description: "Access premium rewards cards"
-//									)
-//									
-//									WhyItMattersRow(
-//										icon: "banknote.fill",
-//										title: "Lower Interest Rates",
-//										description: "Save thousands on loans"
-//									)
-//								}
-//								.padding(30)
-//							)
-//						
-//						// Common Myths
-//						RoundedRectangle(cornerRadius: 20)
-//							.tintedGlassShape(color: white2)
-//							.frame(width: 520, height: 200)
-//							.overlay(
-//								VStack(alignment: .leading, spacing: 15) {
-//									HStack {
-//										Image(systemName: "exclamationmark.triangle.fill")
-//											.font(.system(size: 30))
-//											.foregroundColor(orange)
-//										
-//										Text("Common Myths")
-//											.font(.system(size: 30, weight: .bold))
-//									}
-//									.padding(.bottom, 5)
-//									
-//									Text("❌ Checking your own score hurts it")
-//										.font(.system(size: 18, weight: .semibold))
-//										.foregroundColor(black)
-//									
-//									Text("✅ Only hard inquiries (from lenders) affect your score. Checking your own score is a 'soft inquiry' and doesn't hurt.")
-//										.font(.system(size: 16))
-//										.foregroundColor(black.opacity(0.8))
-//								}
-//								.padding(30)
-//							)
-//					}
-//				}
-//				.padding(.horizontal, 20)
-//			}
-//		}
-//	}
-//}
+struct CreditScoreLineGraph: View {
 
-// MARK: - Helper Components
+	let creditData: [CreditScoreHistory]
 
-//struct CreditScoreRangeRow: View {
-//	let range: String
-//	let label: String
-//	let color: Color
-//	
-//	var body: some View {
-//		HStack {
-//			RoundedRectangle(cornerRadius: 10)
-//				.fill(color)
-//				.frame(width: 100, height: 40)
-//				.overlay(
-//					Text(range)
-//						.font(.system(size: 16, weight: .bold))
-//						.foregroundColor(.white)
-//				)
-//			
-//			Text(label)
-//				.font(.system(size: 20, weight: .semibold))
-//				.foregroundColor(black)
-//			
-//			Spacer()
-//		}
-//	}
-//}
-//
-//struct CreditFactorRow: View {
-//	let percentage: String
-//	let title: String
-//	let description: String
-//	
-//	var body: some View {
-//		HStack(alignment: .top, spacing: 15) {
-//			Text(percentage)
-//				.font(.system(size: 24, weight: .bold))
-//				.foregroundColor(green)
-//				.frame(width: 60, alignment: .leading)
-//			
-//			VStack(alignment: .leading, spacing: 3) {
-//				Text(title)
-//					.font(.system(size: 18, weight: .semibold))
-//					.foregroundColor(black)
-//				
-//				Text(description)
-//					.font(.system(size: 16))
-//					.foregroundColor(black.opacity(0.7))
-//			}
-//		}
-//	}
-//}
-//
-//struct BuildCreditTip: View {
-//	let number: String
-//	let title: String
-//	let description: String
-//	
-//	var body: some View {
-//		HStack(alignment: .top, spacing: 15) {
-//			ZStack {
-//				Circle()
-//					.fill(green)
-//					.frame(width: 35, height: 35)
-//				
-//				Text(number)
-//					.font(.system(size: 18, weight: .bold))
-//					.foregroundColor(.white)
-//			}
-//			
-//			VStack(alignment: .leading, spacing: 3) {
-//				Text(title)
-//					.font(.system(size: 18, weight: .semibold))
-//					.foregroundColor(black)
-//				
-//				Text(description)
-//					.font(.system(size: 16))
-//					.foregroundColor(black.opacity(0.7))
-//			}
-//		}
-//	}
-//}
-//
-//struct WhyItMattersRow: View {
-//	let icon: String
-//	let title: String
-//	let description: String
-//	
-//	var body: some View {
-//		HStack(alignment: .top, spacing: 15) {
-//			Image(systemName: icon)
-//				.font(.system(size: 24))
-//				.foregroundColor(green)
-//				.frame(width: 30)
-//			
-//			VStack(alignment: .leading, spacing: 3) {
-//				Text(title)
-//					.font(.system(size: 18, weight: .semibold))
-//					.foregroundColor(black)
-//				
-//				Text(description)
-//					.font(.system(size: 16))
-//					.foregroundColor(black.opacity(0.7))
-//			}
-//		}
-//	}
-//}
+	var body: some View {
+		Chart {
+			ForEach(creditData) { entry in
+
+				LineMark(
+					x: .value("Month", entry.month),
+					y: .value("Credit Score", entry.score)
+				)
+				.interpolationMethod(.cardinal)
+				.foregroundStyle(green)
+
+				AreaMark(
+					x: .value("Month", entry.month),
+					yStart: .value("Base", 300),
+					yEnd: .value("Credit Score", entry.score)
+				)
+				.interpolationMethod(.cardinal)
+				.foregroundStyle(
+					LinearGradient(
+						colors: [green.opacity(0.5), green.opacity(0.15)],
+						startPoint: .top,
+						endPoint: .bottom
+					)
+				)
+			}
+		}
+		.chartYScale(domain: 300...850)
+		.chartYAxis {
+			AxisMarks(position: .leading)
+		}
+		.frame(height: 250)
+	}
+}
+
+struct CreditScoreRangeRowCompact: View {
+	let range: String
+	let label: String
+	let color: Color
+	
+	var body: some View {
+		HStack {
+			RoundedRectangle(cornerRadius: 8)
+				.fill(color)
+				.frame(width: 75, height: 28)
+				.overlay(
+					Text(range)
+						.font(.system(size: 13, weight: .bold))
+						.foregroundColor(.white)
+				)
+			
+			Text(label)
+				.font(.system(size: 15, weight: .semibold))
+				.foregroundColor(black)
+			
+			Spacer()
+		}
+	}
+}
+
+struct CreditFactorRowCompact: View {
+	let percentage: String
+	let title: String
+	
+	var body: some View {
+		HStack(spacing: 10) {
+			Text(percentage)
+				.font(.system(size: 18, weight: .bold))
+				.foregroundColor(green)
+				.frame(width: 45, alignment: .leading)
+			
+			Text(title)
+				.font(.system(size: 15, weight: .semibold))
+				.foregroundColor(black)
+			
+			Spacer()
+		}
+	}
+}
+
+struct ExpandedCreditScore: View {
+	var body: some View {
+		HStack (spacing: 15) {
+			
+			VStack {
+			
+				Text("Your Credit Score History")
+					.font(.system(size: 30, weight: .semibold))
+					.padding(.bottom, 30)
+					.padding(.top, 10)
+				
+				CreditScoreLineGraph(creditData: (try? creditHelper.decryptCreditScoreHistory()) ?? [])
+					.frame(width: 450)
+					.padding(.bottom, 10)
+				
+				HStack (spacing: 15) {
+					RoundedRectangle(cornerRadius: 20)
+						.tintedGlassShape(color: white2)
+						.frame(width: 220, height: 240)
+						.overlay {
+							VStack {
+								
+								Text("Score Ranges")
+									.font(.system(size: 25, weight: .semibold))
+									.padding(.bottom, 10)
+								
+								VStack(spacing: 6) {
+									CreditScoreRangeRowCompact(range: "800-850", label: "Exceptional", color: green)
+									CreditScoreRangeRowCompact(range: "740-799", label: "Very Good", color: green.opacity(0.7))
+									CreditScoreRangeRowCompact(range: "670-739", label: "Good", color: orange.opacity(0.7))
+									CreditScoreRangeRowCompact(range: "580-669", label: "Fair", color: orange)
+									CreditScoreRangeRowCompact(range: "300-579", label: "Poor", color: red)
+								}
+								.padding(.leading, 10)
+								.padding(.bottom, 10)
+							}
+							.padding(15)
+						}
+					
+					RoundedRectangle(cornerRadius: 20)
+						.tintedGlassShape(color: white2)
+						.frame(width: 260, height: 240)
+						.overlay {
+							VStack {
+								
+								Text("How it's Calculated")
+									.font(.system(size: 25, weight: .semibold))
+									.padding(.bottom, 10)
+								
+								Spacer()
+								
+								VStack(spacing: 6) {
+									CreditFactorRowCompact(percentage: "35%", title: "Payment History")
+										.padding(.bottom, 7)
+									CreditFactorRowCompact(percentage: "30%", title: "Credit Utilization")
+										.padding(.bottom, 7)
+									CreditFactorRowCompact(percentage: "15%", title: "Length of History")
+										.padding(.bottom, 7)
+									CreditFactorRowCompact(percentage: "10%", title: "Credit Mix")
+										.padding(.bottom, 7)
+									CreditFactorRowCompact(percentage: "10%", title: "New Credit")
+								}
+								.padding(.leading, 20)
+								.padding(.bottom, 10)
+							}
+							.padding(15)
+						}
+				}
+			}
+			
+			
+			VStack (spacing: 15) {
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white2)
+					.frame(width: 500, height: 213)
+					.overlay {
+						VStack (alignment: .leading) {
+							Text("What is a Credit Score?")
+								.font(.system(size: 30, weight: .semibold))
+								.padding(.bottom, 10)
+							
+							
+							
+							Text("Credit Score is a three-digit number (300-850) that represents your creditworthiness - how likely you are to repay borrowed money. Lenders, landlords, and employers use it to evaluate your financial responsibility.")
+								.font(.system(size: 18, weight: .semibold))
+							
+							
+						}
+						.padding(20)
+					}
+				
+				RoundedRectangle(cornerRadius: 20)
+					.tintedGlassShape(color: white2)
+					.frame(width: 500, height: 363)
+					.overlay{
+						VStack (alignment: .leading) {
+							Text("How do you Build a Credit Score?")
+								.font(.system(size: 30, weight: .semibold))
+								.padding(.bottom, 10)
+							
+							build_list(
+								num: "1",
+								message: "Get a Credit Card.",
+								message2: "Start with a secured or student card."
+							)
+							
+							build_list(
+								num: "2",
+								message: "Always Pay on Time.",
+								message2: "Set up automatic payments."
+							)
+							
+							build_list(
+								num: "3",
+								message: "Monitor Your Credit.",
+								message2: "Check for errors before they get big."
+							)
+							
+							build_list(
+								num: "4",
+								message: "Keep Balances Low",
+								message2: "Try to use less than 30% of your credit card's limit."
+							)
+							
+							build_list(
+								num: "5",
+								message: "Be an Authorized User",
+								message2: "Your parents can make you an Authorized user in their\n credit cards to build your credit."
+							)
+						}
+						.padding(20)
+					}
+			}
+		}
+	}
+}
+		
+struct build_list: View {
+	let num: String
+	let message: String
+	let message2: String
+	
+	var body: some View {
+		HStack {
+			Circle()
+				.tintedGlassShape(color: white)
+				.frame(width: 40, height: 40)
+				.overlay(
+					Text(num)
+					.font(.system(size: 20, weight: .semibold))
+				)
+			VStack(alignment: .leading) {
+				Text(message)
+					.font(.system(size: 20, weight: .semibold))
+				Text(message2)
+					.font(.system(size: 15, weight: .semibold))
+			}
+		}
+	}
+	
+}
 
 // MARK: -Dashboard View
 
@@ -1464,8 +1371,8 @@ struct ContentView: View {
 									.opacity(tog3 ? 0 : 1)
 									.zIndex(1)
 									.frame(
-										width: tog3 ? 0 : tog1 ? 1100 : 270,
-										height: tog3 ? 0 : tog1 ? 650 : 250
+										width: (tog3 || tog2) ? 0 : tog1 ? 1100 : 270,
+										height: (tog3 || tog2) ? 0 : tog1 ? 650 : 250
 									)
 									.overlay(
 										VStack {
@@ -1480,7 +1387,7 @@ struct ContentView: View {
 														
 														Spacer()
 														
-														Image(systemName: "cursorarrow.click")
+														Image(systemName: "arrow.down.left.and.arrow.up.right.circle")
 															.resizable()
 															.frame(width: 25, height: 25)
 															.padding(.trailing, 15)
@@ -1523,7 +1430,7 @@ struct ContentView: View {
 								
 								RoundedRectangle(cornerRadius: 20)
 									.tintedGlassShape(color: white)
-									.frame(width: (tog1 || tog3) ? 0 : 230, height: (tog1 || tog3) ? 0 : 250)
+									.frame(width: (tog1 || tog3 || tog2) ? 0 : 230, height: (tog1 || tog3 || tog2) ? 0 : 250)
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog3 ? 0 : 1)
 									.overlay(
@@ -1559,27 +1466,55 @@ struct ContentView: View {
 								RoundedRectangle(cornerRadius: 20)
 									.tintedGlassShape(color: white2)
 									.opacity(tog1 ? 0 : 1)
-									.opacity(tog2 ? 0 : 1)
 									.opacity(tog3 ? 0 : 1)
-									.frame(width: 230, height: 250)
-									.frame(width: (tog1 || tog3) ? 0 : 230, height: (tog1 || tog3) ? 0 : 250)
+									.frame(
+										width: tog2 ? 1100 : (tog1 || tog3) ? 0 : 230,
+										height: tog2 ? 650 : (tog1 || tog3) ? 0 : 250
+									)
 									.overlay(
 										VStack {
-											Text("Your Credit Score")
-												.font(.system(size: 35, weight: .semibold))
-											
-											RoundedRectangle(cornerRadius: 20)
-												.tintedGlassShape(color: white)
-												.frame(width: 150, height: 80)
-												.overlay(
-													Text("600")
-														.font(.system(size: 30, weight: .semibold))
-												)
+											if !tog2 {
+												VStack {
+													HStack {
+														Text("Credit \nScore")
+															.font(.system(size: 35, weight: .semibold))
+														
+														Image(systemName: "arrow.down.left.and.arrow.up.right.circle")
+															.resizable()
+															.frame(width: 25, height: 25)
+															.padding(.leading, 60)
+															.padding(.top, -60)
+															.opacity(tog1 ? 0 : 1)
+															.opacity(tog3 ? 0 : 1)
+															.opacity(tog2 ? 0 : 1)
+													}
+													
+													RoundedRectangle(cornerRadius: 20)
+														.tintedGlassShape(color: white)
+														.frame(width: 150, height: 80)
+														.overlay(
+															Text("600")
+																.font(.system(size: 30, weight: .semibold))
+														)
+												}
+													.opacity(tog1 ? 0 : 1)
+													.opacity(tog3 ? 0 : 1)
+											}
+											else {
+												ExpandedCreditScore()
+											}
 										}
-											.opacity(tog1 ? 0 : 1)
-											.opacity(tog2 ? 0 : 1)
-											.opacity(tog3 ? 0 : 1)
 									)
+									.onTapGesture {
+										withAnimation (.timingCurve(AnimationCurve, duration: 0.55)) {
+											tog2.toggle()
+											if tog2 {
+												proxy.scrollTo("top", anchor: .top)
+											}
+										}
+									}
+									.padding(.leading, tog2 ? 25 : 0)
+									.animation(.easeInOut, value: tog1)
 								
 								
 								
@@ -1588,7 +1523,7 @@ struct ContentView: View {
 									.opacity(tog1 ? 0 : 1)
 									.opacity(tog2 ? 0 : 1)
 									.frame(
-										width: (tog1 || tog2) ? 0 : tog3 ? 1100 : 270,
+										width:  (tog1 || tog2) ? 0 : tog3 ? 1100 : 270,
 										height: (tog1 || tog2) ? 0 : tog3 ? 650 : 250
 									)
 									.overlay(
@@ -1601,7 +1536,7 @@ struct ContentView: View {
 													.padding(.leading, 10)
 												
 												
-												Image(systemName: "cursorarrow.click")
+												Image(systemName: "arrow.down.left.and.arrow.up.right.circle")
 													.resizable()
 													.frame(width: 25, height: 25)
 													.padding(.trailing, 10)
@@ -1617,7 +1552,7 @@ struct ContentView: View {
 												RoundedRectangle(cornerRadius: 20)
 													.tintedGlassShape(color: white)
 													.frame(width: 240, height: 120)
-													.frame(width: (tog1 || tog3) ? 0 : 240, height: (tog1 || tog3) ? 0 : 120)
+													.frame(width: (tog1 || tog3 || tog2) ? 0 : 240, height: (tog1 || tog3 || tog2) ? 0 : 120)
 													.padding(.bottom, 10)
 													.overlay(
 														HStack (spacing: 10) {
@@ -1657,7 +1592,7 @@ struct ContentView: View {
 								.opacity(tog2 ? 0 : 1)
 								.opacity(tog3 ? 0 : 1)
 								.frame(width: 515, height: 400)
-								.frame(width: (tog1 || tog3) ? 0 : 515, height: (tog1 || tog3) ? 0 : 400)
+								.frame(width: (tog1 || tog3 || tog2) ? 0 : 515, height: (tog1 || tog3 || tog2) ? 0 : 400)
 								.overlay(
 									VStack (alignment: .leading) {
 										Text("Spending Summary")
@@ -1681,7 +1616,7 @@ struct ContentView: View {
 								.opacity(tog2 ? 0 : 1)
 								.opacity(tog3 ? 0 : 1)
 								.frame(width: 550, height: 300)
-								.frame(width: (tog1 || tog3) ? 0 : 550, height: (tog1 || tog3) ? 0 : 300)
+								.frame(width: (tog1 || tog3 || tog2) ? 0 : 550, height: (tog1 || tog3 || tog2) ? 0 : 300)
 								.overlay(
 									HStack {
 										
@@ -1721,7 +1656,7 @@ struct ContentView: View {
 								.opacity(tog2 ? 0 : 1)
 								.opacity(tog3 ? 0 : 1)
 								.frame(width: 550, height: 615)
-								.frame(width: (tog1 || tog3) ? 0 : 550, height: (tog1 || tog3) ? 0 : 615)
+								.frame(width: (tog1 || tog3 || tog2) ? 0 : 550, height: (tog1 || tog3 || tog2) ? 0 : 615)
 								.overlay(
 									
 									VStack {
@@ -1794,6 +1729,7 @@ struct ContentView: View {
 					
 					formattedSpent = formatWithCommas(number: spent)
 				}
+				  
 			}
 			.onChange(of: billsRefreshTrigger) { _, _ in
 				// Reload bills whenever trigger changes
@@ -2587,8 +2523,6 @@ struct tabView: View {
 		}
 		.onAppear{
 			selectedTab = 0
-			
-			appTour = true
 			
 			st1 = true
 			st2 = false

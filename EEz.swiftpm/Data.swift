@@ -30,4 +30,7 @@ func data_() {
 	
 	UserDefaults.standard.set("goal, saved, 500, 1500"
 							  , forKey: "save_csv")
+	
+	UserDefaults.standard.set("month,score,change\nJan,580,0\nFeb,595,15\nMar,610,15\nApr,625,15\nMay,635,10\nJun,650,15\nJul,665,15\nAug,680,15\nSep,690,10\nOct,705,15\nNov,715,10\nDec,730,15"
+							  , forKey: "creditScoreHistory")
 }
