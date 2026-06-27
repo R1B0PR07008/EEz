@@ -846,26 +846,79 @@ struct ExpandedStocksView: View {
 // MARK: -Speding Summary stuff
 
 struct graph_spendingSummary: View {
-	
+
 	@State private var animatedData: [(String, Double, Double)] = []
-	
+
 	@State private var first_open: Bool = false
-	
+
 	@Environment(\.colorScheme) var colorScheme
 	
+	@AppStorage("MonthlyBudget") private var monthlyBudget: String = "1500"
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0
+	
+	// Add this function to get real monthly spending data:
+	private func getRealMonthlyData() -> [(String, Double, Double)] {
+		let monthlySpending = getMonthlySpending() // This returns [String: Double] like ["2025-01": 1234.5]
+		let currentBudget = getCurrentBudget()
+		
+		var result: [(String, Double, Double)] = []
+		
+		for (index, dataPoint) in monthly_data.enumerated() {
+			let monthName = dataPoint.0
+			let dummySpent = dataPoint.1
+			
+			// Convert month name to format that matches bills (e.g., "Jan" -> "2025-01")
+			let monthNumber = String(format: "%02d", index + 1)
+			let yearMonthKey = "2025-\(monthNumber)"
+			
+			// Use real data if available, otherwise use dummy data
+			let actualSpent = monthlySpending[yearMonthKey] ?? dummySpent
+			
+			result.append((monthName, actualSpent, currentBudget))
+		}
+		
+		return result
+	}
+
 	private func animateData() {
-			for (index, dataPoint) in monthly_data.enumerated() {
-				DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.2) {
-					withAnimation(.easeOut(duration: 0.5)) {
-						animatedData.append((dataPoint.0, dataPoint.1, dataPoint.2))
+		let realData = getRealMonthlyData()
+		for (index, dataPoint) in realData.enumerated() {
+			DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.2) {
+				withAnimation(.easeOut(duration: 0.5)) {
+					animatedData.append(dataPoint)
 				}
 			}
 		}
 	}
 	
-	@State private var line_width = 2
+	private func updateBudgetLine() {
+		let currentBudget = getCurrentBudget()
+		animatedData = animatedData.map { (month, spent, _) in
+			(month, spent, currentBudget)
+		}
+	}
 	
+	private func reloadData() {
+		// Clear current data
+		animatedData = []
+		
+		// Re-animate with updated real values
+		let realData = getRealMonthlyData()
+		for (index, dataPoint) in realData.enumerated() {
+			DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+				withAnimation(.easeOut(duration: 0.3)) {
+					animatedData.append(dataPoint)
+				}
+			}
+		}
+	}
+
+	@State private var line_width = 2
+
 	var body : some View {
+		
+		let currentBudget = getCurrentBudget()
+		
 		Chart {
 			ForEach(animatedData, id: \.0) { month, spent, budget in
 				Plot {
@@ -878,14 +931,14 @@ struct graph_spendingSummary: View {
 						LinearGradient(colors: [green, accent.opacity(0.4)], startPoint: .top, endPoint: .bottom)
 					)
 					.cornerRadius(5)
-					
+
 					RuleMark(
 						y: .value("budget", budget)
 					)
 					.lineStyle(StrokeStyle(lineWidth: CGFloat(line_width)))
 					.foregroundStyle(red)
 					.annotation(position: .top, alignment: .leading, content: {
-						Text("Budget: $1500")
+						Text("Budget: $\(Int(currentBudget))")
 							.font(.system(size: 14, weight: .medium))
 							.foregroundColor(.primary)
 							.padding(.horizontal, 12)
@@ -897,8 +950,8 @@ struct graph_spendingSummary: View {
 										RoundedRectangle(cornerRadius: 10)
 											.fill(
 												colorScheme == .dark
-													? Color.black.opacity(0.3)  // Dark overlay in dark mode
-												: Color.white.opacity(0.95)   // White overlay in light mode
+													? Color.black.opacity(0.3)
+												: Color.white.opacity(0.95)
 											)
 									)
 									.overlay(
@@ -908,17 +961,25 @@ struct graph_spendingSummary: View {
 							)
 							.padding(.bottom, 10)
 					})
-					
+
 				}
 			}
 		}
 		.frame(width: 460, height: 300)
-		.chartYScale(domain: [0,1800])
+		.chartYScale(domain: [0, max(1800, currentBudget + 300)])
 		.onAppear {
 			if !first_open {
 				animateData()
 				first_open = true
 			}
+		}
+		.onChange(of: monthlyBudget) { _, _ in
+			withAnimation(.easeOut(duration: 0.5)) {
+				updateBudgetLine()
+			}
+		}
+		.onChange(of: billsRefreshTrigger) { _, _ in
+			reloadData()
 		}
 	}
 }
@@ -1709,7 +1770,6 @@ struct ContentView: View {
 						}
 						.id("bottom")
 					}
-						.frame(maxWidth: .infinity, maxHeight: .infinity)
 						.onChange(of: st5) { _, newValue in
 							guard newValue else { return }
 							withAnimation {
@@ -1855,7 +1915,6 @@ struct ContentView: View {
 						}
 						.id("bottom")
 					}
-					.frame(maxWidth: .infinity, maxHeight: .infinity)
 					
 					/// st1 explanation
 					VStack {
@@ -2330,6 +2389,13 @@ struct tabView: View {
 							.tabItem { Label("Account", systemImage: "person.crop.circle.fill") }
 							.tag(2)
 					}
+					.overlay{
+						RoundedRectangle(cornerRadius: 30)
+							.fill(colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7))
+							.frame(width: 330, height: 45)
+							.padding(.top, -383)
+							.opacity(appTour  ? 1 : 0)
+					}
 					
 					// Floating Add Bill button
 					VStack {
@@ -2387,14 +2453,6 @@ struct tabView: View {
 								.padding(.leading, 398)
 						}
 						
-					}
-					.opacity(appTour  ? 1 : 0)
-					
-					VStack {
-						RoundedRectangle(cornerRadius: 20)
-							.fill(colorScheme == .dark ? Color.black.opacity(0.6) : Color.white.opacity(0.7))
-							.frame(width: 350, height: 50)
-							.padding(.bottom, 720)
 					}
 					.opacity(appTour  ? 1 : 0)
 					
@@ -2561,7 +2619,6 @@ struct tabView: View {
 			st13 = false
 			st14 = false
 			
-			print(st1, st2, st3, st4, st5, st6, st7, st8, st9, st10, st11, st12, st13, st14, "App Tour: ", appTour)
 		}
 	}
 }

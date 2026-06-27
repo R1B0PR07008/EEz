@@ -235,7 +235,6 @@ struct IniView: View {
 						.scrollTargetLayout()
 				}
 				.scrollTargetBehavior(.viewAligned)
-				.frame(width: .infinity)
 			}
 	}
 }
