@@ -87,11 +87,12 @@ EEz/
 ## Screenshots
 
 ![Home Page](images/home.png)
+![Home light mode Page](images/home_light.png)
 ![Expenses Page](images/expenses.png)
 ![Stock Page](images/stock.png)
 ![Credit Score Page](images/credit.png)
 ![Add Bill Page](images/add_bill.png)
-![Portfolio Page](images/Portfolio.png)
+![Portfolio Page](images/portfolio.png)
 ![Settings Page](images/settings.png)
 
 ---
