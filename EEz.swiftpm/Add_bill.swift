@@ -23,20 +23,7 @@ nonisolated(unsafe) var customCategories: [String] = []
 
 struct Add_bill: View {
 	
-//	enum Category: String, CaseIterable, Identifiable {
-//		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
-//		var id: Self { self }
-//	}
-
-	enum Category: String, CaseIterable, Identifiable {
-		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
-
-		var id: Self { self }
-		
-		static var allCases: [Category] {
-			return [.Clothes, .Fast_Food, .Super_Market, .Subscriptions, .Gas, .Coffee] // Add new cases here
-		}
-	}
+	@AppStorage("billsRefreshTrigger") private var billsRefreshTrigger = 0
 	
 	@State private var selectedCategory: String = Category.Gas.rawValue
 	@State private var newCategory: String = ""
@@ -47,6 +34,16 @@ struct Add_bill: View {
 	@State private var place : String = ""
 	@State private var category : Category = .Subscriptions
 	@State private var categoryStr : String = ""
+	
+	enum Category: String, CaseIterable, Identifiable {
+		case Clothes, Fast_Food, Super_Market, Subscriptions, Gas, Coffee
+
+		var id: Self { self }
+		
+		static var allCases: [Category] {
+			return [.Clothes, .Fast_Food, .Super_Market, .Subscriptions, .Gas, .Coffee]
+		}
+	}
 	
 	private var customCategories: [String] {
 		if let data = UserDefaults.standard.string(forKey: "customCategories"),
@@ -64,7 +61,7 @@ struct Add_bill: View {
 	var body: some View {
 		VStack {
 			RoundedRectangle(cornerRadius: 20)
-				.fill(white)
+				.tintedGlassShape(color: white)
 				.frame(width: 550, height: 650)
 				.overlay(
 					VStack {
@@ -74,7 +71,7 @@ struct Add_bill: View {
 								.font(.system(size: 40, weight: .semibold))
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -85,7 +82,7 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 40)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 200, height: 40)
 											.overlay(
 												TextField("$...", text: $spent_)
@@ -98,7 +95,7 @@ struct Add_bill: View {
 							
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -107,15 +104,6 @@ struct Add_bill: View {
 											.font(.system(size: 20, weight: .semibold))
 											.padding(.leading, 20)
 											.frame(width: 170)
-										
-//										RoundedRectangle(cornerRadius: 40)
-//											.fill(white)
-//											.frame(width: 200, height: 40)
-//											.overlay(
-////												TextField("YYYY/MM/DD", text: $date)
-////													.padding(.leading, 10)
-////													.font(.system(size: 20))
-//											)
 										
 										VStack{
 											DatePicker(
@@ -130,7 +118,7 @@ struct Add_bill: View {
 								.padding(.bottom, 20)
 							
 							RoundedRectangle(cornerRadius: 40)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 60)
 								.overlay(
 									HStack {
@@ -141,7 +129,7 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 40)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 200, height: 40)
 											.overlay(
 												TextField("Store Name", text: $place)
@@ -153,7 +141,7 @@ struct Add_bill: View {
 								.padding(.bottom, 20)
 							
 							RoundedRectangle(cornerRadius: 20)
-								.fill(white2)
+								.tintedGlassShape(color: white2)
 								.frame(width: 450, height: 120)
 								.overlay(
 									VStack (alignment: .leading) {
@@ -164,70 +152,73 @@ struct Add_bill: View {
 											.frame(width: 170)
 										
 										RoundedRectangle(cornerRadius: 20)
-											.fill(white)
+											.tintedGlassShape(color: white)
 											.frame(width: 420, height: 50)
 											.overlay(
-												
-												
-												
 												HStack {
 													Picker("Select category", selection: $selectedCategory) {
 														ForEach(allCategories, id: \.self) { category in
 															Text(replaceUnderscoresWithSpaces(in: category)).tag(category)
-																		}
+														}
 													}
-														.accentColor(black)
-														.padding(.leading, 10)
-														.frame(width: 200)
+													.accentColor(black)
+													.padding(.leading, 10)
+													.frame(width: 200)
 													
 													Spacer()
 													
 													HStack {
 														RoundedRectangle(cornerRadius: 20)
-															.fill(white2)
+															.tintedGlassShape(color: white2)
 															.frame(width: 150, height: 40)
 															.overlay(
 																TextField("New category", text: $newCategory)
 																	.padding(.leading, 20)
 															)
 														
-
-																	Button("Add") {
-																		if !newCategory.isEmpty && !customCategories.contains(newCategory) {
-																								addCategory(newCategory)
-																								newCategory = "" // Clear input field
-																							}
-																	}
-																	.buttonStyle(.borderedProminent)
-																	.cornerRadius(20)
-																	.frame(width: 55)
-																}
-																.padding()
-													
+														Button("Add") {
+															if !newCategory.isEmpty && !customCategories.contains(newCategory) {
+																addCategory(newCategory)
+																newCategory = ""
+															}
+														}
+														.frame(width: 55, height: 40)
+														.background {
+															TintedGlassShapeView(
+																shape: RoundedRectangle(cornerRadius: 20),
+																color: white2
+															)
+														}
+														.foregroundStyle(black)
+														.cornerRadius(20)
+														.frame(width: 55)
 													}
-												)
-												
-													
-											
+													.padding()
+												}
+											)
 									}
 								)
 								.padding(.bottom, 50)
-					}
+						}
 						
 						VStack {
 							Button(action: {
 								
-								dateStr = String(String(date.ISO8601Format()).prefix(10))
+								let dateFormatter = DateFormatter()
+									dateFormatter.dateFormat = "yyyy-MM-dd"
+									dateFormatter.timeZone = TimeZone.current  // Use local timezone
+									dateStr = dateFormatter.string(from: date)
 								
 								categoryStr = replaceUnderscoresWithSpaces(in: selectedCategory)
 								
 								CryptoHelper.addNewBill(spent: Double(spent_)!, date: dateStr, place: place, category: categoryStr)
 								
-								spentG += Double(spent_)!
+								// Trigger refresh
+								billsRefreshTrigger += 1
 								
 							}, label: {
 								RoundedRectangle(cornerRadius: 20)
-									.fill(white2)
+									.tintedGlassShape(color: white2)
 									.frame(width: 250, height: 70)
 									.overlay(
 										Text("Enter Bill Data")
@@ -237,22 +228,21 @@ struct Add_bill: View {
 							})
 						}
 					}
-			)
-					
+				)
 		}
 	}
 	
 	private func addCategory(_ category: String) {
-		   var updatedCategories = customCategories
-		   updatedCategories.append(category)
+		var updatedCategories = customCategories
+		updatedCategories.append(category)
 
-		   if let encoded = try? JSONEncoder().encode(updatedCategories),
-			  let jsonString = String(data: encoded, encoding: .utf8) {
-			   UserDefaults.standard.set(jsonString, forKey: "customCategories")
-		   }
-	   }
+		if let encoded = try? JSONEncoder().encode(updatedCategories),
+		   let jsonString = String(data: encoded, encoding: .utf8) {
+			UserDefaults.standard.set(jsonString, forKey: "customCategories")
+		}
+	}
 }
 
-#Preview {
+#Preview(traits: .landscapeLeft) {
 	Add_bill()
 }

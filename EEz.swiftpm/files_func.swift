@@ -316,35 +316,6 @@ struct CryptoHelper {
 		return parsedBills
 	}
 	
-	static func parseCSVToBill2(_ csvString: String) -> [RecentBillsData] {
-		let columns = csvString.components(separatedBy: ",")
-		
-		// Ensure we have at least one full row (id, spent, date, place, category)
-		guard columns.count > 5 else {
-			print("Invalid CSV data")
-			return []
-		}
-		
-		var parsedBills: [RecentBillsData] = []
-		
-		// Skip the first 5 elements (headers) and process in chunks of 5
-		for i in stride(from: 5, to: columns.count, by: 5) {
-			if i + 4 < columns.count { // Ensure we don't go out
-		
-				let spent = Double(columns[i + 5])!
-				let date = columns[i + 1]
-				let place = columns[i + 2]
-				let category = columns[i + 3]
-				
-				let bill = RecentBillsData(spent: spent, date: date, place: place, category: category)
-				parsedBills.append(bill)
-			}
-		}
-		
-		return parsedBills
-	}
-
-	
 	static func serializeBillsToCSV(_ bills: [RecentBillsData]) -> String {
 		var csvString = "id,spent,date,place,category" // Header row
 		
@@ -373,11 +344,11 @@ struct CryptoHelper {
 		
 		modifieableData.append(newData)
 		
-//		print("\n New data \(modifieableData)")
+		print("\n New data \(modifieableData)")
 		
 		let newDataCsv = serializeBillsToCSV(modifieableData)
 		
-//		print("\n New data csv: \n\(newDataCsv)")
+		print("\n New data csv: \n\(newDataCsv)")
 		
 		let encryptedNewData = encryptCSVToString(newDataCsv, key: key)!
 		
@@ -388,4 +359,93 @@ struct CryptoHelper {
 		
 		
 	}
+}
+
+/// Credit score functions
+
+func encodeCSV(_ history: [CreditScoreHistory]) -> String {
+	history
+		.map { "\($0.month),\($0.score),\($0.change)" }
+		.joined(separator: "\n")
+}
+
+struct creditHelper {
+	static func encryptCreditScoreCSVInPlace(
+		userDefaultsKey: String = "creditScoreHistory"
+	) {
+		// 1. Read decrypted CSV (plain text)
+		guard let csvString = UserDefaults.standard.string(forKey: userDefaultsKey) else {
+			print("❌ No CSV found to encrypt")
+			return
+		}
+		
+		// 2. Retrieve existing AES key
+		guard let aesKey = KeychainHelper.retrieveKey() else {
+			print("❌ AES key not found")
+			return
+		}
+		
+		do {
+			// 3. Encrypt
+			let data = Data(csvString.utf8)
+			let sealedBox = try AES.GCM.seal(data, using: aesKey)
+			let encryptedData = sealedBox.combined!
+			
+			// 4. Overwrite with encrypted Base64
+			UserDefaults.standard.set(
+				encryptedData.base64EncodedString(),
+				forKey: userDefaultsKey
+			)
+			
+			print("✅ CSV encrypted and overwritten")
+		} catch {
+			print("❌ Encryption failed:", error)
+		}
+	}
+	
+	
+	static func decryptCreditScoreHistory() throws -> [CreditScoreHistory] {
+		
+		// 1. Read encrypted Base64 CSV
+		guard let encryptedBase64 = UserDefaults.standard.string(forKey: "creditScoreHistory"),
+			  let encryptedData = Data(base64Encoded: encryptedBase64)
+		else {
+			throw NSError(domain: "Decrypt", code: 1)
+		}
+		
+		// 2. Retrieve existing AES key
+		guard let aesKey = KeychainHelper.retrieveKey() else {
+			throw NSError(domain: "Decrypt", code: 2)
+		}
+		
+		// 3. Decrypt
+		let sealedBox = try AES.GCM.SealedBox(combined: encryptedData)
+		let decryptedData = try AES.GCM.open(sealedBox, using: aesKey)
+		let csvString = String(decoding: decryptedData, as: UTF8.self)
+		
+		// 4. Parse CSV → array
+		let lines = csvString.components(separatedBy: .newlines)
+		guard lines.count > 1 else { return [] } // header only
+		
+		var result: [CreditScoreHistory] = []
+		
+		for line in lines.dropFirst() { // skip header
+			let parts = line.split(separator: ",").map(String.init)
+			guard parts.count == 3,
+				  let score = Int(parts[1]),
+				  let change = Int(parts[2])
+			else { continue }
+			
+			result.append(
+				CreditScoreHistory(
+					month: parts[0],
+					score: score,
+					change: change
+				)
+			)
+		}
+		
+		return result
+	}
+	
 }
