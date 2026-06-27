@@ -79,6 +79,8 @@ EEz/
 ├── Data.swift
 ├── files_func.swift
 ├── MyApp.swift
+├── ini_page.swift
+├── Package.swift
 └── Assets.xcassets/
 ```
 
